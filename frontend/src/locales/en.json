@@ -1,0 +1,265 @@
+{
+    "common": {
+        "close": "Close"
+    },
+    "nav": {
+        "login": "Log In",
+        "accreditation": "Get Accredited"
+    },
+    "logo": {
+        "line1": "ATLAS",
+        "line2": "MINING"
+    },
+    "hero": {
+        "badge": "LIVE AUCTIONS OPEN",
+        "title_prefix": "The Future of",
+        "title_highlight": "Sovereign Gold Trading",
+        "subtitle": "Secure, transparent, and direct access to premium bullion auctions. <span class='text-gold-400'>Atlas Mining</span> provides an accredited platform for institutional investors.",
+        "cta_primary": "Start Trading",
+        "cta_secondary": "View Protocol"
+    },
+    "form": {
+        "title": "Request Accreditation",
+        "subtitle": "Leave your contact details. A moderator will verify your entity.",
+        "org_label": "Organization Name",
+        "org_placeholder": "Atlas Mining Ltd.",
+        "phone_label": "Contact Phone",
+        "email_label": "Corporate Email",
+        "submit": "Submit Application"
+    },
+    "trust": {
+        "title": "Atlas Mining Numbers",
+        "stats": [
+            {
+                "value": "30+",
+                "label": "Years History"
+            },
+            {
+                "value": "11+",
+                "label": "Tons Gold / Year"
+            },
+            {
+                "value": "4",
+                "label": "Mining Hubs"
+            },
+            {
+                "value": "8000+",
+                "label": "Employees"
+            }
+        ],
+        "features": [
+            {
+                "title": "Assets",
+                "desc": "Pioneer, Malomyr, Albyn, Pokrovskiy"
+            },
+            {
+                "title": "Technology",
+                "desc": "Pressure Oxidation (POX) Hub"
+            },
+            {
+                "title": "Region",
+                "desc": "Amur Region Operations"
+            },
+            {
+                "title": "Reliability",
+                "desc": "Top-5 Russian Gold Producer"
+            }
+        ]
+    },
+    "chart": {
+        "title": "Investment Potential",
+        "subtitle": "Performance comparison of Gold vs Real Estate and Stocks over the last 10 years.",
+        "gold": "Gold (999.9)",
+        "real_estate": "Real Estate Index",
+        "stocks": "Stock Market",
+        "dollar": "Dollar (USD)"
+    },
+    "offer": {
+        "title": "What We Offer",
+        "cards": [
+            {
+                "title": "Regular Auctions",
+                "desc": "Weekly scheduled trading"
+            },
+            {
+                "title": "Guaranteed Origin",
+                "desc": "Direct from producer"
+            },
+            {
+                "title": "Full Documentation",
+                "desc": "Internal and quality certificates"
+            },
+            {
+                "title": "Flexible Logistics",
+                "desc": "Secure delivery or pickup"
+            },
+            {
+                "title": "Contract Support",
+                "desc": "Legal transaction support"
+            }
+        ]
+    },
+    "timeline": {
+        "title": "Auction Process",
+        "steps": [
+            "Lot Publication",
+            "Bid Collection",
+            "Bidding Start",
+            "Online Bidding",
+            "Results",
+            "Deal Closing"
+        ],
+        "mechanics_title": "Trading Mechanics",
+        "mechanics": [
+            "Step Bids",
+            "Auto-bidding",
+            "Anti-sniping",
+            "Online Ratings",
+            "Transparent Pricing"
+        ],
+        "protocol": "Atlas Mining Protocol"
+    },
+    "quality": {
+        "title": "Origin & Quality",
+        "items": [
+            {
+                "title": "In-house Mining",
+                "desc": "Full cycle from geological exploration to bullion"
+            },
+            {
+                "title": "Pokrovskiy POX Hub",
+                "desc": "Processing of refractory ores (POX Hub)"
+            },
+            {
+                "title": "Certification",
+                "desc": "Compliance with GOST and Good Delivery standards"
+            },
+            {
+                "title": "Traceability",
+                "desc": "Tracking of every bullion (GIIS DMDK)"
+            },
+            {
+                "title": "Logistics",
+                "desc": "Specialized secure delivery from Amur region"
+            }
+        ]
+    },
+    "advantages": {
+        "title": "Market Advantages",
+        "items": [
+            {
+                "title": "Direct Access",
+                "desc": "Work directly with the miner without intermediaries"
+            },
+            {
+                "title": "Fair Pricing",
+                "desc": "Market pricing based on exchange quotes"
+            },
+            {
+                "title": "Supply Control",
+                "desc": "Guaranteed volumes and adherence to shipment schedules"
+            },
+            {
+                "title": "Risk Minimization",
+                "desc": "Transaction transparency and lack of dubious counterparties"
+            },
+            {
+                "title": "Legal Protection",
+                "desc": "Full legal support for every transaction"
+            }
+        ]
+    },
+    "conditions": {
+        "title": "Special Conditions",
+        "items": [
+            {
+                "title": "Individual Limits",
+                "desc": "Personal extension of trading limits"
+            },
+            {
+                "title": "Contract Volumes",
+                "desc": "Possibility to contract future production"
+            },
+            {
+                "title": "Priority Auctions",
+                "desc": "Early access to exclusive lots"
+            },
+            {
+                "title": "Personal Manager",
+                "desc": "24/7 support for key clients"
+            }
+        ]
+    },
+    "footer": {
+        "rights": "© 2026 Atlas Mining. All rights reserved.",
+        "contacts": "Contacts",
+        "address": "121099, Moscow, Smolenskaya pl., 5 (8th floor)",
+        "phone": "+7 (495) 380-28-16",
+        "email": "hotline@atlasmining.ru",
+        "accreditation": "Accreditation",
+        "request_accreditation": "Request Accreditation",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service"
+    },
+    "legal": {
+        "privacy_title": "Privacy Policy",
+        "privacy_content": "<h3>1. Introduction</h3><p>Welcome to Atlas Mining. We respect your privacy and are committed to protecting your personal data.</p><h3>2. Data We Collect</h3><p>We may collect personal identification information (Name, email address, phone number, etc.) when you register for our services.</p><h3>3. How We Use Your Data</h3><p>We use your data to process orders, manage your account, and email you with special offers on other products and services we think you might like.</p><h3>4. Data Security</h3><p>We implement security measures to maintain the safety of your personal information.</p>",
+        "terms_title": "Terms of Service",
+        "terms_content": "<h3>1. Terms</h3><p>By accessing this website, you agree to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws.</p><h3>2. Use License</h3><p>Permission is granted to temporarily download one copy of the materials (information or software) on Atlas Mining's website for personal, non-commercial transitory viewing only.</p><h3>3. Disclaimer</h3><p>The materials on Atlas Mining's website are provided on an 'as is' basis. Atlas Mining makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>"
+    },
+    "login": {
+        "title": "Client Access",
+        "verify_title": "Secure Entry",
+        "subtitle": "Enter your mobile number to get code",
+        "code_sent": "Code sent to {phone}",
+        "phone_label": "Mobile Number",
+        "get_code": "Get Secure Code",
+        "enter": "Enter Dashboard",
+        "change_phone": "Change Number",
+        "staff_login": "Staff Login",
+        "error_phone": "Enter a valid number",
+        "error_failed_send": "Failed to send code.",
+        "error_code": "Enter 4-digit code",
+        "error_invalid_code": "Invalid code"
+    },
+    "meta": {
+        "dashboard": "Dashboard",
+        "auctions": "My Auctions",
+        "profile": "Profile Settings"
+    },
+    "dashboard": {
+        "nav": {
+            "overview": "Overview",
+            "auctions": "Auctions",
+            "finance": "Finance",
+            "settings": "Settings"
+        },
+        "welcome": "Welcome to Atlas Mining",
+        "welcome_sub": "Your investment dashboard for gold mining. Track auctions and manage assets in real-time.",
+        "stats": {
+            "active_bids": "Active Bids",
+            "won_lots": "Won Lots",
+            "balance": "Balance",
+            "participating": "Participating",
+            "total": "Total",
+            "available": "Available"
+        },
+        "chart_title": "Gold Price (Live)",
+        "activity_title": "Recent Activity"
+    },
+    "admin": {
+        "nav": {
+            "overview": "Overview",
+            "users": "Users",
+            "auctions": "Auctions",
+            "finance": "Finance"
+        },
+        "badge": "STAFF",
+        "system_online": "SYSTEM ONLINE"
+    },
+    "meta_admin": {
+        "dashboard": "Admin Dashboard",
+        "users": "User Management",
+        "auctions": "Auction Management"
+    }
+}

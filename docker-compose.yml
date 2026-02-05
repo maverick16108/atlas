@@ -1,0 +1,78 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: atlas_backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: atlas
+      DB_USERNAME: atlas
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+    depends_on:
+      - db
+      - redis
+    networks:
+      - atlas_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: atlas_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - atlas_net
+
+  db:
+    image: postgres:15-alpine
+    container_name: atlas_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: atlas
+      POSTGRES_USER: atlas
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - atlas_net
+
+  redis:
+    image: redis:alpine
+    container_name: atlas_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - atlas_net
+
+  frontend:
+    image: node:20-alpine
+    container_name: atlas_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5174:5173"
+    networks:
+      - atlas_net
+
+networks:
+  atlas_net:
+    driver: bridge
+
+volumes:
+  pgdata:
