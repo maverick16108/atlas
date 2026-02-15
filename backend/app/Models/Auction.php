@@ -11,6 +11,13 @@ class Auction extends Model
     protected $casts = [
         'start_at' => 'datetime',
         'end_at' => 'datetime',
+        'gpb_started_at' => 'datetime',
+        'min_step' => 'decimal:2',
+        'min_price' => 'decimal:2',
+        'step_time' => 'integer',
+        'gpb_minutes' => 'integer',
+        'bar_count' => 'integer',
+        'bar_weight' => 'decimal:3',
     ];
 
     public function lots()
@@ -21,5 +28,22 @@ class Auction extends Model
     public function bids()
     {
         return $this->hasMany(Bid::class);
+    }
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'auction_participants')
+            ->withPivot('status', 'invited_at')
+            ->withTimestamps();
+    }
+
+    public function auctionParticipants()
+    {
+        return $this->hasMany(AuctionParticipant::class);
+    }
+
+    public function initialOffers()
+    {
+        return $this->hasMany(InitialOffer::class);
     }
 }

@@ -35,7 +35,7 @@ const recentActivity = ref([
                   </div>
                   <span class="text-xs text-gray-500 bg-dark-900 px-2 py-1 rounded-full border border-white/5">{{ stat.label }}</span>
               </div>
-              <h3 class="text-3xl font-oswald font-bold text-white mb-1">{{ stat.value }}</h3>
+              <h3 class="text-3xl font-kanit font-bold text-white mb-1">{{ stat.value }}</h3>
               <p class="text-sm text-gray-400">{{ stat.name }}</p>
           </div>
       </div>

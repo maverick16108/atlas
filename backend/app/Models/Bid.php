@@ -11,6 +11,7 @@ class Bid extends Model
     protected $casts = [
         'is_proxy' => 'boolean',
         'amount' => 'decimal:2',
+        'bar_count' => 'integer',
     ];
 
     public function user()

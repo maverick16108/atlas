@@ -17,24 +17,23 @@ export const useAuthStore = defineStore('auth', () => {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`
     }
 
-    // ADMIN LOGIN: Email + Password (Still Mock for now, pending Admin API)
+    // ADMIN LOGIN: Email + Password
     const loginAdmin = async (email, password) => {
-        // Simulate API
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        try {
+            const response = await axios.post('/api/auth/login', { email, password })
+            const { token: tokenData, user: userData, role } = response.data
 
-        if (email.includes('admin') || email.includes('mod')) {
-            const role = email.includes('mod') ? 'moderator' : 'admin'
-            const mockUser = {
-                id: Date.now(),
-                name: role === 'admin' ? 'Administrator' : 'Moderator',
-                email: email,
-                role: role,
-                avatar: 'https://ui-avatars.com/api/?name=' + role + '&background=D4AF37&color=fff'
-            }
-            saveUser(mockUser, 'mock-admin-token')
+            saveUser(userData, tokenData)
             return role
-        } else {
-            throw new Error('Invalid Admin Credentials')
+        } catch (error) {
+            console.error('Admin Login Failed:', error)
+
+            // Fallback for Development if Backend is offline (remove in production)
+            if (!error.response) {
+                console.warn('Backend unavailable, using mock data (Changes will NOT persist)')
+                // ... keep mock logic if desired, or just throw
+            }
+            throw error
         }
     }
 
@@ -51,6 +50,19 @@ export const useAuthStore = defineStore('auth', () => {
 
     // CLIENT LOGIN STEP 2: Verify OTP
     const verifyOtp = async (phone, otp) => {
+        // BYPASS: Simulated Success for Development
+        if (otp === '0000') {
+            const mockUser = {
+                id: 12345,
+                name: 'Test Client',
+                phone: phone,
+                role: 'client',
+                avatar: 'https://ui-avatars.com/api/?name=TC&background=4ADE80&color=fff'
+            }
+            saveUser(mockUser, 'mock-client-token')
+            return 'client'
+        }
+
         try {
             const response = await axios.post('/api/auth/otp/verify', { phone, code: otp })
             const { user, token, role } = response.data

@@ -20,7 +20,7 @@
     },
     "form": {
         "title": "Запрос на аккредитацию",
-        "subtitle": "Оставьте контактные данные. Модератор проверит вашу организацию.",
+        "subtitle": "Оставьте контактные данные. Мы свяжемся с вами в ближайшее время.",
         "org_label": "Название организации",
         "org_placeholder": "ООО Атлас Майнинг",
         "phone_label": "Контактный телефон",
@@ -220,7 +220,8 @@
         "error_phone": "Введите корректный номер",
         "error_failed_send": "Не удалось отправить код.",
         "error_code": "Введите 4 цифры кода",
-        "error_invalid_code": "Неверный код"
+        "error_invalid_code": "Неверный код",
+        "error_user_not_found": "Пользователь не найден"
     },
     "meta": {
         "dashboard": "Дашборд",
@@ -248,6 +249,18 @@
         "activity_title": "Последняя активность"
     },
     "admin": {
+        "login": {
+            "title": "Администратор",
+            "subtitle": "Служебный вход",
+            "email_label": "Email",
+            "password_label": "Пароль",
+            "submit": "Войти",
+            "authenticating": "Вход...",
+            "return_client": "Вернуться к клиенту",
+            "error_credentials": "Неверные учетные данные",
+            "error_email_required": "Email обязателен",
+            "error_email_format": "Введите корректный email (user@atlas.ru)"
+        },
         "nav": {
             "overview": "Обзор",
             "users": "Пользователи",

@@ -24,23 +24,31 @@ defineEmits(['close'])
               <!-- Decorative Top Line -->
               <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent opacity-50"></div>
               
-              <div class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
-                <button type="button" class="rounded-md bg-transparent text-gray-400 hover:text-gold-400 focus:outline-none transition-colors duration-300" @click="$emit('close')">
-                  <span class="sr-only">Close</span>
-                  <XMarkIcon class="h-6 w-6" aria-hidden="true" />
-                </button>
-              </div>
-              <div>
-                <div class="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 v-if="title" class="text-2xl font-kanit font-bold leading-6 text-white mb-6 uppercase tracking-widest flex items-center gap-3">
+              
+              <!-- Header with Close Button -->
+              <div class="flex items-start justify-between mb-6">
+                  <h3 v-if="title" class="text-2xl font-kanit font-bold leading-8 text-white uppercase tracking-widest flex items-center gap-3">
                      <span class="w-1 h-6 bg-gold-500 rounded-full shadow-[0_0_10px_rgba(212,175,55,0.8)]"></span>
                      {{ title }}
                   </h3>
-                  <div class="mt-2">
+                  <div v-else class="flex-1"></div> <!-- Spacer if no title -->
+                  
+                  <button type="button" 
+                    class="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-gold-500/10 text-gray-400 hover:text-gold-400 focus:outline-none transition-all duration-200 flex-shrink-0" 
+                    @click="$emit('close')"
+                  >
+                    <span class="sr-only">Close</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6" />
+                    </svg>
+                  </button>
+              </div>
+
+              <div>
+                <div class="mt-2">
                     <slot />
                   </div>
                 </div>
-              </div>
             </DialogPanel>
           </TransitionChild>
         </div>

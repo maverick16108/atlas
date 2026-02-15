@@ -10,10 +10,18 @@ class Organization extends Model
 
     protected $casts = [
         'logistics_settings' => 'array',
+        'delivery_basis' => 'decimal:4',
     ];
 
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function auctions()
+    {
+        return $this->belongsToMany(Auction::class, 'auction_participants')
+            ->withPivot('status', 'invited_at')
+            ->withTimestamps();
     }
 }

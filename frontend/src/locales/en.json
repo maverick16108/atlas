@@ -248,6 +248,18 @@
         "activity_title": "Recent Activity"
     },
     "admin": {
+        "login": {
+            "title": "Administration",
+            "subtitle": "Staff Access Portal",
+            "email_label": "Email Address",
+            "password_label": "Password",
+            "submit": "Access Portal",
+            "authenticating": "Verifying...",
+            "return_client": "Return to Client Login",
+            "error_credentials": "Invalid Credentials",
+            "error_email_required": "Email is required",
+            "error_email_format": "Please enter a valid email (e.g. user@atlas.ru)"
+        },
         "nav": {
             "overview": "Overview",
             "users": "Users",

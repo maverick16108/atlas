@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: 'http://atlas_nginx:80', // Docker service name for nginx
         changeOrigin: true,
         secure: false,
       }

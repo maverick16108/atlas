@@ -1,65 +1,261 @@
 <script setup>
-const stats = [
-    { name: 'Всего пользователей', value: '1,248', change: '+12%', type: 'up' },
-    { name: 'Ожидают аккредитации', value: '45', change: 'Требует внимания', type: 'warn' },
-    { name: 'Активные аукционы', value: '3', change: 'Идет торг', type: 'neutral' },
-    { name: 'Объем продаж (мес)', value: '₽ 840M', change: '+5%', type: 'up' },
-]
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js'
+import { Line } from 'vue-chartjs'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
+
+const router = useRouter()
+
+const stats = ref([
+    { name: 'Участники', value: '—', change: 'Загрузка...', type: 'neutral', action: () => router.push({ path: '/admin/users', query: { sort: 'newest' } }) },
+    { name: 'Ожидают аккредитации', value: '—', change: '—', type: 'neutral', action: () => router.push({ path: '/admin/users', query: { filter: 'pending' } }) },
+    { name: 'Активные аукционы', value: '—', change: '—', type: 'neutral', action: () => router.push({ path: '/admin/auctions', query: { status: 'active' } }) },
+    { name: 'Работа комиссии', value: '—', change: '—', type: 'neutral', action: () => router.push({ path: '/admin/auctions', query: { status: 'commission' } }) },
+    { name: 'Завершенные аукционы', value: '—', change: '—', type: 'neutral', action: () => router.push({ path: '/admin/auctions', query: { status: 'completed' } }) },
+])
+
+const chartData = ref({
+  labels: [],
+  datasets: []
+})
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false
+    },
+    tooltip: {
+      mode: 'index',
+      intersect: false,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      titleColor: '#fff',
+      bodyColor: '#fff',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      borderWidth: 1,
+      padding: 10,
+      displayColors: false
+    }
+  },
+  scales: {
+    x: {
+      grid: {
+        color: 'rgba(255, 255, 255, 0.05)',
+        drawBorder: false
+      },
+      ticks: {
+        color: '#9ca3af',
+        font: {
+          family: "'Inter', sans-serif",
+          size: 11
+        }
+      }
+    },
+    y: {
+      grid: {
+        color: 'rgba(255, 255, 255, 0.05)',
+        drawBorder: false
+      },
+      ticks: {
+        color: '#9ca3af',
+        font: {
+          family: "'Inter', sans-serif",
+          size: 11
+        },
+        stepSize: 1
+      },
+      beginAtZero: true
+    }
+  },
+  interaction: {
+    intersect: false,
+    mode: 'index',
+  },
+}
+
+const isLoading = ref(true)
+
+const fetchStats = async () => {
+    try {
+        const response = await axios.get('/api/dashboard/stats')
+        // Map response data to local stats structure while preserving actions
+        const apiStats = response.data.stats
+        
+        // Update values but keep actions
+        if (apiStats[0]) {
+            stats.value[0].name = 'Участники' // Force rename if API returns old name
+            stats.value[0].value = apiStats[0].value
+            stats.value[0].change = apiStats[0].change
+            stats.value[0].type = apiStats[0].type
+        }
+        if (apiStats[1]) {
+            stats.value[1].value = apiStats[1].value
+            stats.value[1].change = apiStats[1].change
+            stats.value[1].type = apiStats[1].type
+        }
+        if (apiStats[2]) {
+            stats.value[2].value = apiStats[2].value
+            stats.value[2].change = apiStats[2].change
+            stats.value[2].type = apiStats[2].type
+        }
+        if (apiStats[3]) {
+            stats.value[3].value = apiStats[3].value
+            stats.value[3].change = apiStats[3].change
+            stats.value[3].type = apiStats[3].type
+        }
+        if (apiStats[4]) {
+            stats.value[4].value = apiStats[4].value
+            stats.value[4].change = apiStats[4].change
+            stats.value[4].type = apiStats[4].type
+        }
+        
+        const chartResponse = response.data.chart
+        chartData.value = {
+            labels: chartResponse.map(item => item.date),
+            datasets: [
+                {
+                    label: 'Аукционы',
+                    data: chartResponse.map(item => item.count),
+                    borderColor: '#10b981', // Emerald 500
+                    backgroundColor: (context) => {
+                        const ctx = context.chart.ctx;
+                        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+                        gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+                        return gradient;
+                    },
+                    borderWidth: 2,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#10b981',
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        }
+    } catch (e) {
+        console.error('Failed to load dashboard stats:', e)
+    } finally {
+        isLoading.value = false
+    }
+}
+
+onMounted(() => {
+    fetchStats()
+})
 </script>
 
 <template>
   <div class="space-y-8">
+      
       <!-- Stats Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div v-for="stat in stats" :key="stat.name" class="bg-dark-800/80 backdrop-blur-sm p-6 rounded-xl border border-white/5 relative overflow-hidden group hover:border-red-500/30 transition-all">
-              <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                   <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div v-for="(stat, index) in stats" :key="stat.name" 
+               @click="stat.action && stat.action()"
+               class="bg-dark-800/80 backdrop-blur-sm p-6 rounded-xl border border-white/5 relative overflow-hidden group hover:border-emerald-500/30 transition-all duration-300 cursor-pointer active:scale-95 active:bg-dark-700/80 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-500/10"
+               :class="{'animate-pulse': isLoading}"
+               :style="`animation-delay: ${index * 100}ms`">
+              
+              <!-- Background Glow -->
+              <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+
+              <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">{{ stat.name }}</p>
+              <div class="flex items-end justify-between">
+                  <h3 class="text-3xl font-kanit font-bold text-white tracking-tight">{{ stat.value }}</h3>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide mb-1" 
+                    :class="{
+                        'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': stat.type === 'up',
+                        'bg-red-500/10 text-red-400 border border-red-500/20': stat.type === 'down',
+                        'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20': stat.type === 'warn',
+                        'bg-white/5 text-gray-400 border border-white/5': stat.type === 'neutral'
+                    }">
+                      {{ stat.change }}
+                  </span>
               </div>
-              <p class="text-sm text-gray-400 font-medium uppercase tracking-wider">{{ stat.name }}</p>
-              <h3 class="text-3xl font-oswald font-bold text-white mt-1 mb-2">{{ stat.value }}</h3>
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold" 
-                :class="{
-                    'bg-green-500/20 text-green-400': stat.type === 'up',
-                    'bg-red-500/20 text-red-400': stat.type === 'down',
-                    'bg-yellow-500/20 text-yellow-400': stat.type === 'warn',
-                    'bg-gray-700 text-gray-300': stat.type === 'neutral'
-                }">
-                  {{ stat.change }}
-              </span>
           </div>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 p-6">
-              <h3 class="text-xl font-kanit font-bold text-white mb-4">Быстрые действия</h3>
-              <div class="grid grid-cols-2 gap-4">
-                  <button class="p-4 bg-white/5 hover:bg-red-500 hover:text-white rounded-lg border border-white/10 transition-all flex flex-col items-center justify-center gap-2 group">
-                      <svg class="w-8 h-8 text-gray-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
-                      <span class="font-bold text-sm">Новый пользователь</span>
-                  </button>
-                  <button class="p-4 bg-white/5 hover:bg-gold-500 hover:text-black rounded-lg border border-white/10 transition-all flex flex-col items-center justify-center gap-2 group">
-                       <svg class="w-8 h-8 text-gray-400 group-hover:text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                      <span class="font-bold text-sm">Создать Лот</span>
-                  </button>
+      <!-- Main Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <!-- Chart Section -->
+          <div class="lg:col-span-2 bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 p-6 relative overflow-hidden group hover:border-white/10 transition-colors">
+              <div class="flex justify-between items-center mb-6">
+                  <div>
+                      <h3 class="text-lg font-kanit font-bold text-white">Активность аукционов</h3>
+                      <p class="text-xs text-gray-500 mt-1">Динамика создания новых аукционов за 30 дней</p>
+                  </div>
+                  <div class="flex gap-2">
+                       <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                  </div>
+              </div>
+              
+              <div class="h-[300px] w-full relative">
+                  <Line v-if="!isLoading && chartData.datasets.length > 0" :data="chartData" :options="chartOptions" />
+                  <div v-else class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                      <span v-if="isLoading">Загрузка данных...</span>
+                      <span v-else>Нет данных для отображения</span>
+                  </div>
               </div>
           </div>
-          
-           <!-- System Status -->
-           <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 p-6">
-              <h3 class="text-xl font-kanit font-bold text-white mb-4">Статус системы</h3>
-              <div class="space-y-4">
-                  <div class="flex justify-between items-center pb-2 border-b border-white/5">
-                      <span class="text-gray-400">Database</span>
-                      <span class="text-green-400 font-bold flex items-center gap-2"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
+
+          <!-- Quick Actions & Status -->
+          <div class="space-y-6">
+              <!-- Quick Actions -->
+              <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 p-6">
+                  <h3 class="text-lg font-kanit font-bold text-white mb-4">Быстрые действия</h3>
+                  <div class="grid grid-cols-2 gap-3">
+                      <router-link :to="{ path: '/admin/users', query: { action: 'create' } }" class="p-4 bg-white/5 hover:bg-emerald-600 hover:text-white rounded-lg border border-white/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 group text-gray-300 active:scale-95 active:bg-emerald-700 hover:scale-[1.02] hover:shadow-lg">
+                          <svg class="w-6 h-6 opacity-70 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                          <span class="font-bold text-xs uppercase tracking-wide text-center">Новый участник</span>
+                      </router-link>
+                      <router-link :to="{ path: '/admin/auctions', query: { action: 'create' } }" class="p-4 bg-white/5 hover:bg-blue-600 hover:text-white rounded-lg border border-white/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 group text-gray-300 active:scale-95 active:bg-blue-700 hover:scale-[1.02] hover:shadow-lg">
+                           <svg class="w-6 h-6 opacity-70 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                          <span class="font-bold text-xs uppercase tracking-wide text-center">Создать Аукцион</span>
+                      </router-link>
                   </div>
-                   <div class="flex justify-between items-center pb-2 border-b border-white/5">
-                      <span class="text-gray-400">SMS Gateway</span>
-                      <span class="text-green-400 font-bold flex items-center gap-2"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Connected</span>
-                  </div>
-                  <div class="flex justify-between items-center pb-2 border-b border-white/5">
-                      <span class="text-gray-400">WebSocket Server</span>
-                      <span class="text-yellow-400 font-bold flex items-center gap-2"><span class="w-2 h-2 bg-yellow-500 rounded-full"></span> Warning (High Load)</span>
+              </div>
+              
+               <!-- System Status -->
+               <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 p-6">
+                  <h3 class="text-lg font-kanit font-bold text-white mb-4">Статус системы</h3>
+                  <div class="space-y-4 text-sm">
+                      <div class="flex justify-between items-center pb-3 border-b border-white/5">
+                          <span class="text-gray-400">База данных</span>
+                          <span class="text-emerald-400 font-bold flex items-center gap-2 text-xs uppercase tracking-wider"><span class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>Онлайн</span>
+                      </div>
+                       <div class="flex justify-between items-center pb-3 border-b border-white/5">
+                          <span class="text-gray-400">SMS Шлюз</span>
+                          <span class="text-emerald-400 font-bold flex items-center gap-2 text-xs uppercase tracking-wider"><span class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>Готов</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                          <span class="text-gray-400">WebSocket</span>
+                          <span class="text-blue-400 font-bold flex items-center gap-2 text-xs uppercase tracking-wider"><span class="w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>Активен</span>
+                      </div>
                   </div>
               </div>
           </div>

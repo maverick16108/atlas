@@ -14,7 +14,6 @@ const user = computed(() => authStore.user)
 const navigation = computed(() => [
     { name: t('dashboard.nav.overview'), path: '/client', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
     { name: t('dashboard.nav.auctions'), path: '/client/auctions', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
-    { name: t('dashboard.nav.finance'), path: '/client/finance', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
     { name: t('dashboard.nav.settings'), path: '/client/profile', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' },
 ])
 
@@ -33,12 +32,7 @@ const handleLogout = () => {
         <!-- Logo Area -->
         <div class="h-20 flex items-center justify-center border-b border-white/5">
             <div class="flex items-center gap-3">
-                 <div class="relative w-8 h-8">
-                  <div class="absolute inset-0 bg-gold-400 rounded-lg blur opacity-40 animate-pulse-slow"></div>
-                  <div class="relative w-full h-full border border-gold-400 bg-gold-500/20 backdrop-blur-md flex items-center justify-center rounded-lg">
-                    <span class="text-gold-300 font-bold font-oswald text-sm">AM</span>
-                  </div>
-                </div>
+                 <img src="/logo.png" alt="Atlas" class="w-8 h-8 rounded shadow-[0_0_20px_rgba(212,175,55,0.6)] object-cover" />
                 <h1 class="text-lg font-kanit font-bold tracking-wider text-white">ATLAS <span class="text-gold-500">CABINET</span></h1>
             </div>
         </div>
