@@ -56,7 +56,7 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
-                    'avatar' => 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=dc2626&color=fff'
+                    'avatar' => $user->avatar ?: 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=dc2626&color=fff'
                 ],
                 'role' => $user->role
             ]);
@@ -91,7 +91,7 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
-                'avatar' => 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=random&color=fff'
+                'avatar' => $user->avatar ?: 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=random&color=fff'
             ],
             'role' => $user->role
         ]);

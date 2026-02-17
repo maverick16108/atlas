@@ -33,6 +33,7 @@ class User extends Authenticatable
         'address',
         'logistics_settings',
         'delivery_basis',
+        'avatar',
     ];
 
     protected $hidden = [

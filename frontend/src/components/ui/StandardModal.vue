@@ -128,43 +128,49 @@ onUnmounted(() => {
 const themeClasses = computed(() => {
   if (props.theme === 'gold') {
     return {
-      border: 'border-gold-500/30',
-      shadow: 'shadow-[0_0_50px_rgba(212,175,55,0.15)]',
+      border: 'border-gray-200 dark:border-gold-500/30',
+      shadow: 'shadow-2xl dark:shadow-[0_0_50px_rgba(212,175,55,0.15)]',
       closeHover: 'hover:text-gold-400',
       titleBar: 'bg-gold-500',
-      titleShadow: 'shadow-[0_0_10px_rgba(212,175,55,0.8)]'
+      titleShadow: 'shadow-[0_0_10px_rgba(212,175,55,0.8)]',
+      background: 'bg-white text-gray-900 dark:bg-stone-900 dark:text-gray-100',
+      closeBtn: 'client-btn-close'
     }
   }
   if (props.theme === 'emerald') {
     return {
-      border: 'border-emerald-500/30',
-      shadow: 'shadow-[0_0_50px_rgba(16,185,129,0.15)]',
+      border: 'border-gray-200 dark:border-emerald-500/30',
+      shadow: 'shadow-2xl dark:shadow-[0_0_50px_rgba(16,185,129,0.15)]',
       closeHover: 'hover:text-emerald-400',
       titleBar: 'bg-emerald-600',
-      titleShadow: 'shadow-[0_0_10px_rgba(16,185,129,0.8)]'
+      titleShadow: 'shadow-[0_0_10px_rgba(16,185,129,0.8)]',
+      background: 'bg-white text-gray-900 dark:bg-stone-900 dark:text-gray-100',
+      closeBtn: 'client-btn-close'
     }
   }
-  // Default 'red'
+  // Default 'red' (Admin) -> Force dark background, no theme switching
   return {
     border: 'border-white/10',
     shadow: 'shadow-[0_0_50px_rgba(239,68,68,0.15)]',
     closeHover: 'hover:text-red-500',
     titleBar: 'bg-red-600',
-    titleShadow: 'shadow-[0_0_10px_rgba(239,68,68,0.8)]'
+    titleShadow: 'shadow-[0_0_10px_rgba(239,68,68,0.8)]',
+    background: 'bg-dark-800/95 text-white',
+    closeBtn: 'flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 focus:outline-none transition-all duration-200'
   }
 })
 </script>
 
 <template>
   <Teleport to="body">
-    <div v-if="isOpen" class="fixed inset-0 bg-black/10 transition-opacity" :class="[backdropZIndexClass, backdropBlur ? 'backdrop-blur-sm' : '']" @click="close"></div>
+    <div v-if="isOpen" class="fixed inset-0 bg-black/30 transition-opacity" :class="[backdropZIndexClass, backdropBlur ? 'backdrop-blur-sm' : '']" @click="close"></div>
     
     
     <div v-if="isOpen" class="fixed inset-0 flex items-center justify-center p-4 font-sans pointer-events-none" :class="zIndexClass">
       <div 
         ref="modalRef"
-        class="relative w-full bg-dark-800/95 rounded-2xl overflow-hidden p-6 pointer-events-auto backdrop-blur-md transition-all duration-300 flex flex-col"
-        :class="[maxWidth, heightClass, themeClasses.border, themeClasses.shadow, 'border']"
+        class="relative w-full rounded-2xl overflow-hidden p-6 pointer-events-auto backdrop-blur-md transition-all duration-300 flex flex-col"
+        :class="[maxWidth, heightClass, themeClasses.border, themeClasses.shadow, themeClasses.background, 'border']"
       >
         
         <!-- Header with Close Button -->
@@ -179,8 +185,7 @@ const themeClasses = computed(() => {
             
             <!-- Close Button (XMark) -->
             <button type="button" 
-              class="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 focus:outline-none transition-all duration-200 flex-shrink-0"
-              :class="themeClasses.closeHover"
+              :class="[themeClasses.closeBtn, themeClasses.closeHover, 'flex-shrink-0']"
               @click="close"
             >
               <span class="sr-only">Close</span>
@@ -193,8 +198,7 @@ const themeClasses = computed(() => {
         <!-- Close Button for no-title modals -->
         <div class="absolute right-6 top-6 z-10" v-else>
           <button type="button" 
-            class="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 focus:outline-none transition-all duration-200"
-            :class="themeClasses.closeHover"
+            :class="[themeClasses.closeBtn, themeClasses.closeHover]"
             @click="close"
           >
             <span class="sr-only">Close</span>

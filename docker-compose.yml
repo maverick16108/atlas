@@ -16,9 +16,45 @@ services:
       DB_USERNAME: atlas
       DB_PASSWORD: password
       REDIS_HOST: redis
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_APP_ID: atlas-local
+      REVERB_APP_KEY: atlas-reverb-key
+      REVERB_APP_SECRET: atlas-reverb-secret
     depends_on:
       - db
       - redis
+    networks:
+      - atlas_net
+
+  reverb:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: atlas_reverb
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: atlas
+      DB_USERNAME: atlas
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+      REVERB_HOST: 0.0.0.0
+      REVERB_PORT: 8080
+      REVERB_APP_ID: atlas-local
+      REVERB_APP_KEY: atlas-reverb-key
+      REVERB_APP_SECRET: atlas-reverb-secret
+    depends_on:
+      - db
+      - redis
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    ports:
+      - "8080:8080"
     networks:
       - atlas_net
 
@@ -55,6 +91,9 @@ services:
     volumes:
       - ./backend:/var/www/html
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+      - reverb
     networks:
       - atlas_net
 
@@ -88,6 +127,8 @@ services:
     working_dir: /app
     volumes:
       - ./frontend:/app
+    environment:
+      DOCKER: "1"
     command: sh -c "npm install && npm run dev -- --host"
     ports:
       - "5174:5173"

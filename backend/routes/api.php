@@ -40,4 +40,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Activity logs (journal)
     Route::get('/activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index']);
+
+    // Client auction cabinet
+    Route::prefix('client')->group(function () {
+        Route::get('/auctions', [\App\Http\Controllers\ClientAuctionController::class, 'myAuctions']);
+        Route::get('/auctions/{id}', [\App\Http\Controllers\ClientAuctionController::class, 'show']);
+        Route::post('/auctions/{id}/offer', [\App\Http\Controllers\ClientAuctionController::class, 'submitOffer']);
+        Route::post('/auctions/{id}/bid', [\App\Http\Controllers\ClientAuctionController::class, 'placeBid']);
+        Route::get('/stats', [\App\Http\Controllers\ClientAuctionController::class, 'myStats']);
+        Route::post('/avatar', [\App\Http\Controllers\ClientAuctionController::class, 'uploadAvatar']);
+
+        // Notifications
+        Route::get('/notifications', [\App\Http\Controllers\ClientNotificationController::class, 'index']);
+        Route::get('/notifications/unread-count', [\App\Http\Controllers\ClientNotificationController::class, 'unreadCount']);
+        Route::post('/notifications/{id}/read', [\App\Http\Controllers\ClientNotificationController::class, 'markAsRead']);
+        Route::post('/notifications/read-all', [\App\Http\Controllers\ClientNotificationController::class, 'markAllAsRead']);
+    });
 });

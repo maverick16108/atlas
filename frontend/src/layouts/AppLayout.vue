@@ -6,11 +6,12 @@ import { useAuthStore } from '../stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-const user = computed(() => authStore.user)
-const userRole = computed(() => authStore.userRole)
+const user = computed(() => authStore.adminUser || authStore.clientUser)
+const userRole = computed(() => authStore.adminRole || authStore.clientRole)
 
 const logout = () => {
-    authStore.logout()
+    const context = authStore.adminUser ? 'admin' : 'client'
+    authStore.logout(context)
 }
 
 // Menu Items based on Role

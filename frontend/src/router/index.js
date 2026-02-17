@@ -62,6 +62,12 @@ const routes = [
         meta: { layout: 'ClientLayout', role: 'client', title: 'meta.auctions' }
     },
     {
+        path: '/client/auctions/:id',
+        name: 'ClientAuctionRoom',
+        component: () => import('../views/client/ClientAuctionRoom.vue'),
+        meta: { layout: 'ClientLayout', role: 'client', title: 'Аукцион' }
+    },
+    {
         path: '/client/profile',
         name: 'ClientProfile',
         component: () => import('../views/client/ClientProfile.vue'),
@@ -86,55 +92,46 @@ router.beforeEach(async (to, from, next) => {
     const { useAuthStore } = await import('../stores/auth')
     const authStore = useAuthStore()
 
-    const isAuthenticated = authStore.isAuthenticated
-    const userRole = authStore.userRole
+    const requiredRole = to.meta.role
 
-    // Protected Routes
-    if (to.meta.role) {
-        if (!isAuthenticated) {
-            // Check if Admin Route
-            if (['admin', 'super_admin'].includes(to.meta.role)) {
-                return next('/admin/login')
-            }
-            return next('/login')
-        }
-
-        // Role Check
-        if (to.meta.role === 'super_admin' && userRole !== 'super_admin') {
-            return next('/admin') // Back to dashboard if trying to access super routes
-        }
-
-        if (to.meta.role === 'admin' && !['admin', 'moderator', 'super_admin'].includes(userRole)) {
-            return next('/admin/login') // Redirect unauthorized admin access to admin login
-        }
-
-        if (to.meta.role === 'client' && ['admin', 'super_admin'].includes(userRole)) {
-            // Admin can view everything, allow or redirect? Usually allow.
-        }
-    }
-
-    // Guest Routes (Login) - only redirect clients who are already logged in
-    if (to.path === '/login' && isAuthenticated) {
-        // Admins can view /login page (they might want to see client flow or switch accounts)
-        if (['admin', 'moderator', 'super_admin'].includes(userRole)) {
-            // Allow access to /login page
-        } else {
-            // Clients already logged in - redirect to their dashboard
+    // No role required — public route
+    if (!requiredRole) {
+        // Guest Routes: redirect if already authenticated
+        if (to.path === '/login' && authStore.isClientAuthenticated) {
             return next('/client')
         }
-    }
-
-    // Admin login - redirect if already authenticated as admin
-    if (to.path === '/admin/login' && isAuthenticated) {
-        if (['admin', 'moderator', 'super_admin'].includes(userRole)) {
+        if (to.path === '/admin/login' && authStore.isAdminAuthenticated) {
             return next('/admin')
         }
+        return next()
     }
 
-    // Redirect /admin root to dashboard explicitly if needed, though component handles it
-    // But importantly: if user is logged in as client and tries to go to /admin/login, 
-    // they should be allowed to see the login page to potentially switch accounts or correct their mistake.
-    // The previous logic allowed this.
+    // Admin Routes (role: 'admin' or 'super_admin')
+    if (['admin', 'super_admin'].includes(requiredRole)) {
+        if (!authStore.isAdminAuthenticated) {
+            return next('/admin/login')
+        }
+
+        // Super admin only routes
+        if (requiredRole === 'super_admin' && authStore.adminRole !== 'super_admin') {
+            return next('/admin')
+        }
+
+        // Check admin has valid admin role
+        if (!['admin', 'moderator', 'super_admin'].includes(authStore.adminRole)) {
+            return next('/admin/login')
+        }
+
+        return next()
+    }
+
+    // Client Routes (role: 'client')
+    if (requiredRole === 'client') {
+        if (!authStore.isClientAuthenticated) {
+            return next('/login')
+        }
+        return next()
+    }
 
     next()
 })

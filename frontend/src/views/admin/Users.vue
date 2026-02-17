@@ -22,7 +22,7 @@ const showModal = ref(false)
 const showConfirmModal = ref(false)
 const deleteId = ref(null)
 const selectedUser = ref(null)
-const newUser = ref({ name: '', email: '', phone: '', auth_phone: '', is_accredited: false, is_gpb: false })
+const newUser = ref({ name: '', email: '', phone: '', auth_phone: '', is_accredited: false, is_gpb: false, delivery_basis: null })
 const errors = ref({ name: '', email: '', phone: '', auth_phone: '' })
 const showPassword = ref(false)
 const isEditing = ref(false)
@@ -166,7 +166,8 @@ const saveUser = async () => {
                 phone: newUser.value.phone,
                 auth_phone: newUser.value.auth_phone,
                 is_accredited: newUser.value.is_accredited,
-                is_gpb: newUser.value.is_gpb
+                is_gpb: newUser.value.is_gpb,
+                delivery_basis: newUser.value.delivery_basis || null
             })
             // Update user in local array without reloading to preserve sort order
             const idx = users.value.findIndex(u => u.id === editingId.value)
@@ -180,6 +181,7 @@ const saveUser = async () => {
                     auth_phone: updated.auth_phone,
                     is_accredited: updated.is_accredited,
                     is_gpb: updated.is_gpb,
+                    delivery_basis: updated.delivery_basis,
                 }
             }
         } else {
@@ -189,7 +191,8 @@ const saveUser = async () => {
                 phone: newUser.value.phone,
                 auth_phone: newUser.value.auth_phone,
                 is_accredited: newUser.value.is_accredited,
-                is_gpb: newUser.value.is_gpb
+                is_gpb: newUser.value.is_gpb,
+                delivery_basis: newUser.value.delivery_basis || null
             })
             resetList()
         }
@@ -250,7 +253,7 @@ const confirmDiscardChanges = () => {
 }
 
 const openModal = async () => {
-    newUser.value = { name: '', email: '', phone: '', auth_phone: '', is_accredited: false, is_gpb: false }
+    newUser.value = { name: '', email: '', phone: '', auth_phone: '', is_accredited: false, is_gpb: false, delivery_basis: null }
     errors.value = { name: '', email: '', phone: '', auth_phone: '' }
     showPassword.value = false
     
@@ -272,7 +275,8 @@ const openEdit = async (user) => {
         phone: user.phone,
         auth_phone: user.auth_phone || '',
         is_accredited: !!user.is_accredited,
-        is_gpb: !!user.is_gpb
+        is_gpb: !!user.is_gpb,
+        delivery_basis: user.delivery_basis ?? null
     }
     errors.value = { name: '', email: '', phone: '', auth_phone: '' }
     showPassword.value = false
@@ -671,13 +675,13 @@ const handleAuthPhoneInput = (event) => {
           :is-open="showModal" 
           :title="isEditing ? 'Редактировать' : 'Новый Участник'"
           theme="red"
-          max-width="max-w-lg"
+          max-width="max-w-2xl"
           :close-on-escape="!showUnsavedModal && !showConfirmModal"
           @close="closeModal"
       >
-          <div class="space-y-6">
-              <!-- Name -->
-              <div class="space-y-1">
+          <div class="grid grid-cols-2 gap-x-5 gap-y-5">
+              <!-- Name (full width) -->
+              <div class="col-span-2 space-y-1">
                    <div class="flex justify-between items-center">
                        <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Название / Имя</label>
                        <span v-if="errors.name" class="text-red-500 text-[10px] font-bold uppercase tracking-wide">{{ errors.name }}</span>
@@ -695,7 +699,7 @@ const handleAuthPhoneInput = (event) => {
               <!-- Email -->
               <div class="space-y-1">
                    <div class="flex justify-between items-center">
-                       <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Email (Контактный)</label>
+                       <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Email</label>
                        <span v-if="errors.email" class="text-red-500 text-[10px] font-bold uppercase tracking-wide">{{ errors.email }}</span>
                    </div>
                    <input 
@@ -707,10 +711,10 @@ const handleAuthPhoneInput = (event) => {
                    />
               </div>
 
-               <!-- Phone -->
+              <!-- Phone -->
               <div class="space-y-1">
                    <div class="flex justify-between items-center">
-                       <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Телефон (Контактный)</label>
+                       <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Телефон</label>
                        <span v-if="errors.phone" class="text-red-500 text-[10px] font-bold uppercase tracking-wide">{{ errors.phone }}</span>
                    </div>
                    <input 
@@ -725,7 +729,7 @@ const handleAuthPhoneInput = (event) => {
               <!-- Auth Phone -->
               <div class="space-y-1">
                    <div class="flex justify-between items-center">
-                       <label class="text-xs uppercase tracking-widest text-gold-500 font-bold ml-1">Телефон для Авторизации</label>
+                       <label class="text-xs uppercase tracking-widest text-gold-500 font-bold ml-1">Телефон для входа</label>
                        <span v-if="errors.auth_phone" class="text-red-500 text-[10px] font-bold uppercase tracking-wide">{{ errors.auth_phone }}</span>
                    </div>
                    <input 
@@ -739,25 +743,36 @@ const handleAuthPhoneInput = (event) => {
                    />
               </div>
 
+              <!-- Delivery Basis -->
+              <div class="space-y-1">
+                  <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Базис поставки (%)</label>
+                  <input 
+                      v-model="newUser.delivery_basis" 
+                      type="number" 
+                      step="0.01" 
+                      min="0" 
+                      max="100" 
+                      placeholder="Не задан" 
+                      class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20 focus:border-red-500 focus:ring-1 focus:ring-red-500 placeholder-gray-600"
+                  />
+              </div>
+
               <!-- Status Toggle -->
-              <div class="space-y-1 pt-2">
-                  <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Статус Аккредитации</label>
+              <div class="space-y-1">
+                  <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Аккредитация</label>
                   <div class="flex items-center gap-4 bg-dark-900/30 p-4 rounded-lg border border-white/5">
                       <div class="relative inline-flex items-center cursor-pointer" @click="newUser.is_accredited = !newUser.is_accredited">
                           <div class="w-12 h-6 rounded-full transition-colors duration-300 ease-in-out" :class="newUser.is_accredited ? 'bg-green-500' : 'bg-gray-600'"></div>
                           <div class="absolute left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ease-in-out transform" :class="newUser.is_accredited ? 'translate-x-6' : 'translate-x-0'"></div>
                       </div>
                       <span class="text-sm font-bold uppercase tracking-wide" :class="newUser.is_accredited ? 'text-green-400' : 'text-gray-500'">
-                          {{ newUser.is_accredited ? 'Аккредитован' : 'Нет доступа' }}
+                          {{ newUser.is_accredited ? 'Да' : 'Нет' }}
                       </span>
                   </div>
-                   <p class="text-[10px] text-gray-500 ml-1">
-                      {{ newUser.is_accredited ? 'Участник может входить в систему.' : 'Доступ к личному кабинету закрыт.' }}
-                   </p>
               </div>
 
               <!-- GPB Toggle -->
-              <div class="space-y-1 pt-2">
+              <div class="space-y-1">
                   <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Сотрудник ГПБ</label>
                   <div class="flex items-center gap-4 bg-dark-900/30 p-4 rounded-lg border border-white/5">
                       <div class="relative inline-flex items-center cursor-pointer" @click="newUser.is_gpb = !newUser.is_gpb">
@@ -768,14 +783,11 @@ const handleAuthPhoneInput = (event) => {
                           {{ newUser.is_gpb ? 'Да' : 'Нет' }}
                       </span>
                   </div>
-                   <p class="text-[10px] text-gray-500 ml-1">
-                      {{ newUser.is_gpb ? 'Участник имеет расширенный функционал ГПБ.' : 'Обычный участник.' }}
-                   </p>
               </div>
 
                   
-                  <!-- Actions -->
-                  <div class="pt-4 flex gap-3">
+                  <!-- Actions (full width) -->
+                  <div class="col-span-2 pt-2 flex gap-3">
                       <button @click="closeModal" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
                           Закрыть
                       </button>
@@ -855,5 +867,13 @@ const handleAuthPhoneInput = (event) => {
 }
 .no-arrow::-ms-expand {
     display: none;
+}
+.hide-spinners::-webkit-outer-spin-button,
+.hide-spinners::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.hide-spinners {
+    -moz-appearance: textfield;
 }
 </style>

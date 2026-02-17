@@ -38,9 +38,13 @@ class ActivityLogController extends Controller
         // Filter by user role
         if ($request->filled('user_role')) {
             $role = $request->input('user_role');
-            $query->whereHas('user', function ($uq) use ($role) {
-                $uq->where('role', $role);
-            });
+            if ($role === 'system') {
+                $query->whereNull('user_id');
+            } else {
+                $query->whereHas('user', function ($uq) use ($role) {
+                    $uq->where('role', $role);
+                });
+            }
         }
 
         // Filter by date range

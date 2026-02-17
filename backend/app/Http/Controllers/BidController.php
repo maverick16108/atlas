@@ -16,7 +16,7 @@ class BidController extends Controller
         $auction = Auction::findOrFail($auctionId);
 
         $bids = Bid::where('auction_id', $auctionId)
-            ->with('user:id,name,inn,phone,email,is_gpb')
+            ->with('user:id,name,inn,phone,email,is_gpb,delivery_basis')
             ->orderByDesc('amount')
             ->orderBy('created_at')
             ->get()
@@ -28,6 +28,7 @@ class BidController extends Controller
                         'name' => $bid->user->name,
                         'inn' => $bid->user->inn,
                         'is_gpb' => $bid->user->is_gpb,
+                        'delivery_basis' => $bid->user->delivery_basis,
                     ] : null,
                     'amount' => $bid->amount,
                     'bar_count' => $bid->bar_count,

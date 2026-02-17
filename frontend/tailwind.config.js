@@ -25,6 +25,25 @@ export default {
           800: '#1C1917',
           700: '#292524',
           600: '#44403C',
+        },
+        skin: {
+          primary: 'rgb(var(--color-text-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--color-text-secondary) / <alpha-value>)',
+          muted: 'rgb(var(--color-text-muted) / <alpha-value>)',
+          inverted: 'rgb(var(--color-bg-primary) / <alpha-value>)',
+        }
+      },
+      backgroundColor: {
+        skin: {
+          primary: 'rgb(var(--color-bg-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--color-bg-secondary) / <alpha-value>)',
+          accent: 'rgb(var(--color-bg-accent) / <alpha-value>)',
+        }
+      },
+      borderColor: {
+        skin: {
+          base: 'rgb(var(--color-border) / <alpha-value>)',
+          hover: 'rgb(var(--color-border-hover) / <alpha-value>)',
         }
       },
       fontFamily: {

@@ -1,5 +1,5 @@
 ---
-trigger: glob
+trigger: model_decision
 ---
 
 # Business Specifications
@@ -26,4 +26,3 @@ trigger: glob
 - **Scenarios**:
   - Breakdown by **VAT / No VAT**.
   - Breakdown by **Internal Market / Export**.
-

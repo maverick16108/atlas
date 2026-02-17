@@ -1,82 +1,156 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
+import { useTheme } from '../../composables/useTheme'
+import { Switch } from '@headlessui/vue'
+import axios from 'axios'
+import { MoonIcon, SunIcon } from '@heroicons/vue/24/solid'
 
 const authStore = useAuthStore()
-const user = computed(() => authStore.user)
+const { theme, toggleTheme } = useTheme()
+const user = computed(() => authStore.clientUser)
+
+const isUploading = ref(false)
+const uploadSuccess = ref(false)
+const avatarPreview = ref(null)
+
+const avatarUrl = computed(() => {
+    if (avatarPreview.value) return avatarPreview.value
+    if (user.value?.avatar) return user.value.avatar
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value?.name || 'U')}&background=B59426&color=fff`
+})
+
+const handleAvatarSelect = (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    // Preview
+    avatarPreview.value = URL.createObjectURL(file)
+    uploadAvatar(file)
+}
+
+const uploadAvatar = async (file) => {
+    isUploading.value = true
+    uploadSuccess.value = false
+
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    try {
+        const response = await axios.post('/api/client/avatar', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+
+        // Update user in store (persists to localStorage)
+        if (response.data.avatar) {
+            authStore.updateClientUser({ avatar: response.data.avatar })
+        }
+        uploadSuccess.value = true
+        setTimeout(() => { uploadSuccess.value = false }, 3000)
+    } catch (e) {
+        console.error('Avatar upload failed:', e)
+        avatarPreview.value = null
+    } finally {
+        isUploading.value = false
+    }
+}
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto space-y-8">
-      <div class="flex items-center justify-between">
-          <h2 class="text-2xl font-kanit font-bold text-white">Настройки профиля</h2>
-          <span 
-            class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border"
-            :class="user?.is_accredited ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-gray-800 text-gray-400 border-gray-700'"
-          >
-              {{ user?.is_accredited ? 'Аккаунт верифицирован' : 'Требуется верификация' }}
-          </span>
-      </div>
+  <div class="max-w-2xl mx-auto space-y-8">
+      <h2 class="text-2xl font-kanit font-bold text-gray-900 dark:text-gray-100">Настройки</h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Left Column: Avatar & Basic Info -->
-          <div class="md:col-span-1 space-y-6">
-              <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl p-6 border border-white/5 text-center">
-                  <div class="relative w-32 h-32 mx-auto mb-4">
-                      <div class="absolute inset-0 bg-gold-500 rounded-full blur-lg opacity-20"></div>
-                      <img :src="user?.avatar" class="relative w-full h-full rounded-full border-2 border-gold-500/30 p-1" />
-                      <button class="absolute bottom-0 right-0 bg-dark-900 border border-white/10 rounded-full p-2 hover:bg-gold-500 hover:text-black transition-colors">
-                          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                      </button>
+      <!-- Avatar + Name Card -->
+      <div class="bg-white dark:bg-stone-900/80 backdrop-blur-sm rounded-xl p-8 border border-gray-200 dark:border-white/5 shadow-sm">
+          <div class="flex items-center gap-6">
+              <!-- Avatar with upload -->
+              <div class="relative group flex-shrink-0">
+                  <div class="relative w-24 h-24">
+                      <div class="absolute inset-0 bg-gold-500 rounded-full blur-lg opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                      <img :src="avatarUrl" class="relative w-full h-full rounded-full border-2 border-gold-500/30 object-cover" />
+                      <!-- Upload overlay -->
+                      <label class="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10">
+                          <svg v-if="!isUploading" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <div v-else class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <input type="file" class="hidden" accept="image/png,image/jpeg,image/webp" @change="handleAvatarSelect" />
+                      </label>
                   </div>
-                  <h3 class="text-xl font-bold text-white">{{ user?.name || 'Клиент' }}</h3>
-                  <p class="text-gray-500 text-sm">Участник с 2024 года</p>
+                  <!-- Success indicator -->
+                  <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 scale-75" enter-to-class="opacity-100 scale-100"
+                              leave-active-class="transition ease-in duration-150" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                      <div v-if="uploadSuccess" class="absolute -bottom-1 -right-1 z-20 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white dark:border-stone-900">
+                          <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                  </transition>
+              </div>
+
+              <!-- Name + hint -->
+              <div class="flex-1 min-w-0">
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 truncate">{{ user?.name || 'Участник' }}</h3>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Наведите на фото, чтобы загрузить новое</p>
               </div>
           </div>
+      </div>
 
-          <!-- Right Column: Form -->
-          <div class="md:col-span-2 space-y-6">
-              <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl p-8 border border-white/5">
-                  <h3 class="text-lg font-kanit font-bold text-white mb-6 border-b border-white/5 pb-4">Личные данные</h3>
-                  
-                  <div class="grid grid-cols-1 gap-6">
-                      <div class="space-y-2">
-                          <label class="text-xs uppercase tracking-widest text-gray-500 font-bold">ФИО / Наименование</label>
-                          <input type="text" :value="user?.name" class="w-full bg-dark-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold-500 focus:outline-none transition-colors" />
-                      </div>
+      <!-- Appearance Settings -->
+      <div class="bg-white dark:bg-stone-900/80 backdrop-blur-sm rounded-xl p-8 border border-gray-200 dark:border-white/5 shadow-sm">
+          <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-gray-100 mb-6 border-b border-gray-200 dark:border-white/5 pb-4">Внешний вид</h3>
+          
+          <div class="flex items-center justify-between">
+              <div>
+                  <div class="font-bold text-gray-900 dark:text-gray-100">Тема оформления</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Выберите светлую или темную тему интерфейса</div>
+              </div>
+              
+              <Switch
+                  :model-value="theme === 'dark'"
+                  @update:model-value="toggleTheme"
+                  :class="theme === 'dark' ? 'bg-gold-500' : 'bg-gray-200'"
+                  class="relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-opacity-75"
+              >
+                  <span class="sr-only">Use setting</span>
+                  <span
+                      aria-hidden="true"
+                      :class="theme === 'dark' ? 'translate-x-6' : 'translate-x-0'"
+                      class="pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out flex items-center justify-center"
+                  >
+                        <MoonIcon v-if="theme === 'dark'" class="w-4 h-4 text-gold-600" />
+                        <SunIcon v-else class="w-4 h-4 text-orange-400" />
+                  </span>
+              </Switch>
+          </div>
+      </div>
 
-                      <div class="space-y-2">
-                          <label class="text-xs uppercase tracking-widest text-gray-500 font-bold">Номер телефона</label>
-                          <input type="text" :value="user?.phone" disabled class="w-full bg-dark-900/50 border border-white/5 rounded-lg px-4 py-3 text-gray-400 cursor-not-allowed" />
-                          <p class="text-xs text-gray-600">Номер телефона используется для входа и не может быть изменен самостоятельно.</p>
-                      </div>
-
-                      <div class="space-y-2">
-                          <label class="text-xs uppercase tracking-widest text-gray-500 font-bold">Email (для уведомлений)</label>
-                          <input type="email" :value="user?.email" class="w-full bg-dark-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold-500 focus:outline-none transition-colors" />
-                      </div>
-                  </div>
-
-                  <div class="mt-8 flex justify-end">
-                      <button class="px-8 py-3 bg-gold-500 hover:bg-gold-400 text-black font-bold uppercase tracking-widest rounded-lg transition-colors shadow-[0_0_20px_rgba(212,175,55,0.2)]">
-                          Сохранить
-                      </button>
+      <!-- Info card (read-only) -->
+      <div class="bg-white dark:bg-stone-900/80 backdrop-blur-sm rounded-xl p-8 border border-gray-200 dark:border-white/5 shadow-sm">
+          <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-gray-100 mb-6 border-b border-gray-200 dark:border-white/5 pb-4">Данные участника</h3>
+          
+          <div class="space-y-5">
+              <div class="space-y-1.5">
+                  <label class="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">Наименование</label>
+                  <div class="w-full bg-gray-100 dark:bg-stone-800/50 border border-gray-200 dark:border-white/5 rounded-lg px-4 py-3 text-gray-900 dark:text-gray-100 cursor-default">
+                      {{ user?.name || '—' }}
                   </div>
               </div>
 
-               <!-- Security -->
-              <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl p-8 border border-white/5">
-                  <h3 class="text-lg font-kanit font-bold text-white mb-4">Безопасность</h3>
-                  <div class="flex items-center justify-between">
-                      <div>
-                          <p class="text-white font-medium">Двухфакторная аутентификация</p>
-                          <p class="text-sm text-gray-500">Дополнительная защита при входе</p>
-                      </div>
-                      <button class="w-12 h-6 bg-dark-900 rounded-full border border-white/10 relative">
-                          <span class="absolute left-1 top-1 w-4 h-4 bg-gray-500 rounded-full transition-all"></span>
-                      </button>
+              <div class="space-y-1.5">
+                  <label class="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">Телефон для авторизации</label>
+                  <div class="w-full bg-gray-100 dark:bg-stone-800/50 border border-gray-200 dark:border-white/5 rounded-lg px-4 py-3 text-gray-900 dark:text-gray-100 font-mono cursor-default">
+                      {{ user?.auth_phone || user?.phone || '—' }}
+                  </div>
+                  <p class="text-xs text-gray-400 dark:text-gray-500">Номер используется для входа в систему и не может быть изменён самостоятельно.</p>
+              </div>
+
+              <div v-if="user?.email" class="space-y-1.5">
+                  <label class="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">Email (контактный)</label>
+                  <div class="w-full bg-gray-100 dark:bg-stone-800/50 border border-gray-200 dark:border-white/5 rounded-lg px-4 py-3 text-gray-900 dark:text-gray-100 cursor-default">
+                      {{ user?.email }}
                   </div>
               </div>
+
           </div>
       </div>
   </div>

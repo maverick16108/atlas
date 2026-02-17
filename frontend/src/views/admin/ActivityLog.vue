@@ -35,6 +35,7 @@ const actionOptions = [
 
 const userRoleOptions = [
     { value: '', label: 'Все пользователи' },
+    { value: 'system', label: 'Система' },
     { value: 'super_admin', label: 'Супер Админ' },
     { value: 'moderator', label: 'Модераторы' },
     { value: 'client', label: 'Участники' },

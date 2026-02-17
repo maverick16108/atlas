@@ -36,6 +36,13 @@ class UserController extends Controller
                     $q->orWhere('email', 'ilike', "%{$search}%");
                     $q->orWhere('phone', 'ilike', "%{$search}%");
                     $q->orWhere('auth_phone', 'ilike', "%{$search}%");
+                    
+                    // Also search by digits only (strip formatting from both search and stored value)
+                    $digitsOnly = preg_replace('/\D/', '', $search);
+                    if (strlen($digitsOnly) >= 3) {
+                        $q->orWhereRaw("regexp_replace(phone, '[^0-9]', '', 'g') LIKE ?", ["%{$digitsOnly}%"]);
+                        $q->orWhereRaw("regexp_replace(auth_phone, '[^0-9]', '', 'g') LIKE ?", ["%{$digitsOnly}%"]);
+                    }
                 }
                 
                 // Search by joined date (Moscow Timezone)
@@ -74,6 +81,7 @@ class UserController extends Controller
                 'phone' => ['required', 'string', 'max:20', 'unique:users'],
                 'is_accredited' => ['boolean'],
                 'is_gpb' => ['boolean'],
+                'delivery_basis' => ['nullable', 'numeric', 'min:0', 'max:100'],
                 'auth_phone' => [
                     'nullable', 
                     'string', 
@@ -92,6 +100,7 @@ class UserController extends Controller
                 'role' => 'client',
                 'is_accredited' => $validated['is_accredited'] ?? false,
                 'is_gpb' => $validated['is_gpb'] ?? false,
+                'delivery_basis' => $validated['delivery_basis'] ?? null,
             ]);
 
             $creationChanges = collect($user->getAttributes())
@@ -131,6 +140,7 @@ class UserController extends Controller
             'phone' => ['string', 'max:20', Rule::unique('users')->ignore($user->id)],
             'is_accredited' => ['boolean'],
             'is_gpb' => ['boolean'],
+            'delivery_basis' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'auth_phone' => [
                 'nullable', 
                 'string', 
@@ -154,6 +164,10 @@ class UserController extends Controller
 
         if (isset($validated['is_gpb'])) {
             $user->is_gpb = $validated['is_gpb'];
+        }
+
+        if (array_key_exists('delivery_basis', $validated)) {
+            $user->delivery_basis = $validated['delivery_basis'];
         }
         
         $user->save();

@@ -9,7 +9,7 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-const user = computed(() => authStore.user)
+const user = computed(() => authStore.adminUser)
 
 // Staff avatar with red background for all admin panel users
 const staffAvatar = computed(() => {
@@ -59,7 +59,7 @@ const handleLogout = () => {
 
 const confirmLogout = () => {
     showLogoutModal.value = false
-    authStore.logout()
+    authStore.logout('admin')
 }
 </script>
     

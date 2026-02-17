@@ -26,12 +26,124 @@ input:-webkit-autofill:active{
 
 
 @layer base {
-  html {
-    @apply antialiased scroll-smooth bg-dark-900;
+  :root {
+    /* Light Mode Variables */
+    --color-bg-primary: 243 244 246; /* #F3F4F6 (gray-100) - Darker BG to make white cards pop */
+    --color-bg-secondary: 255 255 255; /* #FFFFFF */
+    --color-bg-accent: 229 231 235; /* #E5E7EB (gray-200) */
+    
+    --color-text-primary: 17 24 39; /* #111827 (gray-900) */
+    --color-text-secondary: 55 65 81; /* #374151 (gray-700) */
+    --color-text-muted: 107 114 128; /* #6B7280 (gray-500) */
+    
+    --color-border: 209 213 219; /* #D1D5DB (gray-300) - Stronger borders */
+    --color-border-hover: 156 163 175; /* #9CA3AF (gray-400) */
+    
+    --color-shadow: 0 0 0;
   }
-  
-  body {
-    @apply bg-dark-900 text-gray-100;
+
+  .dark {
+    /* Dark Mode Variables */
+    --color-bg-primary: 12 10 9; /* #0C0A09 (dark 900) */
+    --color-bg-secondary: 28 25 23; /* #1C1917 (dark 800) */
+    --color-bg-accent: 41 37 36; /* #292524 (dark 700) */
+    
+    --color-text-primary: 243 244 246; /* #F3F4F6 (gray-100) */
+    --color-text-secondary: 156 163 175; /* #9CA3AF (gray-400) */
+    --color-text-muted: 107 114 128; /* #6B7280 (gray-500) */
+    
+    --color-border: 68 64 60; /* #44403C (stone-700) */
+    --color-border-hover: 87 83 78; /* #57534E (stone-600) */
+    
+    --color-shadow: 0 0 0;
+  }
+
+  html {
+    @apply antialiased scroll-smooth;
+  }
+}
+
+/* ============================================================
+   CLIENT CABINET — Theme-Safe Component Classes
+   These classes automatically handle Light AND Dark themes.
+   Use these instead of manual bg-white/dark:bg-xxx pairs to
+   prevent theme leaking.
+   ============================================================ */
+@layer components {
+  /* --- Cards & Containers --- */
+  .client-card {
+    @apply bg-white text-gray-900
+           dark:bg-stone-900/90 dark:text-gray-100
+           border border-gray-200 dark:border-white/5
+           rounded-xl shadow-sm;
+  }
+
+  .client-surface {
+    @apply bg-gray-50 text-gray-900
+           dark:bg-stone-800/80 dark:text-gray-100;
+  }
+
+  /* --- Modal --- */
+  .client-modal {
+    @apply bg-white text-gray-900
+           dark:bg-stone-900 dark:text-gray-100
+           border border-gray-200 dark:border-white/10
+           rounded-2xl shadow-2xl;
+  }
+
+  /* --- Buttons --- */
+  .client-btn-secondary {
+    @apply bg-gray-100 text-gray-600 border border-gray-200
+           hover:bg-gray-200 hover:text-gray-800
+           dark:bg-white/5 dark:text-gray-400 dark:border-white/10
+           dark:hover:bg-white/10 dark:hover:text-white
+           transition-colors;
+  }
+
+  .client-btn-close {
+    @apply flex items-center justify-center w-8 h-8 rounded-lg
+           bg-gray-100 text-gray-500 border border-gray-200
+           hover:bg-gray-200 hover:text-gray-700
+           dark:bg-white/5 dark:text-gray-400 dark:border-transparent
+           dark:hover:bg-white/10 dark:hover:text-white
+           focus:outline-none transition-all duration-200;
+  }
+
+  /* --- Filters --- */
+  .client-filter {
+    @apply bg-white text-gray-500 border border-gray-200
+           hover:bg-gray-50 hover:text-gray-800
+           dark:bg-stone-800/60 dark:text-gray-400 dark:border-white/5
+           dark:hover:bg-stone-700 dark:hover:text-white
+           transition-all;
+  }
+
+  .client-filter-active {
+    @apply bg-gold-50 text-gold-700 border border-gold-300
+           dark:bg-gold-500/10 dark:text-gold-400 dark:border-gold-500/40;
+  }
+
+  /* --- Sidebar --- */
+  .client-sidebar {
+    @apply bg-white dark:bg-stone-900/95
+           border-r border-gray-200 dark:border-white/5;
+  }
+
+  /* --- Navigation --- */
+  .client-nav-item {
+    @apply text-gray-500 hover:bg-gray-50 hover:text-gray-800 border-transparent
+           dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white;
+  }
+
+  .client-nav-item-active {
+    @apply bg-gold-50 text-gray-900 border-gold-300 shadow-sm
+           dark:bg-gold-500/10 dark:text-white dark:border-gold-500/30;
+  }
+
+  /* --- Header --- */
+  .client-header {
+    @apply bg-white/80 backdrop-blur-md border-b border-gray-200
+           dark:bg-stone-800/80 dark:border-white/5;
   }
 }
 

@@ -66,6 +66,25 @@ class ActivityLog extends Model
             }
 
             $oldValue = $original[$key];
+            
+            // Handle Date Comparisons
+             $casts = $model->getCasts();
+             $isDate = isset($casts[$key]) && in_array($casts[$key], ['date', 'datetime', 'immutable_date', 'immutable_datetime']);
+
+             if ($isDate && $oldValue && $newValue) {
+                 try {
+                     $d1 = \Carbon\Carbon::parse($oldValue);
+                     $d2 = \Carbon\Carbon::parse($newValue);
+                     if ($d1->equalTo($d2)) {
+                         continue;
+                     }
+                     // Normalize values for consistent logging
+                     $oldValue = $d1->toDateTimeString();
+                     $newValue = $d2->toDateTimeString();
+                 } catch (\Throwable $e) {
+                     // Fallback to strict comparison if parsing fails
+                 }
+             }
 
             // Normalize for comparison
             if ($oldValue != $newValue) {

@@ -4,6 +4,10 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
 import StandardModal from '../../components/ui/StandardModal.vue'
 import axios from 'axios'
+import echo from '@/echo.js'
+import { useConnectionStatus } from '@/composables/useConnectionStatus.js'
+
+const { isConnected, statusText } = useConnectionStatus()
 
 // --- State ---
 const auctions = ref([])
@@ -81,6 +85,7 @@ const auctionBids = ref([])
 const isLoadingBids = ref(false)
 const bidsCountCache = ref(0)
 const bidsDisplayCount = computed(() => auctionBids.value.length || bidsCountCache.value)
+const bidsPollInterval = ref(null)
 
 const fetchBids = async () => {
     if (!editingId.value) return
@@ -92,6 +97,20 @@ const fetchBids = async () => {
         console.error('Failed to load bids:', e)
     } finally {
         isLoadingBids.value = false
+    }
+}
+
+const startBidsPolling = () => {
+    stopBidsPolling()
+    bidsPollInterval.value = setInterval(() => {
+        fetchBids()
+    }, 5000)
+}
+
+const stopBidsPolling = () => {
+    if (bidsPollInterval.value) {
+        clearInterval(bidsPollInterval.value)
+        bidsPollInterval.value = null
     }
 }
 
@@ -128,6 +147,11 @@ const allocatedBids = computed(() => {
     const lotWeight = lotBars * barWeight
 
     return { winning, losing, lotTotal, lotBars, lotWeight, totalBars, barWeight }
+})
+
+// Check if any bid has user with delivery_basis set
+const hasBasisBids = computed(() => {
+    return auctionBids.value.some(b => b.user?.delivery_basis != null && Number(b.user.delivery_basis) > 0)
 })
 
 // Computed: GPB right — auto-detect GPB participant bids and show buyout
@@ -882,6 +906,15 @@ const openEdit = async (auction) => {
     // Load offers and bids on modal open
     fetchInitialOffers()
     fetchBids()
+    // Subscribe to real-time bid updates
+    echo.channel(`auction.${auction.id}`)
+        .listen('.bid.placed', () => {
+            fetchBids()
+        })
+    // Start polling for active auctions as reliable fallback
+    if (['active', 'collecting_offers', 'gpb_right'].includes(auction.status)) {
+        startBidsPolling()
+    }
     
     // Set Initial State
     initialAuctionState.value = JSON.stringify(getAuctionState())
@@ -906,6 +939,11 @@ const closeModal = (force = false) => {
     }
 
     stopCountdown()
+    stopBidsPolling()
+    // Unsubscribe from real-time channel
+    if (editingId.value) {
+        echo.leaveChannel(`auction.${editingId.value}`)
+    }
     showModal.value = false
     showConfirmModal.value = false
     showUnsavedModal.value = false
@@ -1092,6 +1130,7 @@ onUnmounted(() => {
     window.removeEventListener('keydown', handleGlobalKeydown)
     window.removeEventListener('keydown', handleEnterKey)
     stopCountdown()
+    stopBidsPolling()
 })
 
 onBeforeRouteLeave((to, from, next) => {
@@ -1459,7 +1498,7 @@ onBeforeRouteLeave((to, from, next) => {
                                   </td>
                                   <td class="px-4 py-3 text-right font-mono text-sm text-white">{{ Number(offer.volume).toLocaleString() }}</td>
                                   <td class="px-4 py-3 text-right font-mono text-sm text-emerald-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ Number(offer.price).toLocaleString() }}</td>
-                                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500">{{ new Date(offer.created_at).toLocaleString('ru-RU') }}</td>
+                                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(offer.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(offer.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                               </tr>
                           </tbody>
                           <tfoot v-if="initialOffers.length > 0" class="sticky bottom-0 bg-dark-900 border-t border-white/10">
@@ -1476,6 +1515,15 @@ onBeforeRouteLeave((to, from, next) => {
 
               <!-- Tab: Trading (Торги) -->
               <div v-show="activeTab === 'trading'" class="flex-1 min-h-0 overflow-hidden flex flex-col gap-3">
+                  <!-- Connection status -->
+                  <div class="flex items-center gap-1.5 text-xs flex-shrink-0" :class="isConnected ? 'text-emerald-500' : 'text-gray-500'">
+                      <span class="relative flex h-2 w-2">
+                          <span v-if="isConnected" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2" :class="isConnected ? 'bg-emerald-500' : 'bg-gray-500'"></span>
+                      </span>
+                      {{ statusText }}
+                  </div>
+
                   <!-- Trading finished banner -->
                   <div v-if="tradingFinished" 
                        class="flex items-center gap-5 px-5 py-3.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 flex-shrink-0">
@@ -1572,13 +1620,14 @@ onBeforeRouteLeave((to, from, next) => {
                                       <th class="px-4 py-3 text-right bg-dark-900">Цена/кг</th>
                                       <th class="px-4 py-3 text-right bg-dark-900">Цена/слиток</th>
                                       <th class="px-4 py-3 text-right bg-dark-900">Сумма</th>
+                                      <th v-if="hasBasisBids" class="px-4 py-3 text-right bg-dark-900">С базисом</th>
                                       <th class="px-4 py-3 text-right bg-dark-900">Дата</th>
                                   </tr>
                               </thead>
                               <tbody>
                                   <!-- Winning Section -->
                                   <tr v-if="allocatedBids.winning.length > 0">
-                                      <td colspan="7" class="px-4 py-2 bg-emerald-500/10 border-b border-emerald-500/20">
+                                      <td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-emerald-500/10 border-b border-emerald-500/20">
                                           <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold flex items-center gap-1.5">
                                               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                                               В лоте ({{ allocatedBids.lotBars }} слитков)
@@ -1602,12 +1651,18 @@ onBeforeRouteLeave((to, from, next) => {
                                       <td class="px-4 py-3 text-right font-mono text-sm text-white">
                                           <span class="font-sans">₽</span>&nbsp;{{ (bid.fulfilled * allocatedBids.barWeight * Number(bid.amount)).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
                                       </td>
-                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-500">{{ new Date(bid.created_at).toLocaleString('ru-RU') }}</td>
+                                      <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-amber-400 font-bold">
+                                          <template v-if="bid.user?.delivery_basis">
+                                              <span class="font-sans">₽</span>&nbsp;{{ (bid.fulfilled * allocatedBids.barWeight * Number(bid.amount) * Number(bid.user.delivery_basis) / 100).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
+                                          </template>
+                                          <span v-else class="text-gray-600">—</span>
+                                      </td>
+                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                                   </tr>
 
                                   <!-- Losing Section -->
                                   <tr v-if="allocatedBids.losing.length > 0">
-                                      <td colspan="7" class="px-4 py-2 bg-red-500/10 border-b border-red-500/20 border-t border-t-white/10">
+                                      <td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-500/10 border-b border-red-500/20 border-t border-t-white/10">
                                           <span class="text-[10px] uppercase tracking-widest text-red-400 font-bold flex items-center gap-1.5">
                                               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                                               Не попали ({{ allocatedBids.losing.reduce((sum, b) => sum + b.bar_count, 0) }})
@@ -1628,7 +1683,8 @@ onBeforeRouteLeave((to, from, next) => {
                                       <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
                                       <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * allocatedBids.barWeight).toLocaleString('ru-RU') }}</td>
                                       <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-600">{{ new Date(bid.created_at).toLocaleString('ru-RU') }}</td>
+                                      <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
+                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                                   </tr>
                               </tbody>
                           </table>
@@ -1703,13 +1759,14 @@ onBeforeRouteLeave((to, from, next) => {
                                       <th class="px-4 py-3 text-right bg-dark-900">Цена/кг</th>
                                       <th class="px-4 py-3 text-right bg-dark-900">Цена/слиток</th>
                                       <th class="px-4 py-3 text-right bg-dark-900">Сумма</th>
+                                      <th v-if="hasBasisBids" class="px-4 py-3 text-right bg-dark-900">С базисом</th>
                                       <th class="px-4 py-3 text-right bg-dark-900">Дата</th>
                                   </tr>
                               </thead>
                               <tbody>
                                   <!-- GPB Buyout Section -->
                                   <tr v-if="gpbAllocatedBids.gpbBought.length > 0">
-                                      <td colspan="7" class="px-4 py-2 bg-blue-500/10 border-b border-blue-500/20">
+                                      <td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-blue-500/10 border-b border-blue-500/20">
                                           <span class="text-[10px] uppercase tracking-widest text-blue-400 font-bold flex items-center gap-1.5">
                                               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                                               Выкуп ГПБ ({{ gpbAllocatedBids.gpbTotalBars }} слитков) — <span class="font-sans">₽</span>&nbsp;{{ gpbAllocatedBids.gpbTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
@@ -1733,12 +1790,13 @@ onBeforeRouteLeave((to, from, next) => {
                                       <td class="px-4 py-3 text-right font-mono text-sm text-white">
                                           <span class="font-sans">₽</span>&nbsp;{{ (item.fulfilled * gpbAllocatedBids.barWeight * item.pricePerKg).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
                                       </td>
-                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-500">{{ new Date(item.created_at).toLocaleString('ru-RU') }}</td>
+                                      <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
+                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(item.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(item.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                                   </tr>
 
                                   <!-- Remaining Participants Section -->
                                   <tr v-if="gpbAllocatedBids.participantWinning.length > 0">
-                                      <td colspan="7" class="px-4 py-2 bg-emerald-500/10 border-b border-emerald-500/20 border-t border-t-white/10">
+                                      <td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-emerald-500/10 border-b border-emerald-500/20 border-t border-t-white/10">
                                           <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold flex items-center gap-1.5">
                                               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                                               Остаток участникам ({{ gpbAllocatedBids.participantBars }} слитков)
@@ -1762,12 +1820,18 @@ onBeforeRouteLeave((to, from, next) => {
                                       <td class="px-4 py-3 text-right font-mono text-sm text-white">
                                           <span class="font-sans">₽</span>&nbsp;{{ (bid.fulfilled * gpbAllocatedBids.barWeight * Number(bid.amount)).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
                                       </td>
-                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-500">{{ new Date(bid.created_at).toLocaleString('ru-RU') }}</td>
+                                      <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-amber-400 font-bold">
+                                          <template v-if="bid.user?.delivery_basis">
+                                              <span class="font-sans">₽</span>&nbsp;{{ (bid.fulfilled * gpbAllocatedBids.barWeight * Number(bid.amount) * Number(bid.user.delivery_basis) / 100).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
+                                          </template>
+                                          <span v-else class="text-gray-600">—</span>
+                                      </td>
+                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                                   </tr>
 
                                   <!-- Lost Section -->
                                   <tr v-if="gpbAllocatedBids.participantLosing.length > 0">
-                                      <td colspan="7" class="px-4 py-2 bg-red-500/10 border-b border-red-500/20 border-t border-t-white/10">
+                                      <td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-500/10 border-b border-red-500/20 border-t border-t-white/10">
                                           <span class="text-[10px] uppercase tracking-widest text-red-400 font-bold flex items-center gap-1.5">
                                               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                                               Не попали ({{ gpbAllocatedBids.participantLosing.reduce((sum, b) => sum + b.bar_count, 0) }})
@@ -1789,7 +1853,8 @@ onBeforeRouteLeave((to, from, next) => {
                                       <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
                                       <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * gpbAllocatedBids.barWeight).toLocaleString('ru-RU') }}</td>
                                       <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-600">{{ new Date(bid.created_at).toLocaleString('ru-RU') }}</td>
+                                      <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
+                                      <td class="px-4 py-3 text-right font-mono text-xs text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                                   </tr>
                               </tbody>
                           </table>
@@ -1847,13 +1912,14 @@ onBeforeRouteLeave((to, from, next) => {
                                       <th class="px-4 py-3 text-right bg-dark-900">Цена/кг</th>
                                       <th class="px-4 py-3 text-right bg-dark-900">Цена/слиток</th>
                                       <th class="px-4 py-3 text-right bg-dark-900">Сумма</th>
+                                      <th v-if="hasBasisBids" class="px-4 py-3 text-right bg-dark-900">С базисом</th>
                                       <th class="px-4 py-3 text-center bg-dark-900">Тип</th>
                                   </tr>
                               </thead>
                               <tbody>
                                   <!-- GPB Buyout Rows -->
                                   <tr v-if="gpbAllocatedBids.gpbBought.length > 0">
-                                      <td colspan="7" class="px-4 py-2 bg-blue-500/10 border-b border-blue-500/20">
+                                      <td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-blue-500/10 border-b border-blue-500/20">
                                           <span class="text-[10px] uppercase tracking-widest text-blue-400 font-bold flex items-center gap-1.5">
                                               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                                               Выкуп ГПБ — {{ gpbAllocatedBids.gpbUser?.name || 'ГПБ' }} ({{ gpbAllocatedBids.gpbTotalBars }} слитков)
@@ -1876,6 +1942,7 @@ onBeforeRouteLeave((to, from, next) => {
                                       <td class="px-4 py-3 text-right font-mono text-sm text-white font-bold">
                                           <span class="font-sans">₽</span>&nbsp;{{ (item.fulfilled * gpbAllocatedBids.barWeight * item.pricePerKg).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
                                       </td>
+                                      <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
                                       <td class="px-4 py-3 text-center">
                                           <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full font-bold">ГПБ</span>
                                       </td>
@@ -1883,7 +1950,7 @@ onBeforeRouteLeave((to, from, next) => {
 
                                   <!-- Participant Winners -->
                                   <tr v-if="gpbAllocatedBids.participantWinning.length > 0">
-                                      <td colspan="7" class="px-4 py-2 bg-emerald-500/10 border-b border-emerald-500/20 border-t border-t-white/10">
+                                      <td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-emerald-500/10 border-b border-emerald-500/20 border-t border-t-white/10">
                                           <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold flex items-center gap-1.5">
                                               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                                               Победители торгов ({{ gpbAllocatedBids.participantBars }} слитков)
@@ -1903,6 +1970,12 @@ onBeforeRouteLeave((to, from, next) => {
                                       <td class="px-4 py-3 text-right font-mono text-sm text-white font-bold">
                                           <span class="font-sans">₽</span>&nbsp;{{ (bid.fulfilled * gpbAllocatedBids.barWeight * Number(bid.amount)).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
                                       </td>
+                                      <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-amber-400 font-bold">
+                                          <template v-if="bid.user?.delivery_basis">
+                                              <span class="font-sans">₽</span>&nbsp;{{ (bid.fulfilled * gpbAllocatedBids.barWeight * Number(bid.amount) * Number(bid.user.delivery_basis) / 100).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
+                                          </template>
+                                          <span v-else class="text-gray-600">—</span>
+                                      </td>
                                       <td class="px-4 py-3 text-center">
                                           <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full font-bold">Торги</span>
                                       </td>
@@ -1911,7 +1984,7 @@ onBeforeRouteLeave((to, from, next) => {
                                   <!-- Unsold Bars Section -->
                                   <template v-if="gpbAllocatedBids.totalBars - gpbAllocatedBids.gpbTotalBars - gpbAllocatedBids.participantBars > 0">
                                   <tr>
-                                      <td colspan="7" class="px-4 py-2 bg-red-500/10 border-b border-red-500/20 border-t border-t-white/10">
+                                      <td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-500/10 border-b border-red-500/20 border-t border-t-white/10">
                                           <span class="text-[10px] uppercase tracking-widest text-red-400 font-bold flex items-center gap-1.5">
                                               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                               Не распределено ({{ gpbAllocatedBids.totalBars - gpbAllocatedBids.gpbTotalBars - gpbAllocatedBids.participantBars }} слитков)
@@ -1927,6 +2000,7 @@ onBeforeRouteLeave((to, from, next) => {
                                       <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
                                       <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
                                       <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
+                                      <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
                                       <td class="px-4 py-3 text-center">
                                           <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-1 rounded-full font-bold">Не продано</span>
                                       </td>
@@ -1946,6 +2020,7 @@ onBeforeRouteLeave((to, from, next) => {
                                       <td class="px-4 py-4 text-right font-mono text-lg text-amber-400 font-bold">
                                           <span class="font-sans">₽</span>&nbsp;{{ gpbAllocatedBids.grandTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}
                                       </td>
+                                      <td v-if="hasBasisBids" class="px-4 py-4"></td>
                                       <td class="px-4 py-4"></td>
                                   </tr>
                               </tbody>

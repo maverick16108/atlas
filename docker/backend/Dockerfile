@@ -22,6 +22,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install extensions
 RUN docker-php-ext-install pdo_pgsql mbstring zip exif pcntl
+RUN pecl install redis && docker-php-ext-enable redis
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install gd
 
