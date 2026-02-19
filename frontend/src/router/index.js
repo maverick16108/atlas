@@ -38,6 +38,12 @@ const routes = [
         meta: { layout: 'AdminLayout', role: 'admin', title: 'meta_admin.auctions' }
     },
     {
+        path: '/admin/auctions/:id',
+        name: 'AdminAuctionDetail',
+        component: () => import('../views/admin/AuctionDetail.vue'),
+        meta: { layout: 'AdminLayout', role: 'admin', title: 'Аукцион' }
+    },
+    {
         path: '/admin/moderators',
         name: 'AdminModerators',
         component: () => import('../views/admin/Moderators.vue'),

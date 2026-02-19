@@ -34,10 +34,10 @@ const initialAuctionState = ref(null) // To track changes
 const newAuction = ref({ 
     title: '', 
     status: 'draft', 
-    min_step: 10000,
+    min_step: 50,
     step_time: 5,
     timezone: 'Europe/Moscow',
-    min_price: 0,
+    min_price: 11000,
     description: '',
     bar_count: 1,
     bar_weight: 12.4,
@@ -386,13 +386,13 @@ const stopCountdown = () => {
 const statusOptions = [
     { value: 'draft', label: 'Черновик', color: 'bg-gray-500/20 text-gray-400' },
     { value: 'collecting_offers', label: 'Сбор предложений', color: 'bg-cyan-500/20 text-cyan-400' },
-    { value: 'scheduled', label: 'Запланирован', color: 'bg-blue-500/20 text-blue-400' },
-    { value: 'active', label: 'Активный', color: 'bg-green-500/20 text-green-400' },
+    { value: 'scheduled', label: 'Запланирован', color: 'bg-purple-500/20 text-purple-400' },
+    { value: 'active', label: 'Активный', color: 'bg-amber-500/20 text-amber-400' },
 
-    { value: 'gpb_right', label: 'Право ГПБ', color: 'bg-purple-500/20 text-purple-400' },
-    { value: 'commission', label: 'Работа комиссии', color: 'bg-yellow-500/20 text-yellow-400' },
+    { value: 'gpb_right', label: 'Право ГПБ', color: 'bg-blue-500/20 text-blue-400' },
+    { value: 'commission', label: 'Работа комиссии', color: 'bg-orange-500/20 text-orange-400' },
     { value: 'completed', label: 'Завершён', color: 'bg-emerald-500/20 text-emerald-400' },
-    { value: 'paused', label: 'Приостановлен', color: 'bg-orange-500/20 text-orange-400' },
+    { value: 'paused', label: 'Приостановлен', color: 'bg-amber-800/20 text-amber-700' },
     { value: 'cancelled', label: 'Отменён', color: 'bg-red-500/20 text-red-400' },
 ]
 
@@ -510,13 +510,13 @@ const getStatusDotClass = (status) => {
     const map = {
         'draft': 'bg-gray-500',
         'collecting_offers': 'bg-cyan-500',
-        'scheduled': 'bg-blue-500',
-        'active': 'bg-green-500',
+        'scheduled': 'bg-purple-500',
+        'active': 'bg-amber-500',
 
-        'gpb_right': 'bg-purple-500',
-        'commission': 'bg-yellow-500',
-        'completed': 'bg-emerald-500',
-        'paused': 'bg-orange-500',
+        'gpb_right': 'bg-blue-500',
+        'commission': 'bg-orange-500',
+        'completed': 'bg-emerald-400',
+        'paused': 'bg-amber-800',
         'cancelled': 'bg-red-500'
     }
     return map[status] || 'bg-gray-400'
@@ -1212,7 +1212,14 @@ onBeforeRouteLeave((to, from, next) => {
           <table class="w-full text-left text-sm text-gray-400 table-fixed">
               <thead class="bg-dark-900 text-xs uppercase font-bold text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-white/5">
                   <tr>
-                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/3" @click="sortBy('title')">
+                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-16" @click="sortBy('id')">
+                          <div class="flex items-center gap-2">
+                              №
+                              <svg v-if="sortKey === 'id'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                          </div>
+                      </th>
+                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none" @click="sortBy('title')">
                           <div class="flex items-center gap-2">
                               Название
                               <svg v-if="sortKey === 'title'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
@@ -1245,6 +1252,7 @@ onBeforeRouteLeave((to, from, next) => {
               </thead>
               <tbody class="transition-opacity duration-300" :class="{ 'opacity-50': isLoading && loadingType === 'search' }">
                   <tr v-for="auction in auctions" :key="auction.id" class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                      <td class="px-6 py-4 font-mono text-xs text-gray-500">{{ auction.id }}</td>
                       <td class="px-6 py-4">
                           <div class="flex flex-col">
                               <span class="font-bold text-white text-base">{{ auction.title }}</span>
@@ -1267,9 +1275,9 @@ onBeforeRouteLeave((to, from, next) => {
                       <td class="px-6 py-4 text-right flex items-center justify-end gap-1">
 
                           <button 
-                            @click="openEdit(auction)"
+                            @click="router.push(`/admin/auctions/${auction.id}`)"
                             class="text-gray-500 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-blue-500/10"
-                            title="Изменить"
+                            title="Открыть"
                           >
                               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1359,19 +1367,20 @@ onBeforeRouteLeave((to, from, next) => {
                   </div>
 
                   <!-- Status (Workflow) -->
-                  <div class="w-[300px] flex-shrink-0 space-y-1">
-                      <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold ml-1">Статус</label>
-                      <div class="flex items-center gap-2">
+                  <div class="w-[300px] flex-shrink-0 relative pb-5">
+                      <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold ml-1 block mb-1">Статус</label>
+                      <div class="flex gap-2" style="align-items: flex-start;">
                            <!-- Select (Manual Override) -->
-                           <div class="relative w-full">
+                           <div class="relative flex-1 min-w-0" style="height: 38px;">
                                <select 
                                   v-model="newAuction.status"
-                                  class="w-full border border-white/10 rounded-lg pl-3 pr-12 py-2 text-sm focus:outline-none transition-all duration-300 hover:border-white/20 focus:border-red-500 focus:ring-1 focus:ring-red-500 font-bold tracking-wide appearance-none cursor-pointer no-arrow"
+                                  style="height: 38px;"
+                                  class="w-full border border-white/10 rounded-lg pl-3 pr-12 text-sm focus:outline-none transition-all duration-300 hover:border-white/20 focus:border-red-500 focus:ring-1 focus:ring-red-500 font-bold tracking-wide appearance-none cursor-pointer no-arrow"
                                   :class="getStatusClass(newAuction.status)"
                                >
                                    <option v-for="opt in statusOptions" :key="opt.value" :value="opt.value" :disabled="blockedStatuses.includes(opt.value)" class="bg-dark-900 text-white" :class="blockedStatuses.includes(opt.value) ? 'opacity-40 line-through' : ''">{{ opt.label }}{{ blockedStatuses.includes(opt.value) ? ' 🔒' : '' }}</option>
                                </select>
-                               <span v-if="errors.status" class="text-red-500 text-[10px] font-bold uppercase tracking-wide ml-1">{{ errors.status }}</span>
+
                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none gap-2">
                                     <div class="w-2 h-2 rounded-full animate-pulse shadow-sm" :class="getStatusDotClass(newAuction.status).replace('bg-', 'bg-')"></div>
                                     <svg class="h-4 w-4" :class="newAuction.status === 'draft' ? 'text-gray-400' : 'text-current opacity-70'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1386,7 +1395,8 @@ onBeforeRouteLeave((to, from, next) => {
                                 type="button"
                                 @click="advanceStatus"
                                 title="Перейти к следующему статусу"
-                                class="h-[38px] w-[38px] flex items-center justify-center bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+                                style="height: 38px; width: 38px;"
+                                class="flex-shrink-0 flex items-center justify-center bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
                            >
                                 <!-- Arrow Right / Next Step Icon -->
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1403,7 +1413,8 @@ onBeforeRouteLeave((to, from, next) => {
                            <!-- Completed Icon -->
                            <div 
                                 v-else-if="newAuction.status === 'completed'"
-                                class="h-[38px] w-[38px] flex items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/20 text-emerald-400 animate-pulse"
+                                style="height: 38px; width: 38px;"
+                                class="flex-shrink-0 flex items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/20 text-emerald-400 animate-pulse"
                                 title="Аукцион завершен"
                            >
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1411,6 +1422,7 @@ onBeforeRouteLeave((to, from, next) => {
                                 </svg>
                            </div>
                       </div>
+                      <span v-if="errors.status" class="absolute left-0 bottom-0 text-red-500 text-[10px] font-bold uppercase tracking-wide ml-1 whitespace-nowrap">{{ errors.status }}</span>
                   </div>
               </div>
 
@@ -1481,10 +1493,10 @@ onBeforeRouteLeave((to, from, next) => {
                       type="button"
                       @click="activeTab = 'results'"
                       class="px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all relative flex items-center gap-2"
-                      :class="activeTab === 'results' ? 'text-amber-400' : 'text-gray-500 hover:text-gray-300'"
+                      :class="activeTab === 'results' ? 'text-emerald-400' : 'text-gray-500 hover:text-gray-300'"
                   >
                       Итоги
-                      <div v-if="activeTab === 'results'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500 rounded-full"></div>
+                      <div v-if="activeTab === 'results'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full"></div>
                   </button>
                </div>
 

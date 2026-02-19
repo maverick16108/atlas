@@ -1,9 +1,9 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import StandardModal from '../components/ui/StandardModal.vue'
-// import GoldenMesh from '../components/effects/GoldenMesh.vue'
+import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
@@ -22,11 +22,6 @@ const navigation = computed(() => {
         { name: 'Участники', path: '/admin/users', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
         { name: 'Аукционы', path: '/admin/auctions', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
     ]
-    
-    const pageTitle = computed(() => {
-        const item = navigation.value.find(i => i.path === route.path)
-        return item?.headerTitle || item?.name || route.meta.title || 'Admin Panel'
-    })
 
     if (user.value?.role === 'super_admin') {
         nav.splice(1, 0, { 
@@ -61,6 +56,97 @@ const confirmLogout = () => {
     showLogoutModal.value = false
     authStore.logout('admin')
 }
+
+// ===== Notifications =====
+const showNotifications = ref(false)
+const notifications = ref([])
+const unreadCount = ref(0)
+const isLoadingNotifications = ref(false)
+let pollInterval = null
+
+const typeIcons = {
+    auction_invite: { icon: '📨', color: 'text-blue-400 bg-blue-500/10' },
+    bid_outbid: { icon: '⚡', color: 'text-red-400 bg-red-500/10' },
+    auction_started: { icon: '🔴', color: 'text-green-400 bg-green-500/10' },
+    auction_ended: { icon: '🏁', color: 'text-emerald-400 bg-emerald-500/10' },
+    offer_accepted: { icon: '✅', color: 'text-cyan-400 bg-cyan-500/10' },
+    status_change: { icon: '🔄', color: 'text-yellow-400 bg-yellow-500/10' },
+    new_bid: { icon: '💰', color: 'text-amber-400 bg-amber-500/10' },
+    system: { icon: '⚙️', color: 'text-gray-400 bg-gray-500/10' },
+}
+
+const getTypeInfo = (type) => typeIcons[type] || { icon: '🔔', color: 'text-gray-400 bg-white/5' }
+
+const fetchUnreadCount = async () => {
+    try {
+        const res = await axios.get('/api/admin/notifications/unread-count')
+        unreadCount.value = res.data.count
+    } catch (e) { /* silently fail */ }
+}
+
+const fetchNotifications = async () => {
+    isLoadingNotifications.value = true
+    try {
+        const res = await axios.get('/api/admin/notifications')
+        notifications.value = res.data
+    } catch (e) { /* silently fail */ }
+    finally { isLoadingNotifications.value = false }
+}
+
+const toggleNotifications = async () => {
+    showNotifications.value = !showNotifications.value
+    if (showNotifications.value) {
+        await fetchNotifications()
+    }
+}
+
+const closeNotifications = () => { showNotifications.value = false }
+
+const markAsRead = async (notification) => {
+    if (notification.read_at) return
+    try {
+        await axios.post(`/api/admin/notifications/${notification.id}/read`)
+        notification.read_at = new Date().toISOString()
+        unreadCount.value = Math.max(0, unreadCount.value - 1)
+    } catch (e) { /* silently fail */ }
+}
+
+const markAllAsRead = async () => {
+    try {
+        await axios.post('/api/admin/notifications/read-all')
+        notifications.value.forEach(n => { n.read_at = n.read_at || new Date().toISOString() })
+        unreadCount.value = 0
+    } catch (e) { /* silently fail */ }
+}
+
+const handleNotificationClick = async (notification) => {
+    await markAsRead(notification)
+    if (notification.auction_id) {
+        router.push(`/admin/auctions/${notification.auction_id}`)
+        closeNotifications()
+    }
+}
+
+const timeAgo = (iso) => {
+    if (!iso) return ''
+    const diff = Date.now() - new Date(iso).getTime()
+    const mins = Math.floor(diff / 60000)
+    if (mins < 1) return 'только что'
+    if (mins < 60) return `${mins} мин назад`
+    const hours = Math.floor(mins / 60)
+    if (hours < 24) return `${hours} ч назад`
+    const days = Math.floor(hours / 24)
+    return `${days} дн назад`
+}
+
+onMounted(() => {
+    fetchUnreadCount()
+    pollInterval = setInterval(fetchUnreadCount, 30000)
+})
+
+onUnmounted(() => {
+    if (pollInterval) clearInterval(pollInterval)
+})
 </script>
     
     <template>
@@ -124,9 +210,86 @@ const confirmLogout = () => {
             </div>
             
             <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2 px-4 py-2 bg-red-500/10 rounded-full border border-red-500/20 shadow-[inset_0_0_10px_rgba(239,68,68,0.1)]">
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
-                    <span class="text-xs text-red-400 font-bold tracking-wider">СИСТЕМА АКТИВНА</span>
+                <!-- Notifications Bell -->
+                <div class="relative">
+                    <button @click="toggleNotifications" class="relative text-gray-500 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5 active:scale-95">
+                        <span v-if="unreadCount > 0" class="absolute top-0.5 right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white border-2 border-dark-800 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.4)]">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                    </button>
+
+                    <!-- Notification Dropdown -->
+                    <transition
+                        enter-active-class="transition ease-out duration-200"
+                        enter-from-class="opacity-0 scale-95 -translate-y-1"
+                        enter-to-class="opacity-100 scale-100 translate-y-0"
+                        leave-active-class="transition ease-in duration-150"
+                        leave-from-class="opacity-100 scale-100"
+                        leave-to-class="opacity-0 scale-95 -translate-y-1"
+                    >
+                        <div v-if="showNotifications" class="absolute right-0 top-full mt-2 w-[360px] md:w-[420px] max-h-[520px] bg-dark-800 border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col z-50">
+                            <!-- Header -->
+                            <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between flex-shrink-0 bg-dark-900/50">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Уведомления</h3>
+                                    <span v-if="unreadCount > 0" class="px-2 py-0.5 bg-red-500/10 text-red-400 text-[10px] font-bold rounded-full">{{ unreadCount }}</span>
+                                </div>
+                                <button v-if="unreadCount > 0" @click="markAllAsRead" class="text-xs text-red-400 hover:text-red-300 font-medium transition-colors">
+                                    Прочитать все
+                                </button>
+                            </div>
+
+                            <!-- List -->
+                            <div class="flex-1 overflow-y-auto custom-scrollbar">
+                                <!-- Loading -->
+                                <div v-if="isLoadingNotifications" class="p-5 space-y-3">
+                                    <div v-for="i in 3" :key="i" class="flex gap-3 animate-pulse">
+                                        <div class="w-9 h-9 rounded-lg bg-white/5 flex-shrink-0"></div>
+                                        <div class="flex-1 space-y-2">
+                                            <div class="h-3 w-3/4 bg-white/5 rounded"></div>
+                                            <div class="h-2.5 w-full bg-white/5 rounded"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Empty -->
+                                <div v-else-if="notifications.length === 0" class="py-12 text-center">
+                                    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-white/5 flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                                    </div>
+                                    <p class="text-sm text-gray-300 font-medium">Нет уведомлений</p>
+                                    <p class="text-xs text-gray-500 mt-1">Здесь появятся ваши уведомления</p>
+                                </div>
+
+                                <!-- Items -->
+                                <div v-else>
+                                    <div v-for="notification in notifications" :key="notification.id"
+                                         @click="handleNotificationClick(notification)"
+                                         class="px-5 py-3.5 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors group flex gap-3"
+                                         :class="!notification.read_at ? 'bg-red-500/5' : ''">
+                                        <!-- Icon -->
+                                        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-base"
+                                             :class="getTypeInfo(notification.type).color">
+                                            {{ getTypeInfo(notification.type).icon }}
+                                        </div>
+                                        <!-- Content -->
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-start justify-between gap-2">
+                                                <p class="text-sm font-bold truncate" :class="!notification.read_at ? 'text-white' : 'text-gray-400'">
+                                                    {{ notification.title }}
+                                                </p>
+                                                <span v-if="!notification.read_at" class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 mt-1.5 shadow-[0_0_6px_rgba(239,68,68,0.5)]"></span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ notification.message }}</p>
+                                            <p class="text-[10px] text-gray-600 mt-1 font-mono">{{ timeAgo(notification.created_at) }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </transition>
+
+                    <!-- Backdrop to close -->
+                    <div v-if="showNotifications" @click="closeNotifications" class="fixed inset-0 z-40"></div>
                 </div>
             </div>
         </header>

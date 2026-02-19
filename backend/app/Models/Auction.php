@@ -16,8 +16,8 @@ class Auction extends Model
         'min_price' => 'decimal:2',
         'step_time' => 'integer',
         'gpb_minutes' => 'integer',
-        'bar_count' => 'integer',
         'bar_weight' => 'decimal:3',
+        'invite_all' => 'boolean',
     ];
 
     public function lots()

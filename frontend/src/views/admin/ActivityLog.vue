@@ -206,10 +206,13 @@ const fieldLabel = (field) => {
 
 const statusLabels = {
     draft: 'Черновик',
+    scheduled: 'Запланирован',
+    collecting_offers: 'Сбор предложений',
     active: 'Активный',
     gpb_right: 'Право ГПБ',
     commission: 'Работа комиссии',
     completed: 'Завершён',
+    paused: 'Приостановлен',
     cancelled: 'Отменён',
 }
 

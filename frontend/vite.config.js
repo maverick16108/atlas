@@ -25,6 +25,18 @@ export default defineConfig({
         target: apiTarget,
         changeOrigin: true,
         secure: false,
+      },
+      '/app': {
+        target: apiTarget,
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
+      '/apps': {
+        target: apiTarget,
+        changeOrigin: true,
+        secure: false,
+        ws: true,
       }
     }
   }

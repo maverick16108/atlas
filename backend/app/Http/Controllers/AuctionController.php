@@ -84,7 +84,7 @@ class AuctionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:255'],
             'start_at' => ['nullable', 'date'],
             'end_at' => ['nullable', 'date', 'after_or_equal:start_at'],
             'status' => ['string', Rule::in(self::VALID_STATUSES)],
@@ -98,10 +98,11 @@ class AuctionController extends Controller
             'bar_count' => ['nullable', 'integer', 'min:0'],
             'bar_weight' => ['nullable', 'numeric', 'min:0'],
             'gpb_minutes' => ['nullable', 'integer', 'min:1'],
+            'invite_all' => ['nullable', 'boolean'],
         ]);
 
         $auction = Auction::create([
-            'title' => $validated['title'],
+            'title' => $validated['title'] ?? 'Без названия',
             'start_at' => $validated['start_at'] ?? null,
             'end_at' => $validated['end_at'] ?? null,
             'status' => $validated['status'] ?? 'draft',
@@ -113,6 +114,7 @@ class AuctionController extends Controller
             'bar_count' => $validated['bar_count'] ?? null,
             'bar_weight' => $validated['bar_weight'] ?? null,
             'gpb_minutes' => $validated['gpb_minutes'] ?? 30,
+            'invite_all' => $validated['invite_all'] ?? false,
         ]);
 
         // Sync participants if provided
@@ -176,35 +178,45 @@ class AuctionController extends Controller
             'bar_count' => ['nullable', 'integer', 'min:0'],
             'bar_weight' => ['nullable', 'numeric', 'min:0'],
             'gpb_minutes' => ['nullable', 'integer', 'min:1'],
+            'invite_all' => ['nullable', 'boolean'],
         ]);
 
     // Time-based status validation
     if (isset($validated['status']) && $validated['status'] !== 'draft') {
         $now = now();
+        $startAt = isset($validated['start_at']) ? \Carbon\Carbon::parse($validated['start_at']) : $auction->start_at;
         $endAt = isset($validated['end_at']) ? \Carbon\Carbon::parse($validated['end_at']) : $auction->end_at;
         $gpbStartedAt = $auction->gpb_started_at;
         $gpbMinutes = $validated['gpb_minutes'] ?? $auction->gpb_minutes ?? 30;
 
-        // If auction end time has passed → can't set active, scheduled, collecting_offers
-        if ($endAt && $now->gte($endAt)) {
-            $blockedByEnd = ['collecting_offers', 'scheduled', 'active'];
-            if (in_array($validated['status'], $blockedByEnd)) {
-                return response()->json([
-                    'message' => 'Время аукциона истекло. Невозможно установить статус "' . $validated['status'] . '".',
-                    'errors' => ['status' => ['Время аукциона истекло']]
-                ], 422);
+        // Only apply time-based checks if auction start time has already passed
+        if ($startAt && $now->gte($startAt)) {
+            // If auction end time has passed → can't set active, scheduled, collecting_offers
+            if ($endAt && $now->gte($endAt)) {
+                $blockedByEnd = ['collecting_offers', 'scheduled', 'active'];
+                if (in_array($validated['status'], $blockedByEnd)) {
+                    return response()->json([
+                        'message' => 'Время аукциона истекло. Невозможно установить статус "' . $validated['status'] . '".',
+                        'errors' => ['status' => ['Время аукциона истекло']]
+                    ], 422);
+                }
+            }
+
+            // If GPB time has passed → can't set gpb_right, active, scheduled, collecting_offers
+            if ($gpbStartedAt && $now->gte(\Carbon\Carbon::parse($gpbStartedAt)->addMinutes($gpbMinutes))) {
+                $blockedByGpb = ['collecting_offers', 'scheduled', 'active', 'gpb_right'];
+                if (in_array($validated['status'], $blockedByGpb)) {
+                    return response()->json([
+                        'message' => 'Время права ГПБ истекло. Невозможно установить статус "' . $validated['status'] . '".',
+                        'errors' => ['status' => ['Время права ГПБ истекло']]
+                    ], 422);
+                }
             }
         }
 
-        // If GPB time has passed → can't set gpb_right, active, scheduled, collecting_offers
-        if ($gpbStartedAt && $now->gte(\Carbon\Carbon::parse($gpbStartedAt)->addMinutes($gpbMinutes))) {
-            $blockedByGpb = ['collecting_offers', 'scheduled', 'active', 'gpb_right'];
-            if (in_array($validated['status'], $blockedByGpb)) {
-                return response()->json([
-                    'message' => 'Время права ГПБ истекло. Невозможно установить статус "' . $validated['status'] . '".',
-                    'errors' => ['status' => ['Время права ГПБ истекло']]
-                ], 422);
-            }
+        // When manually setting gpb_right, reset gpb_started_at to now
+        if ($validated['status'] === 'gpb_right' && $auction->status !== 'gpb_right') {
+            $validated['gpb_started_at'] = $now;
         }
     }
 

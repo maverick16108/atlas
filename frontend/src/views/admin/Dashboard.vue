@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useConnectionStatus } from '@/composables/useConnectionStatus.js'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -27,6 +28,7 @@ ChartJS.register(
 )
 
 const router = useRouter()
+const { isConnected, statusText } = useConnectionStatus()
 
 const stats = ref([
     { name: 'Участники', value: '—', change: 'Загрузка...', type: 'neutral', action: () => router.push({ path: '/admin/users', query: { sort: 'newest' } }) },
@@ -254,7 +256,10 @@ onMounted(() => {
                       </div>
                       <div class="flex justify-between items-center">
                           <span class="text-gray-400">WebSocket</span>
-                          <span class="text-blue-400 font-bold flex items-center gap-2 text-xs uppercase tracking-wider"><span class="w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>Активен</span>
+                          <span class="font-bold flex items-center gap-2 text-xs uppercase tracking-wider" :class="isConnected ? 'text-emerald-400' : 'text-red-400'">
+                            <span class="w-2 h-2 rounded-full" :class="isConnected ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse'"></span>
+                            {{ statusText }}
+                          </span>
                       </div>
                   </div>
               </div>

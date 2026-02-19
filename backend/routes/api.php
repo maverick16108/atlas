@@ -41,6 +41,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Activity logs (journal)
     Route::get('/activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index']);
 
+    // Admin notifications
+    Route::prefix('admin')->group(function () {
+        Route::get('/notifications', [\App\Http\Controllers\AdminNotificationController::class, 'index']);
+        Route::get('/notifications/unread-count', [\App\Http\Controllers\AdminNotificationController::class, 'unreadCount']);
+        Route::post('/notifications/{id}/read', [\App\Http\Controllers\AdminNotificationController::class, 'markAsRead']);
+        Route::post('/notifications/read-all', [\App\Http\Controllers\AdminNotificationController::class, 'markAllAsRead']);
+    });
+
     // Client auction cabinet
     Route::prefix('client')->group(function () {
         Route::get('/auctions', [\App\Http\Controllers\ClientAuctionController::class, 'myAuctions']);
