@@ -258,31 +258,22 @@ const totalWeight = computed(() => {
     return ((auction.value.bar_count || 0) * (auction.value.bar_weight || 0)).toFixed(3)
 })
 
-// Auto-refresh for active/gpb/collecting auctions
-let refreshInterval = null
-const startAutoRefresh = () => {
-    refreshInterval = setInterval(() => {
-        if (['active', 'gpb_right', 'collecting_offers', 'scheduled'].includes(auction.value?.status)) {
-            fetchAuction()
-        }
-    }, 10000)
-}
-
 onMounted(async () => {
     await fetchAuction()
     startTimer()
-    startAutoRefresh()
 
-    // Subscribe to real-time bid updates
+    // Subscribe to real-time updates via WebSocket
     echo.channel(`auction.${auctionId}`)
         .listen('.bid.placed', () => {
+            fetchAuction()
+        })
+        .listen('.offer.placed', () => {
             fetchAuction()
         })
 })
 
 onUnmounted(() => {
     if (timerInterval) clearInterval(timerInterval)
-    if (refreshInterval) clearInterval(refreshInterval)
     echo.leaveChannel(`auction.${auctionId}`)
 })
 </script>

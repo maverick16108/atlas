@@ -301,6 +301,19 @@ class ClientAuctionController extends Controller
             'comment' => $validated['comment'] ?? null,
         ]);
 
+        // Broadcast to admin via WebSocket
+        try {
+            event(new \App\Events\OfferPlaced($auction->id, [
+                'id' => $offer->id,
+                'user_id' => $offer->user_id,
+                'volume' => $offer->volume,
+                'price' => $offer->price,
+                'created_at' => $offer->created_at->toISOString(),
+            ]));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('OfferPlaced broadcast failed: ' . $e->getMessage());
+        }
+
         return response()->json($offer, 201);
     }
 

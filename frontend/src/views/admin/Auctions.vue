@@ -67,9 +67,9 @@ const isLoadingOffers = ref(false)
 const offersCountCache = ref(0)
 const offersDisplayCount = computed(() => initialOffers.value.length || offersCountCache.value)
 
-const fetchInitialOffers = async () => {
+const fetchInitialOffers = async (silent = false) => {
     if (!editingId.value) return
-    isLoadingOffers.value = true
+    if (!silent) isLoadingOffers.value = true
     try {
         const response = await axios.get(`/api/auctions/${editingId.value}/initial-offers`)
         initialOffers.value = response.data
@@ -85,11 +85,10 @@ const auctionBids = ref([])
 const isLoadingBids = ref(false)
 const bidsCountCache = ref(0)
 const bidsDisplayCount = computed(() => auctionBids.value.length || bidsCountCache.value)
-const bidsPollInterval = ref(null)
 
-const fetchBids = async () => {
+const fetchBids = async (silent = false) => {
     if (!editingId.value) return
-    isLoadingBids.value = true
+    if (!silent) isLoadingBids.value = true
     try {
         const response = await axios.get(`/api/auctions/${editingId.value}/bids`)
         auctionBids.value = response.data.bids || []
@@ -100,19 +99,32 @@ const fetchBids = async () => {
     }
 }
 
-const startBidsPolling = () => {
-    stopBidsPolling()
-    bidsPollInterval.value = setInterval(() => {
-        fetchBids()
+// --- Fallback polling (only when WebSocket is disconnected) ---
+let fallbackInterval = null
+const startFallbackPolling = () => {
+    stopFallbackPolling()
+    fallbackInterval = setInterval(() => {
+        if (!showModal.value || !editingId.value) return
+        const status = newAuction.value.status
+        if (status === 'collecting_offers') fetchInitialOffers(true)
+        if (['active', 'gpb_right'].includes(status)) fetchBids(true)
     }, 5000)
 }
-
-const stopBidsPolling = () => {
-    if (bidsPollInterval.value) {
-        clearInterval(bidsPollInterval.value)
-        bidsPollInterval.value = null
+const stopFallbackPolling = () => {
+    if (fallbackInterval) {
+        clearInterval(fallbackInterval)
+        fallbackInterval = null
     }
 }
+
+// Auto-toggle fallback polling based on WebSocket connection
+watch(isConnected, (connected) => {
+    if (connected) {
+        stopFallbackPolling()
+    } else if (showModal.value) {
+        startFallbackPolling()
+    }
+})
 
 // Computed: allocate bids into winning / losing
 const allocatedBids = computed(() => {
@@ -906,14 +918,17 @@ const openEdit = async (auction) => {
     // Load offers and bids on modal open
     fetchInitialOffers()
     fetchBids()
-    // Subscribe to real-time bid updates
+    // Subscribe to real-time updates via WebSocket
     echo.channel(`auction.${auction.id}`)
         .listen('.bid.placed', () => {
-            fetchBids()
+            fetchBids(true)
         })
-    // Start polling for active auctions as reliable fallback
-    if (['active', 'collecting_offers', 'gpb_right'].includes(auction.status)) {
-        startBidsPolling()
+        .listen('.offer.placed', () => {
+            fetchInitialOffers(true)
+        })
+    // Start fallback polling if WebSocket is not connected
+    if (!isConnected.value) {
+        startFallbackPolling()
     }
     
     // Set Initial State
@@ -939,7 +954,7 @@ const closeModal = (force = false) => {
     }
 
     stopCountdown()
-    stopBidsPolling()
+    stopFallbackPolling()
     // Unsubscribe from real-time channel
     if (editingId.value) {
         echo.leaveChannel(`auction.${editingId.value}`)
@@ -1130,7 +1145,7 @@ onUnmounted(() => {
     window.removeEventListener('keydown', handleGlobalKeydown)
     window.removeEventListener('keydown', handleEnterKey)
     stopCountdown()
-    stopBidsPolling()
+    stopFallbackPolling()
 })
 
 onBeforeRouteLeave((to, from, next) => {
