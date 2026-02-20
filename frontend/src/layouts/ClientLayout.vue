@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useTheme } from '../composables/useTheme'
@@ -75,6 +75,21 @@ const toggleNotifications = async () => {
 }
 
 const closeNotifications = () => { showNotifications.value = false }
+
+const notificationRef = ref(null)
+const onDocumentClick = (e) => {
+    if (notificationRef.value && !notificationRef.value.contains(e.target)) {
+        closeNotifications()
+    }
+}
+watch(showNotifications, (val) => {
+    if (val) {
+        nextTick(() => document.addEventListener('click', onDocumentClick))
+    } else {
+        document.removeEventListener('click', onDocumentClick)
+    }
+})
+onUnmounted(() => document.removeEventListener('click', onDocumentClick))
 
 const markAsRead = async (notification) => {
     if (notification.read_at) return
@@ -201,7 +216,7 @@ onUnmounted(() => {
             
             <div class="flex items-center gap-4 md:gap-6">
                 <!-- Notifications Bell -->
-                <div class="relative">
+                <div class="relative" ref="notificationRef">
                     <button @click="toggleNotifications" class="relative text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-white/5">
                         <span v-if="unreadCount > 0" class="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white border-2 border-white dark:border-stone-900 animate-pulse">
                             {{ unreadCount > 9 ? '9+' : unreadCount }}
@@ -280,8 +295,6 @@ onUnmounted(() => {
                         </div>
                     </transition>
 
-                    <!-- Backdrop to close -->
-                    <div v-if="showNotifications" @click="closeNotifications" class="fixed inset-0 z-40"></div>
                 </div>
             </div>
         </header>

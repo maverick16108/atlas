@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import StandardModal from '../components/ui/StandardModal.vue'
@@ -101,6 +101,21 @@ const toggleNotifications = async () => {
 }
 
 const closeNotifications = () => { showNotifications.value = false }
+
+const notificationRef = ref(null)
+const onDocumentClick = (e) => {
+    if (notificationRef.value && !notificationRef.value.contains(e.target)) {
+        closeNotifications()
+    }
+}
+watch(showNotifications, (val) => {
+    if (val) {
+        nextTick(() => document.addEventListener('click', onDocumentClick))
+    } else {
+        document.removeEventListener('click', onDocumentClick)
+    }
+})
+onUnmounted(() => document.removeEventListener('click', onDocumentClick))
 
 const markAsRead = async (notification) => {
     if (notification.read_at) return
@@ -211,7 +226,7 @@ onUnmounted(() => {
             
             <div class="flex items-center gap-6">
                 <!-- Notifications Bell -->
-                <div class="relative">
+                <div class="relative" ref="notificationRef">
                     <button @click="toggleNotifications" class="relative text-gray-500 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5 active:scale-95">
                         <span v-if="unreadCount > 0" class="absolute top-0.5 right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white border-2 border-dark-800 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.4)]">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
@@ -288,8 +303,6 @@ onUnmounted(() => {
                         </div>
                     </transition>
 
-                    <!-- Backdrop to close -->
-                    <div v-if="showNotifications" @click="closeNotifications" class="fixed inset-0 z-40"></div>
                 </div>
             </div>
         </header>

@@ -25,6 +25,10 @@ const editForm = ref({})
 const initialEditState = ref(null)
 const showUnsavedModal = ref(false)
 
+// --- New Auction Mode ---
+const isNewAuction = ref(route.query.new === '1')
+const hasSaved = ref(false)
+
 // --- Participants ---
 const allParticipants = ref([])
 const selectedParticipantIds = ref([])
@@ -43,7 +47,6 @@ const offersDisplayCount = computed(() => initialOffers.value.length)
 const fetchInitialOffers = async (silent = false) => {
     if (!auctionId.value) return
     if (!silent) isLoadingOffers.value = true
-    if (!silent) await new Promise(r => setTimeout(r, 500))
     try {
         const r = await axios.get(`/api/auctions/${auctionId.value}/initial-offers`)
         initialOffers.value = r.data
@@ -59,7 +62,6 @@ const bidsDisplayCount = computed(() => auctionBids.value.length)
 const fetchBids = async (silent = false) => {
     if (!auctionId.value) return
     if (!silent) isLoadingBids.value = true
-    if (!silent) await new Promise(r => setTimeout(r, 500))
     try {
         const r = await axios.get(`/api/auctions/${auctionId.value}/bids`)
         auctionBids.value = r.data.bids || []
@@ -251,6 +253,7 @@ const startCountdown = () => {
                     const r = await axios.post(`/api/auctions/${auctionId.value}/transition-gpb`)
                     auction.value.status = 'gpb_right'
                     auction.value.gpb_started_at = r.data.gpb_started_at
+                    activeTab.value = 'gpb'
                     startCountdown()
                 } catch (e) { console.error('Failed to transition to GPB:', e) }
             }
@@ -258,6 +261,7 @@ const startCountdown = () => {
                 try {
                     await axios.put(`/api/auctions/${auctionId.value}`, { status: 'commission' })
                     auction.value.status = 'commission'
+                    activeTab.value = 'results'
                 } catch (e) { console.error('Failed to transition to commission:', e) }
             }
         }
@@ -328,7 +332,6 @@ const toggleParticipant = (id) => {
 const isLoadingParticipants = ref(false)
 const fetchParticipants = async () => {
     isLoadingParticipants.value = true
-    await new Promise(r => setTimeout(r, 500))
     try { allParticipants.value = (await axios.get('/api/participants-list')).data }
     catch (e) { console.error('Failed to load participants:', e) }
     finally { isLoadingParticipants.value = false }
@@ -338,13 +341,8 @@ const advanceStatus = () => {
     const order = ['draft', 'collecting_offers', 'scheduled', 'active', 'gpb_right', 'commission', 'completed']
     const idx = order.indexOf(editForm.value.status)
     if (idx === -1 || idx >= order.length - 1) return
-    // Find next non-blocked status
-    for (let i = idx + 1; i < order.length; i++) {
-        if (!blockedStatuses.value.includes(order[i])) {
-            editForm.value.status = order[i]
-            return
-        }
-    }
+    // Simply go to next status in order (no skipping)
+    editForm.value.status = order[idx + 1]
 }
 
 // --- Fetch Auction ---
@@ -391,7 +389,6 @@ const fetchAuction = async () => {
 
 const fetchAuctionData = async () => {
     isLoadingPage.value = true
-    await new Promise(r => setTimeout(r, 500))
     try {
         const { data } = await axios.get(`/api/auctions/${auctionId.value}`)
         auction.value = data
@@ -412,15 +409,15 @@ const openEditModal = () => {
         title: auction.value.title,
         status: auction.value.status,
         description: auction.value.description || '',
-        bar_count: auction.value.bar_count,
-        bar_weight: auction.value.bar_weight,
-        min_price: auction.value.min_price || 0,
-        min_step: auction.value.min_step || 10000,
+        bar_count: auction.value.bar_count ?? 10,
+        bar_weight: auction.value.bar_weight ?? 12.5,
+        min_price: auction.value.min_price ?? 900,
+        min_step: auction.value.min_step ?? 50,
         step_time: auction.value.step_time || 5,
         timezone: auction.value.timezone || 'Europe/Moscow',
         gpb_minutes: auction.value.gpb_minutes ?? 30,
         start_date: s.date, start_time: s.time || '10:00',
-        end_date: e.date, end_time: e.time || '18:00',
+        end_date: e.date, end_time: e.time || '12:00',
     }
     if (auction.value.participants?.length > 0) {
         selectedParticipantIds.value = auction.value.participants.map(p => p.id)
@@ -437,7 +434,7 @@ const openEditModal = () => {
     fetchParticipants()
 }
 
-const closeEditModal = (force = false) => {
+const closeEditModal = async (force = false) => {
     if (!force && showEditModal.value) {
         const current = JSON.stringify({ ...editForm.value, pids: [...selectedParticipantIds.value].sort() })
         if (current !== initialEditState.value) { showUnsavedModal.value = true; return }
@@ -445,11 +442,27 @@ const closeEditModal = (force = false) => {
     showEditModal.value = false
     showUnsavedModal.value = false
     errors.value = {}
+
+    // If new auction and never saved — delete draft and go back
+    if (isNewAuction.value && !hasSaved.value) {
+        try {
+            await axios.delete(`/api/auctions/${auctionId.value}`)
+        } catch (e) { console.error('Failed to delete draft:', e) }
+        router.push({ name: 'AdminAuctions' })
+    }
 }
 
-const confirmDiscardChanges = () => {
+const confirmDiscardChanges = async () => {
     showUnsavedModal.value = false
     showEditModal.value = false
+
+    // If new auction and never saved — delete draft and go back
+    if (isNewAuction.value && !hasSaved.value) {
+        try {
+            await axios.delete(`/api/auctions/${auctionId.value}`)
+        } catch (e) { console.error('Failed to delete draft:', e) }
+        router.push({ name: 'AdminAuctions' })
+    }
 }
 
 // Auto-shift End Date
@@ -489,8 +502,16 @@ const saveAuction = async () => {
             invite_all: inviteAll.value,
             participant_ids: inviteAll.value ? [] : selectedParticipantIds.value,
         })
+        hasSaved.value = true
+        if (isNewAuction.value) {
+            isNewAuction.value = false
+            router.replace({ query: {} })
+        }
         closeEditModal(true)
         await fetchAuction()
+        if (auction.value.status !== 'draft') {
+            activeTab.value = getDefaultTab(auction.value.status)
+        }
     } catch (e) {
         if (e.response?.status === 422) {
             const be = e.response.data.errors
@@ -529,6 +550,11 @@ onMounted(async () => {
     if (!isConnected.value) startFallbackPolling()
 
     if (['scheduled', 'active', 'gpb_right'].includes(auction.value?.status)) startCountdown()
+
+    // Auto-open edit modal for new auctions
+    if (isNewAuction.value && auction.value) {
+        openEditModal()
+    }
 })
 
 onUnmounted(() => {
@@ -654,6 +680,9 @@ onUnmounted(() => {
                      auction.status === 'scheduled' ? 'border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.1)]' :
                      auction.status === 'collecting_offers' ? 'border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)]' :
                      auction.status === 'completed' ? 'border-emerald-500/30 shadow-[0_0_15px_rgba(52,211,153,0.1)]' :
+                     auction.status === 'commission' ? 'border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.1)]' :
+                     auction.status === 'paused' ? 'border-amber-800/30 shadow-[0_0_15px_rgba(146,64,14,0.1)]' :
+                     auction.status === 'cancelled' ? 'border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)]' :
                      'bg-white/5 border-white/10'
                    ]">
                  <!-- Animated Glow Background for active states (behind everything) -->
@@ -666,6 +695,8 @@ onUnmounted(() => {
                         auction.status === 'collecting_offers' ? 'bg-cyan-950/40 rounded-lg' :
                         auction.status === 'completed' ? 'bg-emerald-950/40 rounded-lg' :
                         auction.status === 'commission' ? 'bg-orange-950/40 rounded-lg' :
+                        auction.status === 'paused' ? 'bg-amber-950/40 rounded-lg' :
+                        auction.status === 'cancelled' ? 'bg-red-950/40 rounded-lg' :
                         'rounded-lg'
                       ]">
                     <div class="relative flex h-2.5 w-2.5">
@@ -736,8 +767,8 @@ onUnmounted(() => {
              <!-- Participants -->
              <div class="flex items-center gap-2 min-w-[100px]">
                <span class="text-gray-500 text-xs uppercase font-bold tracking-wider">Участники</span>
-               <span v-if="isLoadingParticipants" class="inline-block w-8 h-4 bg-white/5 rounded skeleton-shimmer"></span>
-               <span v-else class="text-white font-bold min-w-[24px] text-center">{{ auction.invite_all ? allParticipants.length : selectedParticipantIds.length }}</span>
+               <span v-if="isLoadingParticipants" class="inline-block min-w-[26px] h-5 bg-white/5 rounded skeleton-shimmer"></span>
+               <span v-else class="text-white font-bold min-w-[26px] text-center">{{ auction.invite_all ? allParticipants.length : selectedParticipantIds.length }}</span>
              </div>
              <!-- Min Price -->
              <div class="flex items-center gap-2">
@@ -770,14 +801,14 @@ onUnmounted(() => {
       <div class="flex border-b border-white/10 mb-4 flex-shrink-0 min-h-[42px]">
         <button type="button" @click="activeTab = 'offers'" class="px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all relative flex items-center gap-2" :class="activeTab === 'offers' ? 'text-cyan-400' : 'text-gray-500 hover:text-gray-300'">
           Предложения
-          <span v-if="isLoadingOffers" class="inline-flex items-center justify-center w-[26px] h-5 rounded-full bg-white/5 skeleton-shimmer"></span>
-          <span v-else class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full" :class="activeTab === 'offers' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/10 text-gray-400'">{{ offersDisplayCount }}</span>
+          <span v-if="isLoadingOffers" class="inline-flex items-center justify-center min-w-[26px] h-5 px-1.5 text-[10px] rounded-full bg-white/5 skeleton-shimmer">&nbsp;</span>
+          <span v-else class="inline-flex items-center justify-center min-w-[26px] h-5 px-1.5 text-[10px] font-bold rounded-full" :class="activeTab === 'offers' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/10 text-gray-400'">{{ offersDisplayCount }}</span>
           <div v-if="activeTab === 'offers'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500 rounded-full"></div>
         </button>
         <button type="button" @click="() => { activeTab = 'trading'; startCountdown() }" class="px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all relative flex items-center gap-2" :class="activeTab === 'trading' ? 'text-amber-400' : 'text-gray-500 hover:text-gray-300'">
           Торги
-          <span v-if="isLoadingBids" class="inline-flex items-center justify-center w-[26px] h-5 rounded-full bg-white/5 skeleton-shimmer"></span>
-          <span v-else class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full" :class="activeTab === 'trading' ? 'bg-amber-500/20 text-amber-400' : 'bg-white/10 text-gray-400'">{{ bidsDisplayCount }}</span>
+          <span v-if="isLoadingBids" class="inline-flex items-center justify-center min-w-[26px] h-5 px-1.5 text-[10px] rounded-full bg-white/5 skeleton-shimmer">&nbsp;</span>
+          <span v-else class="inline-flex items-center justify-center min-w-[26px] h-5 px-1.5 text-[10px] font-bold rounded-full" :class="activeTab === 'trading' ? 'bg-amber-500/20 text-amber-400' : 'bg-white/10 text-gray-400'">{{ bidsDisplayCount }}</span>
           <div v-if="activeTab === 'trading'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500 rounded-full"></div>
         </button>
         <button type="button" @click="activeTab = 'gpb'" class="px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all relative flex items-center gap-2" :class="activeTab === 'gpb' ? 'text-blue-400' : 'text-gray-500 hover:text-gray-300'">
@@ -817,7 +848,7 @@ onUnmounted(() => {
           <span class="text-xs font-medium">Предложений пока нет</span>
         </div>
         <div v-else class="flex-1 overflow-auto scrollbar-dark rounded-lg border border-white/10 bg-dark-900/30">
-          <table class="w-full text-left border-collapse relative">
+          <table class="w-full text-left border-collapse">
             <thead class="sticky top-0 bg-dark-900 z-10">
               <tr class="border-b border-white/10 text-xs text-gray-500 uppercase tracking-widest font-bold">
                 <th class="px-4 py-3 bg-dark-900">Участник</th>
@@ -834,7 +865,7 @@ onUnmounted(() => {
                 <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(offer.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(offer.created_at).toLocaleTimeString('ru-RU') }}</div></td>
               </tr>
             </tbody>
-            <tfoot v-if="initialOffers.length > 0" class="sticky bottom-0 z-10 bg-[#0d1f24]" style="box-shadow: 0 10px 0 #0d1f24">
+            <tfoot v-if="initialOffers.length > 0" class="sticky bottom-0 z-10">
               <tr class="text-sm font-bold">
                 <td class="px-4 py-2 text-cyan-400 uppercase tracking-widest bg-[#0d1f24]" style="box-shadow: inset 0 1px 0 rgba(6,182,212,0.3)">Итого ({{ initialOffers.length }})</td>
                 <td class="px-4 py-2 text-right font-mono text-white bg-[#0d1f24]" style="box-shadow: inset 0 1px 0 rgba(6,182,212,0.3)">{{ initialOffers.reduce((s, o) => s + Number(o.volume), 0).toLocaleString() }}</td>
@@ -848,6 +879,11 @@ onUnmounted(() => {
 
       <!-- TAB: Trading - will be added next -->
       <div v-show="activeTab === 'trading'" class="flex-1 min-h-0 overflow-hidden flex flex-col gap-3">
+
+        <div v-if="tradingFinished" class="flex items-center gap-3 px-5 py-3.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 flex-shrink-0">
+          <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="text-sm font-bold uppercase tracking-widest text-emerald-400">Торги завершены</span>
+        </div>
 
         <div v-if="isLoadingBids" class="flex-1 rounded-lg border border-white/10 bg-dark-900/30 overflow-hidden">
           <div class="flex items-center gap-4 px-4 py-3 border-b border-white/10">
@@ -1063,52 +1099,52 @@ onUnmounted(() => {
         <template v-else>
           <!-- Summary Card -->
           <!-- Summary Card -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 flex-shrink-0 mb-4">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0 mb-4">
             
             <!-- Total Bids -->
-            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-dark-900/60 p-5 flex flex-col justify-between group hover:border-white/20 transition-all duration-300">
-              <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <span class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2 relative z-10">Всего ставок</span>
+            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-dark-900/80 p-4 flex flex-col justify-between group hover:border-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300">
+              <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/5 blur-2xl rounded-full group-hover:bg-white/10 transition-all duration-500"></div>
+              <span class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5 relative z-10">Всего ставок</span>
               <div class="flex items-end justify-between relative z-10">
-                <span class="text-3xl text-white font-bold font-mono tracking-tight">{{ auctionBids.length }}</span>
-                <div class="mb-1 p-1.5 rounded-lg bg-white/5 text-gray-400 group-hover:text-white group-hover:bg-white/10 transition-colors">
+                <span class="text-2xl text-white font-bold font-mono tracking-wide">{{ auctionBids.length }}</span>
+                <div class="mb-0.5 p-1.5 rounded-lg bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-gray-300 transition-colors hidden sm:block">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
                 </div>
               </div>
             </div>
 
             <!-- Allocated -->
-            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-dark-900/60 p-5 flex flex-col justify-between group hover:border-white/20 transition-all duration-300">
-               <div class="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500" :class="allocatedBids.lotBars >= allocatedBids.totalBars ? 'from-emerald-500/10' : 'from-yellow-500/10'"></div>
-              <span class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2 relative z-10">Распределено</span>
-              <div class="flex items-end justify-between relative z-10">
-                <span class="text-3xl font-bold font-mono tracking-tight" :class="allocatedBids.lotBars >= allocatedBids.totalBars ? 'text-emerald-400' : 'text-yellow-400'">{{ allocatedBids.lotBars }} <span class="text-lg text-gray-500 font-medium">/ {{ allocatedBids.totalBars }}</span></span>
-                <div class="mb-1 p-1.5 rounded-lg bg-white/5 transition-colors" :class="allocatedBids.lotBars >= allocatedBids.totalBars ? 'text-emerald-400 group-hover:bg-emerald-500/20' : 'text-yellow-400 group-hover:bg-yellow-500/20'">
+            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-dark-900/80 p-4 flex flex-col justify-between group hover:border-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300">
+               <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/5 blur-2xl rounded-full group-hover:bg-white/10 transition-all duration-500"></div>
+              <span class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5 relative z-10">Распределено</span>
+              <div class="flex items-baseline justify-between relative z-10">
+                <span class="text-2xl font-bold font-mono tracking-wide" :class="allocatedBids.lotBars >= allocatedBids.totalBars ? 'text-emerald-400' : 'text-amber-400'">{{ allocatedBids.lotBars }} <span class="text-sm font-medium text-gray-500">/ {{ allocatedBids.totalBars }}</span></span>
+                <div class="mb-0.5 p-1.5 rounded-lg bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-gray-300 transition-colors hidden sm:block">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
               </div>
             </div>
 
             <!-- Total Weight -->
-            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-dark-900/60 p-5 flex flex-col justify-between group hover:border-white/20 transition-all duration-300">
-              <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <span class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2 relative z-10">Общий вес</span>
+            <div class="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-dark-900/80 p-4 flex flex-col justify-between group hover:border-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300">
+              <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/5 blur-2xl rounded-full group-hover:bg-white/10 transition-all duration-500"></div>
+              <span class="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5 relative z-10">Общий вес</span>
               <div class="flex items-end justify-between relative z-10">
-                <span class="text-3xl text-white font-bold font-mono tracking-tight">{{ allocatedBids.lotWeight.toFixed(1) }} <span class="text-lg text-gray-500 font-sans font-medium">кг</span></span>
-                <div class="mb-1 p-1.5 rounded-lg bg-white/5 text-gray-400 group-hover:text-blue-400 group-hover:bg-blue-500/10 transition-colors">
+                <span class="text-2xl text-blue-400 font-bold font-mono tracking-wide">{{ allocatedBids.lotWeight.toFixed(1) }} <span class="text-sm font-sans font-medium text-gray-500">кг</span></span>
+                <div class="mb-0.5 p-1.5 rounded-lg bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-gray-300 transition-colors hidden sm:block">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
                 </div>
               </div>
             </div>
 
             <!-- Total Sum -->
-            <div class="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-900/20 p-5 flex flex-col justify-between group hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300">
-              <div class="absolute inset-0 bg-[url('/img/noise.png')] opacity-20 mix-blend-overlay"></div>
-              <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/20 blur-3xl rounded-full group-hover:bg-emerald-500/30 transition-all duration-500"></div>
+            <div class="relative overflow-hidden rounded-2xl border border-gold-500/30 bg-gradient-to-br from-gold-500/15 to-dark-900/90 p-4 flex flex-col justify-between group hover:border-gold-500/50 hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all duration-300">
+              <div class="absolute inset-0 bg-[url('/img/noise.png')] opacity-10 mix-blend-overlay"></div>
+              <div class="absolute -right-4 -top-4 w-24 h-24 bg-gold-500/20 blur-2xl rounded-full group-hover:bg-gold-500/30 transition-all duration-500"></div>
               
-              <span class="text-[10px] uppercase tracking-widest text-emerald-400/80 font-bold mb-2 relative z-10">Итого сумма</span>
-              <div class="flex items-end justify-between relative z-10">
-                <span class="text-3xl text-emerald-300 font-bold font-mono tracking-tight text-shadow-sm"><span class="font-sans text-2xl opacity-80">₽</span>&nbsp;{{ allocatedBids.lotTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</span>
+              <span class="text-[10px] uppercase tracking-widest text-gold-400/90 font-bold mb-1.5 relative z-10">Итого сумма</span>
+              <div class="flex items-end justify-between relative z-10 truncate">
+                <span class="text-2xl text-gold-300 font-bold font-mono tracking-wide text-shadow-sm truncate"><span class="font-sans text-lg opacity-80 mr-1">₽</span>{{ allocatedBids.lotTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</span>
               </div>
             </div>
           </div>
@@ -1134,7 +1170,7 @@ onUnmounted(() => {
                   <td class="px-4 py-3 text-right font-mono text-sm font-bold" :class="bid.partial ? 'text-yellow-400' : 'text-white'">{{ bid.fulfilled }}<span v-if="bid.partial" class="text-[10px] text-yellow-500 ml-1">(частич.)</span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-emerald-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-white"><span class="font-sans">₽</span>&nbsp;{{ (bid.fulfilled * (allocatedBids.barWeight * 1000) * Number(bid.amount)).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500">{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                 </tr>
                 <tr v-if="allocatedBids.losing.length > 0"><td colspan="6" class="px-4 py-2 bg-red-500/10 border-b border-red-500/20 border-t border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ allocatedBids.losing.reduce((s,b) => s + b.bar_count, 0) }})</span></td></tr>
                 <tr v-for="(bid, idx) in allocatedBids.losing" :key="'rl-'+bid.id" class="border-b border-white/5 hover:bg-white/5 transition-colors opacity-60">
@@ -1143,7 +1179,7 @@ onUnmounted(() => {
                   <td class="px-4 py-3 text-right font-mono text-sm text-gray-400">{{ bid.bar_count }}</td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-600">{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                 </tr>
               </tbody>
             </table>
@@ -1154,9 +1190,8 @@ onUnmounted(() => {
       </div><!-- end tab content area -->
 
       <!-- EDIT MODAL -->
-      <StandardModal :is-open="showEditModal" max-width="max-w-2xl" @close="closeEditModal(true)">
+      <StandardModal :is-open="showEditModal" max-width="max-w-2xl" :title="isNewAuction ? 'Новый аукцион' : 'Редактирование'" @close="closeEditModal()">
         <form @submit.prevent="saveAuction" class="flex flex-col h-[820px]">
-          <h2 class="text-lg font-kanit font-bold text-white tracking-wide uppercase mb-4 flex-shrink-0">Редактирование аукциона</h2>
 
           <!-- Internal tabs -->
           <div class="flex border-b border-white/10 mb-4 flex-shrink-0">

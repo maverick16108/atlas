@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Auto-transition auction statuses every minute
 Schedule::command('auctions:transition-expired')->everyMinute();
+
+// Send auction start reminders and completion notifications every minute
+Schedule::command('auctions:send-reminders')->everyMinute();

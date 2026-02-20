@@ -101,18 +101,19 @@ class AuctionController extends Controller
             'invite_all' => ['nullable', 'boolean'],
         ]);
 
+        $tomorrow = now()->addDay();
         $auction = Auction::create([
-            'title' => $validated['title'] ?? 'Без названия',
-            'start_at' => $validated['start_at'] ?? null,
-            'end_at' => $validated['end_at'] ?? null,
+            'title' => $validated['title'] ?? '',
+            'start_at' => $validated['start_at'] ?? $tomorrow->copy()->setTime(10, 0),
+            'end_at' => $validated['end_at'] ?? $tomorrow->copy()->setTime(12, 0),
             'status' => $validated['status'] ?? 'draft',
-            'min_step' => $validated['min_step'] ?? 10000,
+            'min_step' => $validated['min_step'] ?? 50,
             'step_time' => $validated['step_time'] ?? 5,
             'timezone' => $validated['timezone'] ?? 'Europe/Moscow',
-            'min_price' => $validated['min_price'] ?? null,
+            'min_price' => $validated['min_price'] ?? 900,
             'description' => $validated['description'] ?? null,
-            'bar_count' => $validated['bar_count'] ?? null,
-            'bar_weight' => $validated['bar_weight'] ?? null,
+            'bar_count' => $validated['bar_count'] ?? 10,
+            'bar_weight' => $validated['bar_weight'] ?? 12.5,
             'gpb_minutes' => $validated['gpb_minutes'] ?? 30,
             'invite_all' => $validated['invite_all'] ?? false,
         ]);
