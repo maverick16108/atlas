@@ -158,7 +158,10 @@ onUnmounted(() => {
                               🏆 Ведёте
                           </span>
                       </div>
-                      <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white group-hover:text-gold-600 dark:group-hover:text-gold-400 transition-colors truncate">{{ auction.title }}</h3>
+                      <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white group-hover:text-gold-600 dark:group-hover:text-gold-400 transition-colors truncate">
+                          <span class="text-gray-400 dark:text-gray-500 font-mono text-sm mr-1.5">№{{ auction.id }}</span>
+                          {{ auction.title }}
+                      </h3>
                       <p v-if="auction.description" class="text-xs text-gray-500 mt-1 line-clamp-1">{{ auction.description }}</p>
                   </div>
 

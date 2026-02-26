@@ -21,6 +21,7 @@ const myWinningBars = ref(0)
 const highestBid = ref(null)
 const isLoading = ref(true)
 const error = ref(null)
+const isGpb = ref(false)
 const previousBidsCount = ref(0)
 const newBidsFlash = ref(false)
 const goBack = () => router.push('/client/auctions')
@@ -146,6 +147,7 @@ const fetchAuction = async () => {
         myStatus.value = response.data.my_status || 'none'
         myWinningBars.value = response.data.my_winning_bars || 0
         highestBid.value = response.data.highest_bid || null
+        isGpb.value = response.data.is_gpb || false
 
         // Flash notification on new bids
         if (oldBidsCount > 0 && allBids.value.length > oldBidsCount) {
@@ -272,6 +274,78 @@ const placeBid = async () => {
         }
     } finally {
         isSubmittingBid.value = false
+    }
+}
+
+// ===== GPB Priority Purchase =====
+const gpbForm = ref({ bar_count: 1 })
+const isSubmittingGpb = ref(false)
+
+// Winning bids sorted by price ASC (cheapest first) — for GPB to take
+const gpbAvailableBids = computed(() => {
+    return [...winningBids.value].sort((a, b) => Number(a.amount) - Number(b.amount))
+})
+
+// Max bars GPB can take
+const gpbMaxBars = computed(() => lotSummary.value.lotBars || 0)
+
+// Live preview: which bids GPB takes at current bar_count
+const gpbPreview = computed(() => {
+    const want = gpbForm.value.bar_count || 0
+    const barWeight = auction.value?.bar_weight || 0
+    let remaining = want
+    const taken = []
+    for (const bid of gpbAvailableBids.value) {
+        if (remaining <= 0) break
+        const take = Math.min(bid.fulfilled, remaining)
+        taken.push({
+            ...bid,
+            gpbTake: take,
+            gpbPricePerGram: Number(bid.amount),
+            gpbPricePerBar: Number(bid.amount) * (barWeight * 1000 || 1),
+            gpbSum: take * (barWeight * 1000 || 1) * Number(bid.amount)
+        })
+        remaining -= take
+    }
+    const totalBars = taken.reduce((s, b) => s + b.gpbTake, 0)
+    const totalWeight = totalBars * barWeight
+    const totalSum = taken.reduce((s, b) => s + b.gpbSum, 0)
+    const minPrice = taken.length > 0 ? Math.min(...taken.map(b => b.gpbPricePerGram)) : 0
+    return { taken, totalBars, totalWeight, totalSum, minPrice }
+})
+
+// Submit GPB purchase
+const submitGpbPurchase = async () => {
+    formErrors.value = {}
+    successMessage.value = ''
+
+    if (!gpbForm.value.bar_count || gpbForm.value.bar_count < 1) {
+        formErrors.value.bar_count = 'Минимум 1 слиток'
+        return
+    }
+    if (gpbForm.value.bar_count > gpbMaxBars.value) {
+        formErrors.value.bar_count = `Максимум ${gpbMaxBars.value} слитков`
+        return
+    }
+
+    isSubmittingGpb.value = true
+    try {
+        // GPB sends bar_count + minimum price from taken bids
+        const response = await axios.post(`/api/client/auctions/${auctionId}/bid`, {
+            bar_count: gpbForm.value.bar_count,
+            amount: gpbPreview.value.minPrice,
+        })
+        successMessage.value = response.data.message || 'Слитки забраны!'
+        await fetchAuction()
+        setTimeout(() => { successMessage.value = '' }, 3000)
+    } catch (e) {
+        if (e.response?.data?.errors) {
+            formErrors.value = e.response.data.errors
+        } else {
+            formErrors.value.general = e.response?.data?.message || 'Ошибка'
+        }
+    } finally {
+        isSubmittingGpb.value = false
     }
 }
 
@@ -431,7 +505,7 @@ onUnmounted(() => {
                       ]">{{ getStatusInfo(auction.status).label }}</span>
                     </div>
                       <!-- Show partial / winning status inline if exists -->
-                      <span v-if="['active', 'gpb_right'].includes(auction.status) && myStatus !== 'none'" class="ml-2 pl-2 border-l border-gray-200 dark:border-white/10 flex flex-col leading-none">
+                      <span v-if="['active', 'gpb_right'].includes(auction.status) && myStatus !== 'none' && !(isGpb && auction.status === 'gpb_right')" class="ml-2 pl-2 border-l border-gray-200 dark:border-white/10 flex flex-col leading-none">
 
                          <span v-if="myStatus === 'winning'" class="text-xs font-bold text-green-600 dark:text-green-400 flex items-center gap-1"><span class="text-[10px]">🏆</span> Вы ведёте</span>
                          <span v-else-if="myStatus === 'losing'" class="text-xs font-bold text-red-600 dark:text-red-400">Перебиты</span>
@@ -475,10 +549,7 @@ onUnmounted(() => {
                       class="px-5 py-2 flex flex-col items-center justify-center min-w-[120px] rounded-r-lg border-l bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-500/30 backdrop-blur-sm">
                      <span class="text-xs font-bold text-red-500 dark:text-red-400 uppercase tracking-wider">Отменён</span>
                  </div>
-                 <div v-else-if="['completed', 'commission'].includes(auction.status)"
-                      class="px-5 py-2 flex flex-col items-center justify-center min-w-[120px] rounded-r-lg border-l bg-gray-50 dark:bg-emerald-950/40 border-gray-200 dark:border-emerald-500/30 backdrop-blur-sm">
-                     <span class="text-xs font-bold text-gray-400 dark:text-emerald-400 uppercase tracking-wider">Завершено</span>
-                 </div>
+
               </div>
             </div>
           </div>
@@ -528,16 +599,6 @@ onUnmounted(() => {
           </div>
       </transition>
 
-      <!-- New bids flash -->
-      <transition enter-active-class="transition ease-out duration-300" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0"
-                  leave-active-class="transition ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
-          <div v-if="newBidsFlash" class="bg-blue-500/10 border border-blue-500/30 rounded-lg px-5 py-3 flex items-center gap-3">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              <span class="text-sm text-blue-700 dark:text-blue-400 font-bold">Новые ставки! Данные обновлены.</span>
-          </div>
-      </transition>
 
       <!-- Error message -->
       <div v-if="formErrors.general" class="bg-red-500/10 border border-red-500/30 rounded-lg px-5 py-3 flex items-center gap-3">
@@ -617,9 +678,89 @@ onUnmounted(() => {
       </div>
 
       <!-- ======== ACTIVE TRADING SECTION ======== -->
-      <div v-if="auction.status === 'active'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Bid Form -->
-          <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border p-6 lg:col-span-1 transition-all duration-500"
+      <div v-if="auction.status === 'active' || (auction.status === 'gpb_right' && isGpb)" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- ===== GPB Priority Purchase Card ===== -->
+          <div v-if="isGpb && auction.status === 'gpb_right'" class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-blue-300 dark:border-blue-500/30 p-6 lg:col-span-1 transition-all duration-500 shadow-[0_0_25px_rgba(59,130,246,0.1)]">
+              <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                  <span class="text-xl">🏛</span>
+                  Приоритетная покупка
+              </h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-5">Выберите количество слитков для выкупа</p>
+
+              <div class="space-y-4">
+                  <!-- Bar count input -->
+                  <div class="space-y-1">
+                      <div class="flex items-center justify-between">
+                          <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Количество слитков</label>
+                          <span class="text-[10px] text-gray-400 font-mono">макс. {{ gpbMaxBars }}</span>
+                      </div>
+                      <div class="relative group">
+                          <input v-model.number="gpbForm.bar_count" type="number" min="1" :max="gpbMaxBars"
+                             class="w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-4 pr-10 py-3 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono text-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                             :class="formErrors.bar_count ? 'border-red-500/50' : ''" />
+                          <div class="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity bg-gray-200/50 dark:bg-white/5 rounded divide-y divide-gray-300 dark:divide-white/10 border border-gray-300 dark:border-white/10 overflow-hidden">
+                              <button type="button" tabindex="-1" @click="gpbForm.bar_count = Math.min((gpbForm.bar_count || 1) + 1, gpbMaxBars || 999)" class="w-6 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-white/10 transition-colors">
+                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
+                              </button>
+                              <button type="button" tabindex="-1" @click="gpbForm.bar_count = Math.max((gpbForm.bar_count || 1) - 1, 1)" class="w-6 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-white/10 transition-colors">
+                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                              </button>
+                          </div>
+                      </div>
+                      <p v-if="formErrors.bar_count" class="text-red-400 text-xs">{{ Array.isArray(formErrors.bar_count) ? formErrors.bar_count[0] : formErrors.bar_count }}</p>
+                      <!-- Slider -->
+                      <input type="range" min="1" :max="gpbMaxBars || 1" v-model.number="gpbForm.bar_count"
+                             class="w-full h-1.5 bg-gray-200 dark:bg-white/10 rounded-full appearance-none cursor-pointer accent-blue-500 mt-2" />
+                  </div>
+
+                  <!-- Live preview of taken bids -->
+                  <div v-if="gpbPreview.taken.length > 0" class="rounded-lg border border-gray-200 dark:border-white/10 overflow-hidden bg-gray-50 dark:bg-dark-900/40">
+                      <div class="px-3 py-2 border-b border-gray-200 dark:border-white/10 bg-blue-50/50 dark:bg-blue-500/5">
+                          <p class="text-[10px] uppercase tracking-widest text-blue-600 dark:text-blue-400 font-bold">Забираемые ставки</p>
+                      </div>
+                      <div class="divide-y divide-gray-100 dark:divide-white/5 max-h-[240px] overflow-auto">
+                          <div v-for="(item, idx) in gpbPreview.taken" :key="idx" class="px-3 py-2.5 flex items-center justify-between gap-2 text-sm">
+                              <div class="flex items-center gap-2 min-w-0">
+                                  <span class="text-gray-400 font-mono text-xs w-4 shrink-0">{{ idx + 1 }}</span>
+                                  <span class="text-gray-900 dark:text-white font-medium truncate">{{ item.participant_label.replace('Участник', 'Уч.') }}</span>
+                              </div>
+                              <div class="flex items-center gap-3 shrink-0">
+                                  <span class="font-mono text-xs text-blue-600 dark:text-blue-400 font-bold">{{ item.gpbTake }} сл.</span>
+                                  <span class="font-mono text-xs text-gray-500">₽ {{ formatPrice(item.gpbPricePerGram) }}/г</span>
+                                  <span class="font-mono text-xs text-gray-900 dark:text-white font-bold min-w-[90px] text-right">₽ {{ formatPrice(item.gpbSum) }}</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Totals -->
+                  <div v-if="gpbPreview.totalBars > 0" class="bg-blue-50 dark:bg-blue-500/10 rounded-lg px-4 py-3 border border-blue-200 dark:border-blue-500/20 space-y-1.5">
+                      <div class="flex justify-between items-center">
+                          <span class="text-[10px] uppercase tracking-widest text-blue-600/70 dark:text-blue-400/70 font-bold">Слитков</span>
+                          <span class="font-mono text-sm font-bold text-blue-700 dark:text-blue-300">{{ gpbPreview.totalBars }}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                          <span class="text-[10px] uppercase tracking-widest text-blue-600/70 dark:text-blue-400/70 font-bold">Вес</span>
+                          <span class="font-mono text-sm font-bold text-blue-700 dark:text-blue-300">{{ gpbPreview.totalWeight.toFixed(3) }} кг</span>
+                      </div>
+                      <div class="border-t border-blue-200 dark:border-blue-500/20 pt-1.5 flex justify-between items-center">
+                          <span class="text-[10px] uppercase tracking-widest text-blue-600 dark:text-blue-400 font-bold">Итого</span>
+                          <span class="font-mono text-lg font-black text-blue-700 dark:text-blue-300"><span class="font-sans text-xs">₽</span>&nbsp;{{ formatPrice(gpbPreview.totalSum) }}</span>
+                      </div>
+                  </div>
+
+                  <!-- Submit -->
+                  <button @click="submitGpbPurchase" :disabled="isSubmittingGpb || gpbPreview.totalBars === 0"
+                          class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-widest rounded-lg transition-all shadow-lg shadow-blue-500/30 text-base disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]">
+                      {{ isSubmittingGpb ? 'Обработка...' : '🏛 Забрать слитки' }}
+                  </button>
+              </div>
+
+          </div>
+
+
+          <!-- ===== Regular Bid Form (non-GPB during active) ===== -->
+          <div v-else class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border p-6 lg:col-span-1 transition-all duration-500"
                :class="myStatus === 'winning' ? 'border-green-500/30 shadow-[0_0_25px_rgba(34,197,94,0.15)]' : myStatus === 'losing' ? 'border-red-500/30 shadow-[0_0_25px_rgba(239,68,68,0.1)]' : 'border-gold-500/20'">
               <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full animate-pulse" :class="myStatus === 'winning' ? 'bg-green-500' : 'bg-gold-500'"></span>
@@ -761,7 +902,7 @@ onUnmounted(() => {
                               <td colspan="7" class="px-4 py-2 bg-red-500/10 border-b border-red-500/20 border-t border-t-gray-200 dark:border-t-white/10">
                                   <span class="text-[10px] uppercase tracking-widest text-red-400 font-bold flex items-center gap-1.5">
                                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                      Не попали ({{ losingBids.reduce((sum, b) => sum + b.bar_count, 0) }})
+                                      Не попали
                                   </span>
                               </td>
                           </tr>
@@ -787,10 +928,10 @@ onUnmounted(() => {
       </div>
 
       <!-- ======== GPB / COMMISSION / NON-ACTIVE SECTION ======== -->
-      <div v-if="['gpb_right','commission','completed','paused','cancelled'].includes(auction.status)" class="space-y-6">
+      <div v-if="(isGpb && auction.status === 'active') || (['gpb_right','commission','completed','paused','cancelled'].includes(auction.status) && !(isGpb && auction.status === 'gpb_right'))" class="space-y-6">
           <div class="grid grid-cols-1 gap-6">
-          <!-- My Status Card -->
-          <div class="h-full flex flex-col justify-center bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border p-6 transition-all duration-500"
+          <!-- My Status Card (not for GPB participants) -->
+          <div v-if="!isGpb" class="h-full flex flex-col justify-center bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border p-6 transition-all duration-500"
                :class="myStatus === 'winning' ? 'border-green-500/30 shadow-[0_0_25px_rgba(34,197,94,0.15)]' : myStatus === 'losing' ? 'border-red-500/30' : 'border-gray-200 dark:border-white/10'">
               <div class="flex flex-col xl:flex-row items-stretch gap-4 h-full">
                   <div class="flex-1 w-full relative">
@@ -810,13 +951,7 @@ onUnmounted(() => {
                               <p class="text-[11px] xl:text-sm text-yellow-800/70 dark:text-yellow-200/60 font-medium font-mono"><span class="font-bold text-yellow-700 dark:text-yellow-400">{{ myWinningBars }}</span> слитков из запрошенных</p>
                           </div>
                       </div>
-                        <div v-else-if="auction.status === 'gpb_right' || auction.status === 'commission'" class="flex items-center gap-3 bg-blue-500/10 px-4 py-2 rounded-xl shrink-0">
-                            <div class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>
-                            <div>
-                                <div class="text-[10px] font-bold text-gray-400 tracking-widest uppercase relative z-10 font-mono">Статус</div>
-                                <div class="font-bold text-blue-600 dark:text-blue-400 text-sm whitespace-nowrap">{{ statusOptions[auction.status].label }}</div>
-                            </div>
-                        </div>
+
                       <div v-else-if="myStatus === 'losing'" class="bg-red-500/10 border border-red-500/30 rounded-lg p-3 xl:p-4 flex items-center gap-4 h-full">
                           <div class="text-xl bg-red-500/20 w-10 h-10 flex items-center justify-center rounded-full shrink-0">📉</div>
                           <div>
@@ -824,11 +959,12 @@ onUnmounted(() => {
                               <p class="text-[11px] xl:text-sm text-gray-500 dark:text-gray-400">Ставки не вошли в лот</p>
                           </div>
                       </div>
-                      <div v-else class="bg-gray-50 dark:bg-dark-900/50 border border-gray-100 dark:border-white/5 rounded-lg p-3 xl:p-4 flex items-center gap-4 h-full">
-                          <div class="text-xl bg-gray-200 dark:bg-white/5 w-10 h-10 flex items-center justify-center rounded-full shrink-0">📊</div>
-                          <div>
-                              <p class="text-[11px] xl:text-sm font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Нет ставок</p>
-                              <p class="text-[11px] xl:text-sm text-gray-500">Вы не размещали ставок</p>
+                      <div v-else class="relative overflow-hidden bg-gradient-to-br from-gray-50 to-slate-100 dark:from-dark-900/80 dark:to-slate-900/60 border border-gray-200/80 dark:border-white/10 rounded-xl p-3 xl:p-4 flex items-center gap-4 h-full group">
+                          <div class="absolute -right-6 -top-6 w-20 h-20 bg-gray-300/20 dark:bg-white/5 blur-2xl rounded-full"></div>
+                          <div class="relative text-xl bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700 w-10 h-10 flex items-center justify-center rounded-xl shrink-0 shadow-sm">📊</div>
+                          <div class="relative">
+                              <p class="text-[11px] xl:text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none mb-1">Наблюдатель</p>
+                              <p class="text-[11px] xl:text-sm text-gray-400 dark:text-gray-500">Вы не участвовали в торгах</p>
                           </div>
                       </div>
                       

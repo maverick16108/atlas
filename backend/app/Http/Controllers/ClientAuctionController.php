@@ -260,6 +260,7 @@ class ClientAuctionController extends Controller
             'my_status' => $myStatus,
             'my_winning_bars' => $myWinningBars,
             'highest_bid' => $highestBid,
+            'is_gpb' => (bool) $user->is_gpb,
         ]);
     }
 
@@ -337,13 +338,29 @@ class ClientAuctionController extends Controller
             return response()->json(['message' => 'Вы не являетесь участником этого аукциона'], 403);
         }
 
-        if ($auction->status !== 'active') {
+        if ($auction->status === 'active') {
+            // Обычные торги — GPB участники НЕ могут ставить
+            if ($user->is_gpb) {
+                return response()->json(['message' => 'ГПБ участник не может ставить в обычных торгах'], 422);
+            }
+            // Check if auction time has expired
+            if ($auction->end_at && now()->gte($auction->end_at)) {
+                return response()->json(['message' => 'Время торгов истекло'], 422);
+            }
+        } elseif ($auction->status === 'gpb_right') {
+            // Фаза Право ГПБ — только GPB участники могут ставить
+            if (!$user->is_gpb) {
+                return response()->json(['message' => 'Торги не активны'], 422);
+            }
+            // Проверка: не истекло ли время ГПБ
+            if ($auction->gpb_started_at) {
+                $gpbEnd = \Carbon\Carbon::parse($auction->gpb_started_at)->addMinutes($auction->gpb_minutes ?? 30);
+                if (now()->gte($gpbEnd)) {
+                    return response()->json(['message' => 'Время права ГПБ истекло'], 422);
+                }
+            }
+        } else {
             return response()->json(['message' => 'Торги не активны'], 422);
-        }
-
-        // Check if auction time has expired
-        if ($auction->end_at && now()->gte($auction->end_at)) {
-            return response()->json(['message' => 'Время торгов истекло'], 422);
         }
 
         $validated = $request->validate([
@@ -405,6 +422,15 @@ class ClientAuctionController extends Controller
             \Illuminate\Support\Facades\Log::warning('BidPlaced broadcast failed: ' . $e->getMessage());
         }
 
+        // If GPB bid during gpb_right → auto-transition to commission
+        if ($auction->status === 'gpb_right' && $user->is_gpb) {
+            $auction->update(['status' => 'commission']);
+            ActivityLog::log('updated', 'auction', $auction->id, $auction->title, null, [
+                'status' => ['old' => 'gpb_right', 'new' => 'commission'],
+                'reason' => 'GPB exercised priority purchase right',
+            ]);
+        }
+
         return response()->json([
             'bid' => [
                 'id' => $bid->id,
@@ -412,7 +438,7 @@ class ClientAuctionController extends Controller
                 'bar_count' => $bid->bar_count,
                 'created_at' => $bid->created_at,
             ],
-            'message' => 'Ставка принята',
+            'message' => $auction->status === 'commission' ? 'Слитки забраны! Аукцион передан комиссии.' : 'Ставка принята',
         ], 201);
     }
 

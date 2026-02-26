@@ -622,7 +622,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col">
     <!-- Loading Skeleton -->
     <div v-if="isLoadingPage" class="flex flex-col h-full overflow-hidden relative">
         <!-- Back button skeleton -->
@@ -681,7 +681,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Ready Content -->
-    <div v-else class="flex flex-col h-full overflow-hidden relative">
+    <div v-else class="flex flex-col relative">
       <!-- Header Bar -->
       <div class="flex items-center gap-4 mb-4 flex-shrink-0">
         <button @click="goBack" class="group flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300 active:scale-95 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white">
@@ -879,11 +879,11 @@ onUnmounted(() => {
       </div>
 
       <!-- Tab Content Area -->
-      <div class="flex-1 min-h-0 overflow-hidden flex flex-col">
+      <div class="flex flex-col">
 
       <!-- TAB: Offers -->
       <!-- TAB: Offers -->
-      <div v-show="activeTab === 'offers'" class="flex-1 min-h-0 overflow-hidden flex flex-col">
+      <div v-show="activeTab === 'offers'" class="flex flex-col">
         <div v-if="isLoadingOffers" class="flex-1 rounded-lg border border-white/10 bg-dark-900/30 overflow-hidden">
           <div class="flex items-center gap-4 px-4 py-3 border-b border-white/10">
             <div class="h-3 w-20 bg-white/5 rounded skeleton-shimmer"></div>
@@ -941,7 +941,7 @@ onUnmounted(() => {
       </div>
 
       <!-- TAB: Trading - will be added next -->
-      <div v-show="activeTab === 'trading'" class="flex-1 min-h-0 overflow-hidden flex flex-col gap-3">
+      <div v-show="activeTab === 'trading'" class="flex flex-col gap-3">
 
         <div v-if="tradingFinished" class="flex items-center gap-3 px-5 py-3.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 flex-shrink-0">
           <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1027,7 +1027,7 @@ onUnmounted(() => {
       </div>
 
       <!-- TAB: GPB Right -->
-      <div v-show="activeTab === 'gpb'" class="flex-1 min-h-0 overflow-hidden flex flex-col gap-3">
+      <div v-show="activeTab === 'gpb'" class="flex flex-col gap-3">
         <div v-if="gpbFinished" class="flex items-center gap-3 px-5 py-3.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 flex-shrink-0">
           <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span class="text-sm font-bold uppercase tracking-widest text-emerald-400">Право ГПБ завершено</span>
@@ -1130,7 +1130,7 @@ onUnmounted(() => {
       </div>
 
       <!-- TAB: Results -->
-      <div v-show="activeTab === 'results'" class="flex-1 min-h-0 overflow-hidden flex flex-col gap-3">
+      <div v-show="activeTab === 'results'" class="flex flex-col gap-3">
         <div v-if="isLoadingBids" class="flex-1 flex flex-col gap-3">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-shrink-0">
             <div v-for="i in 4" :key="i" class="p-3 rounded-lg border border-white/10 bg-dark-900/40">
