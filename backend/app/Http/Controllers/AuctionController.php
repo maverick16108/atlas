@@ -304,10 +304,17 @@ class AuctionController extends Controller
         } catch (\Throwable $e) {}
 
         try {
-            return $auction->load('participants')->loadCount('auctionParticipants')->loadCount('initialOffers')->loadCount('bids');
+            $freshAuction = $auction->load('participants')->loadCount('auctionParticipants')->loadCount('initialOffers')->loadCount('bids');
         } catch (QueryException $e) {
-            return $auction;
+            $freshAuction = $auction;
         }
+
+        // Broadcast status change to all connected clients
+        try {
+            event(new \App\Events\AuctionUpdated($auction->id, $freshAuction->toArray()));
+        } catch (\Throwable $e) {}
+
+        return $freshAuction;
     }
 
     /**

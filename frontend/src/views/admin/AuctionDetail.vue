@@ -585,20 +585,17 @@ onMounted(async () => {
         .listen('.bid.placed', () => fetchBids(true))
         .listen('.offer.placed', () => fetchInitialOffers(true))
         .listen('.auction.updated', (data) => {
-            if (data) {
-                const oldStatus = auction.value?.status
-                auction.value = { ...auction.value, ...data }
-                // Restart or stop countdown based on new status
+            // Event payload is minimal (id, status, title) — do full refetch
+            const oldStatus = auction.value?.status
+            fetchAuction()
+            fetchBids(true)
+            fetchInitialOffers(true)
+            if (data?.status && data.status !== oldStatus) {
+                fetchParticipants()
                 if (['scheduled', 'active', 'gpb_right'].includes(data.status)) {
                     startCountdown()
                 } else {
                     stopCountdown()
-                }
-                // Refresh related data if status changed
-                if (oldStatus !== data.status) {
-                    fetchBids(true)
-                    fetchInitialOffers(true)
-                    fetchParticipants()
                 }
             }
         })

@@ -43,6 +43,13 @@ class AuctionUpdated implements ShouldBroadcastNow
      */
     public function broadcastWith(): array
     {
-        return $this->auction;
+        // Send only minimal data to avoid Pusher/Reverb payload size limits.
+        // Clients do a full fetchAuction() on receiving this event.
+        return [
+            'id' => $this->auctionId,
+            'status' => $this->auction['status'] ?? null,
+            'title' => $this->auction['title'] ?? null,
+            'updated_at' => $this->auction['updated_at'] ?? null,
+        ];
     }
 }

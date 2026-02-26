@@ -377,11 +377,9 @@ onMounted(async () => {
         .listen('.offer.placed', () => {
             fetchAuction()
         })
-        .listen('.auction.updated', (data) => {
-            // Update auction data reactively
-            if (data) {
-                auction.value = { ...auction.value, ...data }
-            }
+        .listen('.auction.updated', () => {
+            // Full refetch to get all updated data (bids, offers, status, etc.)
+            fetchAuction()
         })
 })
 

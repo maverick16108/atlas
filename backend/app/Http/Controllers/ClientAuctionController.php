@@ -429,6 +429,10 @@ class ClientAuctionController extends Controller
                 'status' => ['old' => 'gpb_right', 'new' => 'commission'],
                 'reason' => 'GPB exercised priority purchase right',
             ]);
+            // Broadcast status change to all connected clients
+            try {
+                event(new \App\Events\AuctionUpdated($auction->id, $auction->fresh()->toArray()));
+            } catch (\Throwable $e) {}
         }
 
         return response()->json([
