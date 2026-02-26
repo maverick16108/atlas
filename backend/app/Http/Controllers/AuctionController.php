@@ -55,7 +55,8 @@ class AuctionController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'ilike', "%{$search}%")
                   ->orWhere('status', 'ilike', "%{$search}%")
-                  ->orWhere('description', 'ilike', "%{$search}%");
+                  ->orWhere('description', 'ilike', "%{$search}%")
+                  ->orWhereRaw('id::text ILIKE ?', ["%{$search}%"]);
                   
                 // Search by date/time (Moscow Timezone)
                 // Use HH24:MI to support querying by time "14:30"
@@ -65,10 +66,10 @@ class AuctionController extends Controller
         }
         
         // Sorting
-        $sortKey = $request->input('sort_key', 'created_at');
-        $sortOrder = $request->input('sort_order', 'desc');
+        $sortKey = $request->input('sort', 'created_at');
+        $sortOrder = $request->input('order', 'desc');
         
-        $allowedSorts = ['title', 'status', 'start_at', 'end_at', 'created_at', 'min_price', 'min_step'];
+        $allowedSorts = ['id', 'title', 'status', 'start_at', 'end_at', 'created_at', 'min_price', 'min_step'];
         if (!in_array($sortKey, $allowedSorts)) {
             $sortKey = 'created_at';
         }
@@ -359,15 +360,65 @@ class AuctionController extends Controller
     }
 
     /**
-     * Send invitations to auction participants (stub for future SMS).
+     * Send invitations to auction participants.
      */
-    public function sendInvitations(string $id)
+    public function sendInvitations(Request $request, string $id)
     {
         $auction = Auction::findOrFail($id);
 
+        $inviteAll = $request->boolean('invite_all', $auction->invite_all);
+        $participantIds = $request->input('participant_ids', []);
+
+        // If invite_all, sync ALL accredited clients
+        if ($inviteAll) {
+            $allClientIds = \App\Models\User::where('role', 'client')
+                ->where('is_accredited', true)
+                ->pluck('id')
+                ->toArray();
+
+            $existing = AuctionParticipant::where('auction_id', $auction->id)->pluck('user_id')->toArray();
+            $toAdd = array_diff($allClientIds, $existing);
+            foreach ($toAdd as $userId) {
+                AuctionParticipant::create([
+                    'auction_id' => $auction->id,
+                    'user_id' => $userId,
+                    'status' => 'approved',
+                ]);
+            }
+        } elseif (!empty($participantIds)) {
+            // Sync only specified participants
+            $existing = AuctionParticipant::where('auction_id', $auction->id)->pluck('user_id')->toArray();
+            $toAdd = array_diff($participantIds, $existing);
+            foreach ($toAdd as $userId) {
+                AuctionParticipant::create([
+                    'auction_id' => $auction->id,
+                    'user_id' => (int)$userId,
+                    'status' => 'approved',
+                ]);
+            }
+        }
+
+        // Update invited_at for ALL participants
         $count = AuctionParticipant::where('auction_id', $auction->id)
-            ->whereNull('invited_at')
             ->update(['invited_at' => now()]);
+
+        // Create client notifications for each participant
+        $participantUserIds = AuctionParticipant::where('auction_id', $auction->id)
+            ->pluck('user_id');
+
+        foreach ($participantUserIds as $userId) {
+            try {
+                \App\Models\ClientNotification::create([
+                    'user_id' => $userId,
+                    'type' => 'auction_invite',
+                    'title' => 'Приглашение на аукцион',
+                    'message' => "Вы приглашены на аукцион: {$auction->title}",
+                    'data' => ['auction_id' => $auction->id],
+                ]);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Failed to create notification for user {$userId}: " . $e->getMessage());
+            }
+        }
 
         return response()->json([
             'message' => "Приглашения отправлены ({$count} участников)",

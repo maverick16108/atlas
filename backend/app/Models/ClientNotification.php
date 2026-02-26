@@ -10,6 +10,7 @@ class ClientNotification extends Model
 
     protected $casts = [
         'read_at' => 'datetime',
+        'data' => 'array',
     ];
 
     public function user()

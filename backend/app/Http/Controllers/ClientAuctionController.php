@@ -18,12 +18,11 @@ class ClientAuctionController extends Controller
         $user = $request->user();
 
         // Show auctions where user is a participant OR auctions open to all (no specific participants, not draft)
-        $query = Auction::where(function ($q) use ($user) {
+        $query = Auction::where('status', '!=', 'draft')->where(function ($q) use ($user) {
             $q->whereHas('auctionParticipants', function ($sub) use ($user) {
                 $sub->where('user_id', $user->id);
             })->orWhere(function ($sub) {
-                $sub->whereDoesntHave('auctionParticipants')
-                    ->where('status', '!=', 'draft');
+                $sub->whereDoesntHave('auctionParticipants');
             });
         });
 
@@ -415,23 +414,26 @@ class ClientAuctionController extends Controller
     {
         $user = $request->user();
 
-        $totalAuctions = AuctionParticipant::where('user_id', $user->id)->count();
+        // Base query for auctions available to the user (same as in myAuctions)
+        $baseQuery = Auction::where('status', '!=', 'draft')->where(function ($q) use ($user) {
+            $q->whereHas('auctionParticipants', function ($sub) use ($user) {
+                $sub->where('user_id', $user->id);
+            })->orWhere(function ($sub) {
+                $sub->whereDoesntHave('auctionParticipants');
+            });
+        });
 
-        $activeAuctions = AuctionParticipant::where('user_id', $user->id)
-            ->whereHas('auction', function ($q) {
-                $q->whereIn('status', ['active', 'collecting_offers', 'scheduled']);
-            })
-            ->count();
+        $totalAuctions = (clone $baseQuery)->count();
+        $activeAuctions = (clone $baseQuery)->whereIn('status', ['active', 'scheduled'])->count();
+        $collectingAuctions = (clone $baseQuery)->where('status', 'collecting_offers')->count();
 
         $totalBids = Bid::where('user_id', $user->id)->count();
         $totalOffers = InitialOffer::where('user_id', $user->id)->count();
 
         // Won auctions: auctions where user has winning bids in completed status
-        $completedAuctionIds = AuctionParticipant::where('user_id', $user->id)
-            ->whereHas('auction', function ($q) {
-                $q->where('status', 'completed');
-            })
-            ->pluck('auction_id');
+        $completedAuctionIds = (clone $baseQuery)
+            ->where('status', 'completed')
+            ->pluck('id');
 
         $wonCount = 0;
         foreach ($completedAuctionIds as $auctionId) {
@@ -456,12 +458,36 @@ class ClientAuctionController extends Controller
             }
         }
 
+                // Calculate Price History
+        $quarterAgo = now()->subMonths(3);
+        $completedAuctions = \App\Models\Auction::whereIn('status', ['completed', 'commission'])
+            ->where('end_at', '>=', $quarterAgo)
+            ->with(['bids' => function($q) {
+                $q->orderBy('amount', 'desc');
+            }])
+            ->orderBy('end_at', 'asc')
+            ->get();
+
+        $priceHistory = [];
+        foreach ($completedAuctions as $auction) {
+            $highestBid = $auction->bids->first();
+            if ($highestBid) {
+                $priceHistory[] = [
+                    'date' => $auction->end_at->format('Y-m-d'),
+                    'price' => (float) $highestBid->amount,
+                    'title' => $auction->title
+                ];
+            }
+        }
+
         return response()->json([
             'total_auctions' => $totalAuctions,
             'active_auctions' => $activeAuctions,
+            'collecting_auctions' => $collectingAuctions,
             'total_bids' => $totalBids,
             'total_offers' => $totalOffers,
             'won_auctions' => $wonCount,
+            'price_history' => $priceHistory,
         ]);
     }
 

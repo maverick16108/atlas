@@ -1,4 +1,9 @@
 services:
+  # ── Backend PHP-FPM ────────────────────────────────────────────────
+  # Основное Laravel-приложение. Обрабатывает все REST API запросы,
+  # аутентификацию (JWT/OTP), управление аукционами, ставками,
+  # пользователями и загрузку файлов. Работает через FastCGI (:9000),
+  # HTTP-запросы проксируются через Nginx.
   app:
     build:
       context: .
@@ -27,6 +32,10 @@ services:
     networks:
       - atlas_net
 
+  # ── WebSocket Server (Laravel Reverb) ─────────────────────────────
+  # Real-time события: обновление ставок, обратный отсчёт аукционов,
+  # push-уведомления. Протокол Pusher, совместим с Laravel Echo.
+  # Порт 8080 проброшен на хост для прямого подключения клиентов.
   reverb:
     build:
       context: .
@@ -58,6 +67,10 @@ services:
     networks:
       - atlas_net
 
+  # ── Auction Transition Scheduler ──────────────────────────────────
+  # Демон автоматических переходов статусов аукционов:
+  # collecting_offers → active → gpb_right → commission.
+  # Работает непрерывно в фоне, проверяя расписание переходов.
   scheduler:
     build:
       context: .
@@ -82,6 +95,10 @@ services:
     networks:
       - atlas_net
 
+  # ── Nginx Reverse Proxy ───────────────────────────────────────────
+  # Входная точка для всех HTTP-запросов. Проксирует PHP на backend:9000,
+  # WebSocket /app и /apps на reverb:8080, отдаёт статику из public/.
+  # Конфигурация: docker/nginx/conf.d/app.conf
   nginx:
     image: nginx:alpine
     container_name: atlas_nginx
@@ -97,6 +114,10 @@ services:
     networks:
       - atlas_net
 
+  # ── PostgreSQL 15 ─────────────────────────────────────────────────
+  # Основное хранилище: пользователи, аукционы, ставки, предложения,
+  # уведомления, логи активности. Порт 5433 на хосте (не 5432,
+  # чтобы не конфликтовать с локальным PostgreSQL).
   db:
     image: postgres:15-alpine
     container_name: atlas_db
@@ -112,6 +133,8 @@ services:
     networks:
       - atlas_net
 
+  # ── Redis ─────────────────────────────────────────────────────────
+  # Кэширование, очереди задач, pub/sub backbone для Laravel Reverb.
   redis:
     image: redis:alpine
     container_name: atlas_redis
@@ -121,6 +144,10 @@ services:
     networks:
       - atlas_net
 
+  # ── Frontend Vite Dev Server ──────────────────────────────────────
+  # Vue.js 3 SPA с Vite HMR. Доступен на :5174.
+  # Проксирует /api/* и /storage/* на nginx:80.
+  # Для локальной разработки предпочтительнее запуск на хосте (:5173).
   frontend:
     image: node:20-alpine
     container_name: atlas_frontend

@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StandardModal from '../../components/ui/StandardModal.vue'
+import ModernNumberInput from '../../components/ui/ModernNumberInput.vue'
 import axios from 'axios'
 import echo from '@/echo.js'
 import { useConnectionStatus } from '@/composables/useConnectionStatus.js'
@@ -36,6 +37,8 @@ const participantSearch = ref('')
 const inviteAll = ref(true)
 const isSendingInvitations = ref(false)
 const showInviteModal = ref(false)
+const showInviteResultModal = ref(false)
+const inviteResultMessage = ref('')
 const participantSearchRef = ref(null)
 const editActiveTab = ref('general')
 
@@ -483,14 +486,19 @@ const saveAuction = async () => {
     if (!f.timezone) { errors.value.timezone = 'Выберите часовой пояс'; valid = false }
     if (!f.start_date) { errors.value.start_at = 'Укажите дату начала'; valid = false }
     if (!f.end_date) { errors.value.end_at = 'Укажите дату окончания'; valid = false }
-    if (!valid) { editActiveTab.value = 'general'; return }
+    if (!valid) {
+        // Route to the correct tab based on which errors exist
+        if (errors.value.title) { editActiveTab.value = 'general' }
+        else { editActiveTab.value = 'params' }
+        return
+    }
 
     const startAt = `${f.start_date}T${f.start_time || '00:00'}:00`
     const endAt = `${f.end_date}T${f.end_time || '23:59'}:00`
     const startD = new Date(startAt), endD = new Date(endAt)
     if (endD <= startD) { errors.value.end_at = 'Окончание должно быть позже начала'; valid = false }
     else if ((endD - startD) / 60000 < 15) { errors.value.end_at = 'Минимальная длительность — 15 минут'; valid = false }
-    if (!valid) { editActiveTab.value = 'general'; return }
+    if (!valid) { editActiveTab.value = 'params'; return }
 
     isSaving.value = true
     try {
@@ -514,12 +522,16 @@ const saveAuction = async () => {
         }
     } catch (e) {
         if (e.response?.status === 422) {
-            const be = e.response.data.errors
-            if (be.title) errors.value.title = be.title[0]
-            if (be.start_at) errors.value.start_at = be.start_at[0]
-            if (be.end_at) errors.value.end_at = be.end_at[0]
-            if (be.status) errors.value.status = be.status[0]
-        } else { alert('Ошибка сохранения: ' + (e.response?.data?.message || e.message)) }
+            const be = e.response.data.errors || {}
+            Object.keys(be).forEach(key => {
+                errors.value[key] = Array.isArray(be[key]) ? be[key][0] : be[key]
+            })
+            // Route to correct tab
+            if (be.title || be.status) { editActiveTab.value = 'general' }
+            else { editActiveTab.value = 'params' }
+        } else {
+            errors.value._general = e.response?.data?.message || e.message || 'Ошибка сохранения'
+        }
     } finally { isSaving.value = false }
 }
 
@@ -528,16 +540,38 @@ const confirmSendInvitations = async () => {
     showInviteModal.value = false
     isSendingInvitations.value = true
     try {
-        const r = await axios.post(`/api/auctions/${auctionId.value}/send-invitations`)
-        alert(r.data.message)
-    } catch (e) { alert('Ошибка при отправке приглашений') }
-    finally { isSendingInvitations.value = false }
+        const r = await axios.post(`/api/auctions/${auctionId.value}/send-invitations`, {
+            invite_all: inviteAll.value,
+            participant_ids: inviteAll.value ? [] : selectedParticipantIds.value,
+        })
+        inviteResultMessage.value = r.data.message
+    } catch (e) {
+        inviteResultMessage.value = 'Ошибка при отправке приглашений'
+    } finally {
+        isSendingInvitations.value = false
+        showInviteResultModal.value = true
+    }
 }
-
 const goBack = () => router.push('/admin/auctions')
+
+// --- Unified ESC handler for edit modal ---
+const handleEsc = (e) => {
+    if (e.key !== 'Escape') return
+    // If any sub-modal is open, close it
+    if (showInviteResultModal.value) { e.stopImmediatePropagation(); showInviteResultModal.value = false; return }
+    if (showInviteModal.value) { e.stopImmediatePropagation(); showInviteModal.value = false; return }
+    if (showUnsavedModal.value) { e.stopImmediatePropagation(); showUnsavedModal.value = false; return }
+    // If edit modal is open, try to close with unsaved check
+    if (showEditModal.value) {
+        e.stopImmediatePropagation()
+        e.preventDefault()
+        closeEditModal()
+    }
+}
 
 // --- Lifecycle ---
 onMounted(async () => {
+    document.addEventListener('keydown', handleEsc, true) // capture phase to fire before StandardModal
     await fetchAuction()
     fetchInitialOffers()
     fetchBids()
@@ -558,6 +592,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+    document.removeEventListener('keydown', handleEsc, true)
     stopCountdown()
     stopFallbackPolling()
     if (auctionId.value) echo.leaveChannel(`auction.${auctionId.value}`)
@@ -854,6 +889,7 @@ onUnmounted(() => {
                 <th class="px-4 py-3 bg-dark-900">Участник</th>
                 <th class="px-4 py-3 text-right bg-dark-900">Кол-во слитков</th>
                 <th class="px-4 py-3 text-right bg-dark-900">Сумма</th>
+                <th class="px-4 py-3 text-left bg-dark-900">Комментарий</th>
                 <th class="px-4 py-3 text-right bg-dark-900">Дата</th>
               </tr>
             </thead>
@@ -862,6 +898,10 @@ onUnmounted(() => {
                 <td class="px-4 py-3"><span class="text-sm text-white font-bold">{{ offer.user?.name || 'Н/Д' }}</span></td>
                 <td class="px-4 py-3 text-right font-mono text-sm text-white">{{ Number(offer.volume).toLocaleString() }}</td>
                 <td class="px-4 py-3 text-right font-mono text-sm text-emerald-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ Number(offer.price).toLocaleString() }}</td>
+                <td class="px-4 py-3 text-left text-xs text-gray-400">
+                   <div v-if="offer.comment" class="whitespace-pre-wrap break-words max-w-[300px]">{{ offer.comment }}</div>
+                   <div v-else class="text-white/20">-</div>
+                </td>
                 <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(offer.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(offer.created_at).toLocaleTimeString('ru-RU') }}</div></td>
               </tr>
             </tbody>
@@ -870,6 +910,7 @@ onUnmounted(() => {
                 <td class="px-4 py-2 text-cyan-400 uppercase tracking-widest bg-[#0d1f24]" style="box-shadow: inset 0 1px 0 rgba(6,182,212,0.3)">Итого ({{ initialOffers.length }})</td>
                 <td class="px-4 py-2 text-right font-mono text-white bg-[#0d1f24]" style="box-shadow: inset 0 1px 0 rgba(6,182,212,0.3)">{{ initialOffers.reduce((s, o) => s + Number(o.volume), 0).toLocaleString() }}</td>
                 <td class="px-4 py-2 text-right font-mono text-cyan-400 bg-[#0d1f24]" style="box-shadow: inset 0 1px 0 rgba(6,182,212,0.3)"><span class="font-sans">₽</span>&nbsp;{{ initialOffers.reduce((s, o) => s + Number(o.price), 0).toLocaleString() }}</td>
+                <td class="px-4 py-2 bg-[#0d1f24]" style="box-shadow: inset 0 1px 0 rgba(6,182,212,0.3)"></td>
                 <td class="px-4 py-2 bg-[#0d1f24]" style="box-shadow: inset 0 1px 0 rgba(6,182,212,0.3)"></td>
               </tr>
             </tfoot>
@@ -1190,20 +1231,28 @@ onUnmounted(() => {
       </div><!-- end tab content area -->
 
       <!-- EDIT MODAL -->
-      <StandardModal :is-open="showEditModal" max-width="max-w-2xl" :title="isNewAuction ? 'Новый аукцион' : 'Редактирование'" @close="closeEditModal()">
-        <form @submit.prevent="saveAuction" class="flex flex-col h-[820px]">
+      <StandardModal :is-open="showEditModal" max-width="max-w-2xl" height-class="h-[85vh]" :title="isNewAuction ? 'Новый аукцион' : 'Редактирование'" :close-on-escape="false" @close="closeEditModal()">
+        <form @submit.prevent="saveAuction" class="flex flex-col h-full min-h-0 overflow-hidden">
 
           <!-- Internal tabs -->
           <div class="flex border-b border-white/10 mb-4 flex-shrink-0">
             <button type="button" @click="editActiveTab = 'general'" class="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all relative" :class="editActiveTab === 'general' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'">
               Основное<div v-if="editActiveTab === 'general'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full"></div>
             </button>
+            <button type="button" @click="editActiveTab = 'params'" class="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all relative" :class="editActiveTab === 'params' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'">
+              Параметры<div v-if="editActiveTab === 'params'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full"></div>
+            </button>
             <button type="button" @click="editActiveTab = 'participants'" class="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all relative" :class="editActiveTab === 'participants' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'">
               Участники<div v-if="editActiveTab === 'participants'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full"></div>
             </button>
           </div>
 
-          <!-- General Tab -->
+          <!-- General Error -->
+          <div v-if="errors._general" class="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2.5 text-sm text-red-400 font-medium flex-shrink-0 mb-2">
+            {{ errors._general }}
+          </div>
+
+          <!-- General Tab: Название, Описание, Статус -->
           <div v-show="editActiveTab === 'general'" class="flex-1 overflow-y-auto min-h-0 pr-1 space-y-4">
             <!-- Title -->
             <div>
@@ -1214,7 +1263,10 @@ onUnmounted(() => {
             <!-- Description -->
             <div>
               <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Описание</label>
-              <textarea v-model="editForm.description" rows="2" class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all resize-none"></textarea>
+              <textarea v-model="editForm.description" rows="6" maxlength="200" class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all resize-none"></textarea>
+              <div class="flex justify-end text-xs text-gray-500 mt-1">
+                {{ editForm.description ? editForm.description.length : 0 }} / 200
+              </div>
             </div>
             <!-- Status (styled like create form) -->
             <div class="relative">
@@ -1254,45 +1306,52 @@ onUnmounted(() => {
               </div>
               <p v-if="errors.status" class="text-red-500 text-[10px] font-bold uppercase tracking-wide mt-1 ml-1">{{ errors.status }}</p>
             </div>
+          </div>
+
+          <!-- Params Tab: Лот, Цена, Шаг, Время, Даты -->
+          <div v-show="editActiveTab === 'params'" class="flex-1 overflow-y-auto min-h-0 pr-1 space-y-4">
             <!-- Grid: bar_count, bar_weight, min_price, min_step -->
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Кол-во слитков *</label>
-                <input v-model.number="editForm.bar_count" type="number" min="1" class="w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" :class="errors.bar_count ? 'border-red-500' : 'border-white/10'" />
+                <ModernNumberInput dark v-model="editForm.bar_count" min="1" :inputClass="['w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all', errors.bar_count ? 'border-red-500' : 'border-white/10']" />
                 <p v-if="errors.bar_count" class="text-red-400 text-xs mt-1">{{ errors.bar_count }}</p>
               </div>
               <div>
                 <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Вес слитка (кг) *</label>
-                <input v-model.number="editForm.bar_weight" type="number" step="0.01" min="0.01" class="w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" :class="errors.bar_weight ? 'border-red-500' : 'border-white/10'" />
+                <ModernNumberInput dark v-model="editForm.bar_weight" step="1" min="0.01" :inputClass="['w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all', errors.bar_weight ? 'border-red-500' : 'border-white/10']" />
                 <p v-if="errors.bar_weight" class="text-red-400 text-xs mt-1">{{ errors.bar_weight }}</p>
               </div>
               <div>
                 <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Мин. цена (₽/г) *</label>
-                <input v-model.number="editForm.min_price" type="number" min="1" class="w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" :class="errors.min_price ? 'border-red-500' : 'border-white/10'" />
+                <ModernNumberInput dark v-model="editForm.min_price" step="1" min="1" :inputClass="['w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all', errors.min_price ? 'border-red-500' : 'border-white/10']" />
                 <p v-if="errors.min_price" class="text-red-400 text-xs mt-1">{{ errors.min_price }}</p>
               </div>
               <div>
                 <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Мин. шаг (₽) *</label>
-                <input v-model.number="editForm.min_step" type="number" min="1" class="w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" :class="errors.min_step ? 'border-red-500' : 'border-white/10'" />
+                <ModernNumberInput dark v-model="editForm.min_step" step="1" min="1" :inputClass="['w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all', errors.min_step ? 'border-red-500' : 'border-white/10']" />
                 <p v-if="errors.min_step" class="text-red-400 text-xs mt-1">{{ errors.min_step }}</p>
               </div>
             </div>
-            <!-- step_time, gpb_minutes, timezone -->
-            <div class="grid grid-cols-3 gap-3">
+            <!-- step_time, gpb_minutes -->
+            <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Время шага (мин)</label>
-                <input v-model.number="editForm.step_time" type="number" min="1" max="1440" class="w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" :class="errors.step_time ? 'border-red-500' : 'border-white/10'" />
+                <ModernNumberInput dark v-model="editForm.step_time" min="1" max="1440" :inputClass="['w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all', errors.step_time ? 'border-red-500' : 'border-white/10']" />
+                <p v-if="errors.step_time" class="text-red-400 text-xs mt-1">{{ errors.step_time }}</p>
               </div>
               <div>
                 <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">ГПБ (мин)</label>
-                <input v-model.number="editForm.gpb_minutes" type="number" min="1" class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" />
+                <ModernNumberInput dark v-model="editForm.gpb_minutes" min="1" inputClass="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" />
               </div>
-              <div>
-                <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Часовой пояс</label>
-                <select v-model="editForm.timezone" class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all no-arrow">
-                  <option v-for="tz in timezoneOptions" :key="tz.value" :value="tz.value">{{ tz.label }}</option>
-                </select>
-              </div>
+            </div>
+            <!-- Timezone -->
+            <div>
+              <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Часовой пояс</label>
+              <select v-model="editForm.timezone" class="w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all no-arrow" :class="errors.timezone ? 'border-red-500' : 'border-white/10'">
+                <option v-for="tz in timezoneOptions" :key="tz.value" :value="tz.value">{{ tz.label }}</option>
+              </select>
+              <p v-if="errors.timezone" class="text-red-400 text-xs mt-1">{{ errors.timezone }}</p>
             </div>
             <!-- Dates -->
             <div class="grid grid-cols-2 gap-3">
@@ -1300,7 +1359,7 @@ onUnmounted(() => {
                 <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Дата начала *</label>
                 <div class="flex gap-2">
                   <input v-model="editForm.start_date" type="date" class="flex-1 bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" :class="errors.start_at ? 'border-red-500' : 'border-white/10'" />
-                  <input v-model="editForm.start_time" type="time" class="w-28 bg-dark-900/50 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" />
+                  <input v-model="editForm.start_time" type="time" class="w-24 bg-dark-900/50 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" />
                 </div>
                 <p v-if="errors.start_at" class="text-red-400 text-xs mt-1">{{ errors.start_at }}</p>
               </div>
@@ -1308,7 +1367,7 @@ onUnmounted(() => {
                 <label class="block text-xs text-gray-400 font-bold uppercase tracking-widest mb-1.5">Дата окончания *</label>
                 <div class="flex gap-2">
                   <input v-model="editForm.end_date" type="date" class="flex-1 bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" :class="errors.end_at ? 'border-red-500' : 'border-white/10'" />
-                  <input v-model="editForm.end_time" type="time" class="w-28 bg-dark-900/50 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" />
+                  <input v-model="editForm.end_time" type="time" class="w-24 bg-dark-900/50 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all" />
                 </div>
                 <p v-if="errors.end_at" class="text-red-400 text-xs mt-1">{{ errors.end_at }}</p>
               </div>
@@ -1316,7 +1375,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Participants Tab -->
-          <div v-show="editActiveTab === 'participants'" class="flex-1 min-h-0 flex flex-col gap-3">
+          <div v-show="editActiveTab === 'participants'" class="flex-1 min-h-0 flex flex-col gap-3 overflow-hidden">
             <label class="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-white/10 bg-dark-900/30 cursor-pointer hover:border-white/20 transition-all group shrink-0">
               <div class="relative flex-shrink-0">
                 <input type="checkbox" v-model="inviteAll" class="sr-only peer"/>
@@ -1357,7 +1416,7 @@ onUnmounted(() => {
 
           <!-- Actions -->
           <div class="pt-4 flex justify-end gap-3 border-t border-white/5 mt-auto flex-shrink-0">
-            <button type="button" @click="closeEditModal" class="px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">Закрыть</button>
+            <button type="button" @click="closeEditModal()" class="px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">Закрыть</button>
             <button type="submit" :disabled="isSaving" class="px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 shadow-lg shadow-red-900/20 transition-all active:scale-95 flex items-center gap-2" :class="isSaving ? 'opacity-70 cursor-wait' : ''">
               <svg v-if="isSaving" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
               Сохранить
@@ -1367,7 +1426,7 @@ onUnmounted(() => {
       </StandardModal>
 
       <!-- Unsaved Changes Modal -->
-      <StandardModal :is-open="showUnsavedModal" theme="red" z-index-class="z-[200]" backdrop-z-index-class="z-[150]" :backdrop-blur="false" @close="showUnsavedModal = false">
+      <StandardModal :is-open="showUnsavedModal" theme="red" z-index-class="z-[200]" backdrop-z-index-class="z-[150]" :backdrop-blur="false" :close-on-escape="false" @close="showUnsavedModal = false">
         <div class="text-center pt-2">
           <h3 class="text-xl font-kanit font-bold text-white tracking-wide uppercase mb-6">Закрыть<span class="text-2xl">?</span></h3>
           <p class="text-gray-400 text-sm mb-2 font-light">Внесённые изменения</p>
@@ -1389,6 +1448,18 @@ onUnmounted(() => {
             <button @click="showInviteModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">Отмена</button>
             <button @click="confirmSendInvitations" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20 transition-all active:scale-95 border border-emerald-500/50">Отправить</button>
           </div>
+        </div>
+      </StandardModal>
+
+      <!-- Invite Result Modal -->
+      <StandardModal :is-open="showInviteResultModal" theme="red" max-width="max-w-sm" z-index-class="z-[200]" backdrop-z-index-class="z-[150]" :backdrop-blur="false" @close="showInviteResultModal = false">
+        <div class="text-center pt-2">
+          <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-500/10 flex items-center justify-center">
+            <svg class="w-7 h-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <p class="text-white font-semibold text-lg mb-1">Успешно!</p>
+          <p class="text-gray-400 text-sm mb-6">{{ inviteResultMessage }}</p>
+          <button @click="showInviteResultModal = false" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20 transition-all active:scale-95 border border-emerald-500/50">Закрыть</button>
         </div>
       </StandardModal>
 

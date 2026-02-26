@@ -82,14 +82,24 @@ const onDocumentClick = (e) => {
         closeNotifications()
     }
 }
+const onDocumentKeydown = (e) => {
+    if (e.key === 'Escape') closeNotifications()
+}
 watch(showNotifications, (val) => {
     if (val) {
-        nextTick(() => document.addEventListener('click', onDocumentClick))
+        nextTick(() => {
+            document.addEventListener('click', onDocumentClick)
+            document.addEventListener('keydown', onDocumentKeydown)
+        })
     } else {
         document.removeEventListener('click', onDocumentClick)
+        document.removeEventListener('keydown', onDocumentKeydown)
     }
 })
-onUnmounted(() => document.removeEventListener('click', onDocumentClick))
+onUnmounted(() => {
+    document.removeEventListener('click', onDocumentClick)
+    document.removeEventListener('keydown', onDocumentKeydown)
+})
 
 const markAsRead = async (notification) => {
     if (notification.read_at) return
@@ -146,7 +156,7 @@ onUnmounted(() => {
 
     <!-- Sidebar -->
     <aside 
-        class="fixed lg:static inset-y-0 left-0 z-50 w-72 client-sidebar backdrop-blur-xl flex flex-col shadow-[4px_0_30px_rgba(0,0,0,0.05)] dark:shadow-[4px_0_30px_rgba(0,0,0,0.5)] transform transition-transform duration-300 lg:transform-none"
+        class="fixed lg:static inset-y-0 left-0 z-50 w-64 client-sidebar backdrop-blur-xl flex flex-col shadow-[4px_0_30px_rgba(0,0,0,0.05)] dark:shadow-[4px_0_30px_rgba(0,0,0,0.5)] transform transition-transform duration-300 lg:transform-none"
         :class="isSidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     >
         <!-- Logo Area -->
@@ -154,9 +164,9 @@ onUnmounted(() => {
              <button @click="isSidebarOpen = false" class="absolute left-4 lg:hidden p-2 text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-white">
                 <XMarkIcon class="w-6 h-6" />
             </button>
-            <div class="flex items-center gap-3">
-                 <img src="/logo.png" alt="Atlas" class="w-8 h-8 rounded shadow-lg shadow-gold-500/30 object-cover" />
-                <h1 class="text-lg font-kanit font-bold tracking-wider text-gray-900 dark:text-white">ATLAS <span class="text-gold-500">CABINET</span></h1>
+            <div class="flex items-center gap-2 lg:gap-3">
+                 <img src="/logo.png" alt="Atlas" class="w-7 h-7 lg:w-8 lg:h-8 rounded shadow-lg shadow-gold-500/30 object-cover" />
+                <h1 class="text-base lg:text-lg font-kanit font-bold tracking-wider text-gray-900 dark:text-white whitespace-nowrap">ATLAS <span class="text-gold-500">АУКЦИОН</span></h1>
             </div>
         </div>
 
@@ -166,7 +176,7 @@ onUnmounted(() => {
                 <router-link 
                     :to="item.path"
                     @click="isSidebarOpen = false"
-                    class="flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 group outline-none border"
+                    class="flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-300 group outline-none border"
                     :class="route.path === item.path ? 'client-nav-item-active' : 'client-nav-item'"
                 >
                     <svg class="w-5 h-5 transition-colors" :class="route.path === item.path ? 'text-gold-500' : 'text-gray-400 dark:text-gray-500 group-hover:text-gold-500'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -204,20 +214,17 @@ onUnmounted(() => {
                     <Bars3Icon class="w-6 h-6" />
                 </button>
 
-                <div>
-                     <h2 class="text-xl md:text-2xl font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase">
-                         {{ navigation.find(i => i.path === route.path)?.name || 'Дашборд' }}
-                     </h2>
-                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 hidden md:block">
-                         {{ new Date().toLocaleDateString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
-                     </p>
-                </div>
+                <!-- Decorative accent -->
+                <div class="h-8 w-1 bg-gradient-to-b from-gold-500 to-gold-600 rounded-full shadow-[0_0_10px_rgba(212,175,55,0.5)]"></div>
+                <h2 class="text-2xl font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase drop-shadow-md">
+                    {{ navigation.find(i => i.path === route.path)?.name || route.meta.title || route.name || 'Дашборд' }}
+                </h2>
             </div>
             
             <div class="flex items-center gap-4 md:gap-6">
                 <!-- Notifications Bell -->
                 <div class="relative" ref="notificationRef">
-                    <button @click="toggleNotifications" class="relative text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-white/5">
+                    <button @click="toggleNotifications" class="relative outline-none focus:outline-none focus:ring-0 text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-white/5">
                         <span v-if="unreadCount > 0" class="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white border-2 border-white dark:border-stone-900 animate-pulse">
                             {{ unreadCount > 9 ? '9+' : unreadCount }}
                         </span>

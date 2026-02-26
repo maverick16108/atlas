@@ -303,7 +303,7 @@ onUnmounted(() => {
       </div>
 
       <div class="overflow-x-auto relative flex-1 flex flex-col overflow-y-scroll scrollbar-none">
-          <table class="w-full text-left text-sm text-gray-400 table-fixed">
+          <table class="w-full text-left text-sm text-gray-400 min-w-max">
               <thead class="bg-dark-900 text-xs uppercase font-bold text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-white/5">
                   <tr>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-16" @click="sortBy('id')">
@@ -320,8 +320,8 @@ onUnmounted(() => {
                               <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
-                      <th class="px-6 py-4 select-none w-[140px]">Лот</th>
-                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[120px]" @click="sortBy('status')">
+                      <th class="px-6 py-4 select-none w-[160px]">Лот</th>
+                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[160px]" @click="sortBy('status')">
                           <div class="flex items-center gap-2">
                               Статус
                               <svg v-if="sortKey === 'status'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
@@ -361,14 +361,14 @@ onUnmounted(() => {
                           </div>
                       </td>
                       <td class="px-6 py-4">
-                          <div v-if="auction.bar_count && auction.bar_weight" class="flex flex-col">
+                          <div v-if="auction.bar_count && auction.bar_weight" class="flex flex-col whitespace-nowrap">
                               <span class="text-sm text-white font-mono font-bold">{{ auction.bar_count }} × {{ auction.bar_weight }} кг</span>
                               <span class="text-xs text-gray-500 font-mono">= {{ (auction.bar_count * auction.bar_weight).toFixed(1) }} кг</span>
                           </div>
                           <span v-else class="text-xs text-gray-600">—</span>
                       </td>
                       <td class="px-6 py-4">
-                          <span class="px-2 py-1 rounded text-xs font-bold uppercase" :class="getStatusClass(auction.status)">
+                          <span class="px-2 py-1 rounded text-xs font-bold uppercase whitespace-nowrap" :class="getStatusClass(auction.status)">
                               {{ getStatusLabel(auction.status) }}
                           </span>
                       </td>
