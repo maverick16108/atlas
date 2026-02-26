@@ -26,6 +26,7 @@ class BidPlaced implements ShouldBroadcastNow
     {
         return [
             new Channel('auction.' . $this->auctionId),
+            new Channel('auctions'),
         ];
     }
 

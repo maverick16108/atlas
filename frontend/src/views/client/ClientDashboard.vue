@@ -148,14 +148,34 @@ const statCards = computed(() => [
     { label: 'Всего аукционов', value: stats.value.total_auctions || 0, icon: ChartBarSquareIcon, route: '/client/auctions' },
     { label: 'Побед', value: stats.value.won_auctions || 0, icon: TrophyIcon, route: '/client/auctions?filter=completed' },
 ])
+import echo from '@/echo.js'
+
+// Silent refresh — no loading spinner
+const refreshData = async () => {
+    try {
+        const [statsRes, auctionsRes] = await Promise.all([
+            axios.get('/api/client/stats'),
+            axios.get('/api/client/auctions'),
+        ])
+        stats.value = statsRes.data
+        recentAuctions.value = auctionsRes.data.slice(0, 6)
+    } catch (e) {
+        console.error('Dashboard refresh failed:', e)
+    }
+}
 
 onMounted(() => {
     fetchData()
     timerInterval = setInterval(() => { timerNow.value = Date.now() }, 1000)
+    // Real-time updates via WebSocket
+    echo.channel('auctions')
+        .listen('.auction.updated', () => refreshData())
+        .listen('.bid.placed', () => refreshData())
 })
 
 onUnmounted(() => {
     if (timerInterval) clearInterval(timerInterval)
+    echo.leaveChannel('auctions')
 })
 </script>
 
