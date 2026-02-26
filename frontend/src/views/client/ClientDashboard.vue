@@ -190,7 +190,7 @@ onUnmounted(() => {
           <!-- Price Trend Chart -->
           <div v-if="chartData" class="bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-white/10 p-6 shadow-sm dark:shadow-none -mt-4 mb-4">
               <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
-                  <h2 class="text-lg font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase">Динамика цен (последний квартал)</h2>
+                  <h2 class="text-lg font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase">Динамика цен</h2>
                   <div class="text-xs text-gray-500 font-medium bg-gray-100 dark:bg-white/5 px-2 py-1 rounded">Цена за грамм (₽)</div>
               </div>
               <div class="h-64 w-full relative">

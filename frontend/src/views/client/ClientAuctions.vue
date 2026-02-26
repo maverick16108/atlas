@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
+import echo from '@/echo.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -92,6 +93,12 @@ onMounted(() => {
     }
     fetchAuctions()
     timerInterval = setInterval(() => { timerNow.value = Date.now() }, 1000)
+
+    // Subscribe to real-time auction updates
+    echo.channel('auctions')
+        .listen('.auction.updated', () => {
+            fetchAuctions()
+        })
 })
 
 watch(() => route.query.filter, (newFilter) => {
@@ -103,6 +110,7 @@ watch(() => route.query.filter, (newFilter) => {
 
 onUnmounted(() => {
     if (timerInterval) clearInterval(timerInterval)
+    echo.leaveChannel('auctions')
 })
 </script>
 

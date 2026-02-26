@@ -88,9 +88,15 @@ services:
       DB_USERNAME: atlas
       DB_PASSWORD: password
       REDIS_HOST: redis
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_APP_ID: atlas-local
+      REVERB_APP_KEY: atlas-reverb-key
+      REVERB_APP_SECRET: atlas-reverb-secret
     depends_on:
       - db
       - redis
+      - reverb
     command: ["php", "artisan", "auctions:process-transitions", "--daemon"]
     networks:
       - atlas_net

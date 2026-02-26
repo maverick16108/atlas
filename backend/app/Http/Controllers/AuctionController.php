@@ -264,10 +264,19 @@ class AuctionController extends Controller
         }
 
         try {
-            return $auction->load('participants')->loadCount('auctionParticipants');
+            $freshAuction = $auction->load('participants')->loadCount('auctionParticipants');
         } catch (QueryException $e) {
-            return $auction;
+            $freshAuction = $auction;
         }
+
+        // Broadcast auction update to all connected clients
+        try {
+            event(new \App\Events\AuctionUpdated($auction->id, $freshAuction->toArray()));
+        } catch (\Throwable $e) {
+            // Broadcasting may fail silently
+        }
+
+        return $freshAuction;
     }
 
     /**

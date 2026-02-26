@@ -221,7 +221,7 @@
         "error_failed_send": "Не удалось отправить код.",
         "error_code": "Введите 4 цифры кода",
         "error_invalid_code": "Неверный код",
-        "error_user_not_found": "Пользователь не найден"
+        "error_user_not_found": "Номер телефона не найден"
     },
     "meta": {
         "dashboard": "Дашборд",

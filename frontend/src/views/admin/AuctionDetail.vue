@@ -178,7 +178,7 @@ let timerInterval = null
 
 const tradingCountdownSeconds = computed(() => {
     if (!auction.value?.end_at) return -1
-    const endMs = new Date(auction.value.end_at.replace(' ', 'T')).getTime()
+    const endMs = new Date(auction.value.end_at).getTime()
     const diff = Math.floor((endMs - timerNow.value) / 1000)
     return diff > 0 ? diff : 0
 })
@@ -196,7 +196,7 @@ const tradingFinished = computed(() => ['gpb_right', 'commission', 'completed', 
 const gpbCountdownSeconds = computed(() => {
     if (!auction.value?.gpb_started_at) return -1
     const gpbMins = auction.value.gpb_minutes || 30
-    const endMs = new Date(auction.value.gpb_started_at.replace(' ', 'T')).getTime() + gpbMins * 60 * 1000
+    const endMs = new Date(auction.value.gpb_started_at).getTime() + gpbMins * 60 * 1000
     const diff = Math.floor((endMs - timerNow.value) / 1000)
     return diff > 0 ? diff : 0
 })
@@ -213,7 +213,7 @@ const gpbFinished = computed(() => ['commission', 'completed', 'cancelled'].incl
 
 const scheduledCountdownSeconds = computed(() => {
     if (!auction.value?.start_at) return -1
-    const startMs = new Date(auction.value.start_at.replace(' ', 'T')).getTime()
+    const startMs = new Date(auction.value.start_at).getTime()
     const diff = Math.floor((startMs - timerNow.value) / 1000)
     return diff > 0 ? diff : 0
 })
@@ -351,10 +351,14 @@ const advanceStatus = () => {
 // --- Fetch Auction ---
 const parseDateTimeFromISO = (iso) => {
     if (!iso) return { date: '', time: '' }
-    const m = iso.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/)
-    if (m) return { date: m[1], time: m[2] }
-    const d = iso.match(/^(\d{4}-\d{2}-\d{2})/)
-    return { date: d ? d[1] : '', time: '' }
+    const d = new Date(iso)
+    if (isNaN(d.getTime())) return { date: '', time: '' }
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    const hours = String(d.getHours()).padStart(2, '0')
+    const mins = String(d.getMinutes()).padStart(2, '0')
+    return { date: `${year}-${month}-${day}`, time: `${hours}:${mins}` }
 }
 
 const formatDate = (iso) => {
@@ -580,6 +584,24 @@ onMounted(async () => {
     echo.channel(`auction.${auctionId.value}`)
         .listen('.bid.placed', () => fetchBids(true))
         .listen('.offer.placed', () => fetchInitialOffers(true))
+        .listen('.auction.updated', (data) => {
+            if (data) {
+                const oldStatus = auction.value?.status
+                auction.value = { ...auction.value, ...data }
+                // Restart or stop countdown based on new status
+                if (['scheduled', 'active', 'gpb_right'].includes(data.status)) {
+                    startCountdown()
+                } else {
+                    stopCountdown()
+                }
+                // Refresh related data if status changed
+                if (oldStatus !== data.status) {
+                    fetchBids(true)
+                    fetchInitialOffers(true)
+                    fetchParticipants()
+                }
+            }
+        })
 
     if (!isConnected.value) startFallbackPolling()
 
@@ -756,7 +778,7 @@ onUnmounted(() => {
                  </div>
 
                  <!-- Active / GPB / Scheduled Countdown — inset button -->
-                 <div v-if="['active', 'gpb_right', 'scheduled'].includes(auction.status) && countdownSeconds > 0"
+                 <div v-if="['active', 'gpb_right', 'scheduled'].includes(auction.status) && countdownSeconds >= 0"
                       class="px-5 py-2 flex flex-col items-center justify-center min-w-[160px] rounded-lg border-l backdrop-blur-sm"
                       :class="[
                         auction.status === 'active' ? 'bg-amber-950/40 border-amber-500/30' :
@@ -1037,7 +1059,7 @@ onUnmounted(() => {
           <p class="text-xs font-medium">Ставок пока нет</p>
         </div>
         <template v-else>
-          <div v-if="!gpbAllocatedBids.hasGpbBids" class="flex-1 flex flex-col items-center justify-center text-gray-500">
+          <div v-if="!gpbAllocatedBids.hasGpbBids" class="flex flex-col items-center justify-center text-gray-400 py-6 mb-4 bg-dark-900/30 rounded-lg border border-dashed border-white/10">
             <svg class="w-10 h-10 mb-2 text-blue-500/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
             <p class="text-xs font-medium">Участник ГПБ ещё не сделал ставку</p>
           </div>
@@ -1234,6 +1256,42 @@ onUnmounted(() => {
       <StandardModal :is-open="showEditModal" max-width="max-w-2xl" height-class="h-[85vh]" :title="isNewAuction ? 'Новый аукцион' : 'Редактирование'" :close-on-escape="false" @close="closeEditModal()">
         <form @submit.prevent="saveAuction" class="flex flex-col h-full min-h-0 overflow-hidden">
 
+          <!-- Status (always visible, above tabs) -->
+          <div class="relative flex-shrink-0 mb-4">
+              <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5 ml-1">Статус</label>
+              <div class="flex items-start gap-2">
+                <div class="relative flex-1" style="height: 38px;">
+                  <select
+                    v-model="editForm.status"
+                    style="height: 38px;"
+                    class="w-full border border-white/10 rounded-lg pl-3 pr-12 text-sm focus:outline-none transition-all duration-300 hover:border-white/20 focus:border-red-500 focus:ring-1 focus:ring-red-500 font-bold tracking-wide appearance-none cursor-pointer no-arrow"
+                    :class="getStatusClass(editForm.status)"
+                  >
+                    <option v-for="s in statusOptions" :key="s.value" :value="s.value" class="bg-dark-900 text-white">{{ s.label }}</option>
+                  </select>
+                  <div class="absolute top-0 bottom-0 right-0 flex items-center pr-3 pointer-events-none gap-2" style="height: 38px;">
+                    <div class="w-2 h-2 rounded-full animate-pulse shadow-sm" :class="getStatusDotClass(editForm.status)"></div>
+                    <svg class="h-4 w-4" :class="editForm.status === 'draft' ? 'text-gray-400' : 'text-current opacity-70'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+                <button
+                  v-if="!['completed', 'cancelled'].includes(editForm.status)"
+                  type="button"
+                  @click="advanceStatus"
+                  title="Перейти к следующему статусу"
+                  style="height: 38px; width: 38px;"
+                  class="flex-shrink-0 flex items-center justify-center bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+                >
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              <p v-if="errors.status" class="text-red-500 text-[10px] font-bold uppercase tracking-wide mt-1 ml-1">{{ errors.status }}</p>
+          </div>
+
           <!-- Internal tabs -->
           <div class="flex border-b border-white/10 mb-4 flex-shrink-0">
             <button type="button" @click="editActiveTab = 'general'" class="px-4 py-2 text-xs font-bold uppercase tracking-widest transition-all relative" :class="editActiveTab === 'general' ? 'text-red-400' : 'text-gray-500 hover:text-gray-300'">
@@ -1267,44 +1325,6 @@ onUnmounted(() => {
               <div class="flex justify-end text-xs text-gray-500 mt-1">
                 {{ editForm.description ? editForm.description.length : 0 }} / 200
               </div>
-            </div>
-            <!-- Status (styled like create form) -->
-            <div class="relative">
-              <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5 ml-1">Статус</label>
-              <div class="flex items-start gap-2">
-                <!-- Select (with color & dot indicator) -->
-                <div class="relative flex-1" style="height: 38px;">
-                  <select
-                    v-model="editForm.status"
-                    style="height: 38px;"
-                    class="w-full border border-white/10 rounded-lg pl-3 pr-12 text-sm focus:outline-none transition-all duration-300 hover:border-white/20 focus:border-red-500 focus:ring-1 focus:ring-red-500 font-bold tracking-wide appearance-none cursor-pointer no-arrow"
-                    :class="getStatusClass(editForm.status)"
-                  >
-                    <option v-for="s in statusOptions" :key="s.value" :value="s.value" class="bg-dark-900 text-white">{{ s.label }}</option>
-                  </select>
-                  <div class="absolute top-0 bottom-0 right-0 flex items-center pr-3 pointer-events-none gap-2" style="height: 38px;">
-                    <div class="w-2 h-2 rounded-full animate-pulse shadow-sm" :class="getStatusDotClass(editForm.status)"></div>
-                    <svg class="h-4 w-4" :class="editForm.status === 'draft' ? 'text-gray-400' : 'text-current opacity-70'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-
-                <!-- Workflow >> Button -->
-                <button
-                  v-if="!['completed', 'cancelled'].includes(editForm.status)"
-                  type="button"
-                  @click="advanceStatus"
-                  title="Перейти к следующему статусу"
-                  style="height: 38px; width: 38px;"
-                  class="flex-shrink-0 flex items-center justify-center bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
-                >
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-              <p v-if="errors.status" class="text-red-500 text-[10px] font-bold uppercase tracking-wide mt-1 ml-1">{{ errors.status }}</p>
             </div>
           </div>
 

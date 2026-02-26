@@ -104,12 +104,15 @@ class AuthController extends Controller
         ]);
 
         $phone = $request->input('phone');
+        $digits = preg_replace('/\D/', '', $phone);
         
-        // Find user by AUTH phone and check accreditation
-        $user = User::where('auth_phone', $phone)->where('role', 'client')->first();
+        // Find user by AUTH phone (digits-only comparison) and check accreditation
+        $user = User::whereRaw("regexp_replace(auth_phone, '[^0-9]', '', 'g') = ?", [$digits])
+            ->where('role', 'client')
+            ->first();
 
         if (!$user) {
-             return response()->json(['message' => 'User not found or phone not registered for auth.'], 404);
+             return response()->json(['message' => 'Номер телефона не найден.'], 404);
         }
 
         if (!$user->is_accredited) {
@@ -143,8 +146,11 @@ class AuthController extends Controller
             Cache::forget($key);
         }
 
-        // Find User by Auth Phone
-        $user = User::where('auth_phone', $phone)->where('role', 'client')->first();
+        // Find User by Auth Phone (digits-only comparison)
+        $digits = preg_replace('/\D/', '', $phone);
+        $user = User::whereRaw("regexp_replace(auth_phone, '[^0-9]', '', 'g') = ?", [$digits])
+            ->where('role', 'client')
+            ->first();
 
         if (!$user || !$user->is_accredited) {
             return response()->json(['message' => 'Authentication failed or revoked.'], 403);

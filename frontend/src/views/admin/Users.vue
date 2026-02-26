@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
 import StandardModal from '../../components/ui/StandardModal.vue'
+import ModernNumberInput from '../../components/ui/ModernNumberInput.vue'
 import axios from 'axios'
 
 // --- State ---
@@ -746,14 +747,14 @@ const handleAuthPhoneInput = (event) => {
               <!-- Delivery Basis -->
               <div class="space-y-1">
                   <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Базис поставки (%)</label>
-                  <input 
+                  <ModernNumberInput 
+                      dark 
                       v-model="newUser.delivery_basis" 
-                      type="number" 
-                      step="0.01" 
+                      step="1" 
                       min="0" 
                       max="100" 
                       placeholder="Не задан" 
-                      class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20 focus:border-red-500 focus:ring-1 focus:ring-red-500 placeholder-gray-600"
+                      :inputClass="['w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all border-white/10']"
                   />
               </div>
 

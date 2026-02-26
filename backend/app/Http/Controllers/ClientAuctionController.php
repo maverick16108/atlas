@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Auction;
 use App\Models\AuctionParticipant;
 use App\Models\Bid;
@@ -381,6 +382,14 @@ class ClientAuctionController extends Controller
             'amount' => $validated['amount'],
             'bar_count' => $validated['bar_count'],
             'is_proxy' => false,
+        ]);
+
+        // Log bid in Activity Log
+        ActivityLog::log('created', 'bid', $auction->id, $auction->title, null, [
+            'bid_id' => $bid->id,
+            'user_name' => $user->name,
+            'amount' => $bid->amount,
+            'bar_count' => $bid->bar_count,
         ]);
 
         // Broadcast to all listeners on this auction channel (non-critical)
