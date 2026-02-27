@@ -394,7 +394,14 @@ const subscribeWebSocket = () => {
         })
 }
 
+const handleEsc = (e) => {
+    if (e.key === 'Escape' && !['INPUT', 'TEXTAREA'].includes(e.target?.tagName)) {
+        goBack()
+    }
+}
+
 onMounted(async () => {
+    document.addEventListener('keydown', handleEsc)
     await fetchAuction()
     startTimer()
     subscribeWebSocket()
@@ -410,6 +417,7 @@ watch(auctionId, async (newId, oldId) => {
 })
 
 onUnmounted(() => {
+    document.removeEventListener('keydown', handleEsc)
     if (timerInterval) clearInterval(timerInterval)
     if (currentChannel) {
         echo.leaveChannel(`auction.${currentChannel}`)
