@@ -1085,14 +1085,14 @@ onUnmounted(() => {
           <p class="text-xs font-medium">Ставок пока нет</p>
         </div>
         <template v-else>
-          <div v-if="!gpbAllocatedBids.hasGpbBids" class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 py-6 mb-4 bg-gray-50 dark:bg-dark-900/30 rounded-lg border border-dashed border-gray-200 dark:border-white/10">
-            <svg class="w-10 h-10 mb-2 text-blue-500/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-            <p class="text-xs font-medium">Участник ГПБ ещё не сделал ставку</p>
+          <div v-if="!gpbAllocatedBids.hasGpbBids" class="flex flex-col items-center justify-center text-gray-600 dark:text-gray-400 py-6 mb-4 bg-gray-50 dark:bg-dark-900/30 rounded-lg border border-dashed border-gray-300 dark:border-white/10">
+            <svg class="w-10 h-10 mb-2 text-blue-400 dark:text-blue-500/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Участник ГПБ ещё не сделал ставку</p>
           </div>
           <div class="flex-1 overflow-auto scrollbar-dark rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30">
             <table class="w-full text-left border-collapse relative">
               <thead class="sticky top-0 bg-gray-100 dark:bg-dark-900 z-10">
-                <tr class="border-b border-gray-200 dark:border-white/10 text-xs text-gray-500 uppercase tracking-widest font-bold">
+                <tr class="border-b border-gray-200 dark:border-white/10 text-xs text-gray-700 dark:text-gray-500 uppercase tracking-widest font-bold">
                   <th class="px-4 py-3 bg-gray-100 dark:bg-dark-900 w-8">#</th><th class="px-4 py-3 bg-gray-100 dark:bg-dark-900">Участник</th><th class="px-4 py-3 text-right bg-gray-100 dark:bg-dark-900">Слитков</th><th class="px-4 py-3 text-right bg-gray-100 dark:bg-dark-900">Цена/г</th><th class="px-4 py-3 text-right bg-gray-100 dark:bg-dark-900">Цена/слиток</th><th class="px-4 py-3 text-right bg-gray-100 dark:bg-dark-900">Сумма</th>
                   <th v-if="hasBasisBids" class="px-4 py-3 text-right bg-gray-100 dark:bg-dark-900">С базисом</th><th class="px-4 py-3 text-right bg-gray-100 dark:bg-dark-900">Дата</th>
                 </tr>
