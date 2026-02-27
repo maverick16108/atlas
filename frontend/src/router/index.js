@@ -142,4 +142,26 @@ router.beforeEach(async (to, from, next) => {
     next()
 })
 
+// Update page title on navigation
+const pageTitles = {
+    'meta.dashboard': 'Обзор',
+    'meta.auctions': 'Аукционы',
+    'meta.profile': 'Настройки',
+    'meta_admin.dashboard': 'Панель администратора',
+    'meta_admin.users': 'Пользователи',
+    'meta_admin.auctions': 'Аукционы',
+    'meta_admin.moderators': 'Модераторы',
+}
+
+router.afterEach((to) => {
+    const baseTitle = 'Атлас Майнинг | Аукцион'
+    const titleKey = to.meta.title
+    if (titleKey) {
+        const pageTitle = pageTitles[titleKey] || titleKey
+        document.title = `${pageTitle} — ${baseTitle}`
+    } else {
+        document.title = baseTitle
+    }
+})
+
 export default router
