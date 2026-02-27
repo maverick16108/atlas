@@ -2,12 +2,14 @@
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useTheme } from '../composables/useTheme'
 import StandardModal from '../components/ui/StandardModal.vue'
 import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const { theme } = useTheme()
 
 const user = computed(() => authStore.adminUser)
 
@@ -181,17 +183,17 @@ onUnmounted(() => {
 </script>
     
     <template>
-      <div class="h-screen w-full bg-dark-900 text-white flex overflow-hidden admin-dark-scroll">
+      <div class="h-screen w-full bg-gray-100 dark:bg-dark-900 text-gray-900 dark:text-white flex overflow-hidden admin-dark-scroll transition-colors duration-300">
         <!-- Grid Background -->
-        <div class="fixed inset-0 bg-[url('/img/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
+        <div class="fixed inset-0 bg-[url('/img/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-0 dark:opacity-10 pointer-events-none"></div>
         
     <!-- Sidebar -->
-    <aside class="w-64 bg-dark-800/80 backdrop-blur-xl border-r border-red-500/10 flex flex-col z-[60] relative shadow-[4px_0_30px_rgba(0,0,0,0.5)]">
-        <!-- Logo Area (from Client Panel but Red + Image) -->
-        <div class="h-20 flex items-center justify-center border-b border-white/5 relative overflow-hidden">
+    <aside class="w-64 bg-white dark:bg-dark-800/80 backdrop-blur-xl border-r border-gray-200 dark:border-red-500/10 flex flex-col z-[60] relative shadow-lg dark:shadow-[4px_0_30px_rgba(0,0,0,0.5)] transition-colors duration-300">
+        <!-- Logo Area -->
+        <div class="h-20 flex items-center justify-center border-b border-gray-200 dark:border-white/5 relative overflow-hidden">
             <router-link to="/admin" class="flex items-center gap-3 group hover:opacity-90 transition-opacity">
                  <img src="/logo.png" alt="Atlas" class="w-8 h-8 rounded shadow-[0_0_20px_rgba(239,68,68,0.6)] object-cover group-hover:scale-105 transition-transform duration-300" />
-                <h1 class="text-lg font-kanit font-bold tracking-wider text-white whitespace-nowrap">АТЛАС <span class="text-red-500 group-hover:text-red-400 transition-colors">АДМИН</span></h1>
+                <h1 class="text-lg font-kanit font-bold tracking-wider text-gray-900 dark:text-white whitespace-nowrap">АТЛАС <span class="text-red-500 group-hover:text-red-400 transition-colors">АДМИН</span></h1>
             </router-link>
         </div>
 
@@ -201,9 +203,9 @@ onUnmounted(() => {
                 <router-link 
                     :to="item.path"
                     class="flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-300 group focus:outline-none"
-                    :class="route.path === item.path ? 'bg-red-500/20 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)] border border-red-500/50' : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'"
+                    :class="route.path === item.path ? 'bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-white shadow-sm dark:shadow-[0_0_15px_rgba(239,68,68,0.3)] border border-red-500/30 dark:border-red-500/50' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white border border-transparent'"
                 >
-                    <svg class="w-5 h-5 transition-colors" :class="route.path === item.path ? 'text-red-400' : 'text-gray-500 group-hover:text-red-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-5 h-5 transition-colors" :class="route.path === item.path ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-gray-500 group-hover:text-red-500 dark:group-hover:text-red-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
                     </svg>
                     <span class="font-medium tracking-wide text-sm">{{ item.name }}</span>
@@ -212,8 +214,8 @@ onUnmounted(() => {
         </nav>
 
         <!-- Logout (Bottom Sidebar) -->
-        <div class="p-4 border-t border-white/5">
-            <button @click="handleLogout" class="w-full flex items-center justify-start gap-2 px-4 py-2.5 rounded-xl text-gray-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all text-sm font-medium">
+        <div class="p-4 border-t border-gray-200 dark:border-white/5">
+            <button @click="handleLogout" class="w-full flex items-center justify-start gap-2 px-4 py-2.5 rounded-xl text-gray-500 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 border border-transparent hover:border-red-200 dark:hover:border-red-500/20 transition-all text-sm font-medium">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -223,13 +225,13 @@ onUnmounted(() => {
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col relative z-10 overflow-hidden bg-dark-900">
+    <main class="flex-1 flex flex-col relative z-10 overflow-hidden bg-gray-100 dark:bg-dark-900 transition-colors duration-300">
         <!-- Topbar -->
-        <header class="h-20 min-h-[5rem] px-8 flex items-center justify-between border-b border-white/10 bg-dark-800/90 backdrop-blur-md sticky top-0 z-30 shadow-lg shadow-black/20">
+        <header class="h-20 min-h-[5rem] px-8 flex items-center justify-between border-b border-gray-200 dark:border-white/10 bg-white/90 dark:bg-dark-800/90 backdrop-blur-md sticky top-0 z-30 shadow-sm dark:shadow-lg dark:shadow-black/20 transition-colors duration-300">
             <div class="flex items-center gap-4">
                  <!-- Decorative accent -->
                  <div class="h-8 w-1 bg-gradient-to-b from-red-500 to-red-600 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
-                 <h2 class="text-2xl font-kanit font-bold text-white tracking-wide uppercase drop-shadow-md">
+                 <h2 class="text-2xl font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase drop-shadow-md">
                      {{ pageTitle }}
                  </h2>
             </div>
@@ -237,7 +239,7 @@ onUnmounted(() => {
             <div class="flex items-center gap-6">
                 <!-- Notifications Bell -->
                 <div class="relative" ref="notificationRef">
-                    <button @click="toggleNotifications" class="relative outline-none focus:outline-none focus:ring-0 text-gray-500 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5 active:scale-95">
+                    <button @click="toggleNotifications" class="relative outline-none focus:outline-none focus:ring-0 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 active:scale-95">
                         <div v-if="unreadCount > 0" class="absolute top-0.5 right-0.5 rounded-full">
                             <span class="absolute inset-0 inline-flex w-full h-full rounded-full bg-red-500 opacity-75 animate-ping"></span>
                             <span class="relative flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white border-2 border-dark-800 shadow-[0_0_8px_rgba(239,68,68,0.4)]">
@@ -256,14 +258,14 @@ onUnmounted(() => {
                         leave-from-class="opacity-100 scale-100"
                         leave-to-class="opacity-0 scale-95 -translate-y-1"
                     >
-                        <div v-if="showNotifications" class="absolute right-0 top-full mt-2 w-[360px] md:w-[420px] max-h-[520px] bg-dark-800 border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col z-50">
+                        <div v-if="showNotifications" class="absolute right-0 top-full mt-2 w-[360px] md:w-[420px] max-h-[520px] bg-white dark:bg-dark-800 border border-gray-200 dark:border-white/10 rounded-xl shadow-2xl dark:shadow-black/50 overflow-hidden flex flex-col z-50">
                             <!-- Header -->
-                            <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between flex-shrink-0 bg-dark-900/50">
+                            <div class="px-5 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between flex-shrink-0 bg-gray-50 dark:bg-dark-900/50">
                                 <div class="flex items-center gap-2">
-                                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Уведомления</h3>
+                                    <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Уведомления</h3>
                                     <span v-if="unreadCount > 0" class="px-2 py-0.5 bg-red-500/10 text-red-400 text-[10px] font-bold rounded-full">{{ unreadCount }}</span>
                                 </div>
-                                <button v-if="unreadCount > 0" @click="markAllAsRead" class="text-xs text-red-400 hover:text-red-300 font-medium transition-colors">
+                                <button v-if="unreadCount > 0" @click="markAllAsRead" class="text-xs text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 font-medium transition-colors">
                                     Прочитать все
                                 </button>
                             </div>
@@ -283,19 +285,19 @@ onUnmounted(() => {
 
                                 <!-- Empty -->
                                 <div v-else-if="notifications.length === 0" class="py-12 text-center">
-                                    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-white/5 flex items-center justify-center">
+                                    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
                                         <svg class="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
                                     </div>
-                                    <p class="text-sm text-gray-300 font-medium">Нет уведомлений</p>
-                                    <p class="text-xs text-gray-500 mt-1">Здесь появятся ваши уведомления</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 font-medium">Нет уведомлений</p>
+                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Здесь появятся ваши уведомления</p>
                                 </div>
 
                                 <!-- Items -->
                                 <div v-else>
                                     <div v-for="notification in notifications" :key="notification.id"
                                          @click="handleNotificationClick(notification)"
-                                         class="px-5 py-3.5 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors group flex gap-3"
-                                         :class="!notification.read_at ? 'bg-red-500/5' : ''">
+                                         class="px-5 py-3.5 border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors group flex gap-3"
+                                         :class="!notification.read_at ? 'bg-red-50 dark:bg-red-500/5' : ''">
                                         <!-- Icon -->
                                         <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-base"
                                              :class="getTypeInfo(notification.type).color">
@@ -304,7 +306,7 @@ onUnmounted(() => {
                                         <!-- Content -->
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-start justify-between gap-2">
-                                                <p class="text-sm font-bold truncate" :class="!notification.read_at ? 'text-white' : 'text-gray-400'">
+                                                <p class="text-sm font-bold truncate" :class="!notification.read_at ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'">
                                                     {{ notification.title }}
                                                 </p>
                                                 <span v-if="!notification.read_at" class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 mt-1.5 shadow-[0_0_6px_rgba(239,68,68,0.5)]"></span>
@@ -323,7 +325,7 @@ onUnmounted(() => {
         </header>
 
         <!-- View Content -->
-        <div class="flex-1 overflow-y-scroll p-8 custom-scrollbar">
+        <div class="flex-1 overflow-y-scroll p-8 custom-scrollbar transition-colors duration-300">
              <router-view v-slot="{ Component }">
                 <transition 
                     mode="out-in"
@@ -350,19 +352,19 @@ onUnmounted(() => {
         @close="showLogoutModal = false"
     >
         <div class="text-center pt-2">
-            <h3 class="text-xl font-kanit font-bold text-white tracking-wide uppercase mb-6">Выйти<span class="text-2xl">?</span></h3>
-            <p class="text-gray-400 text-sm mb-2 font-light">
+            <h3 class="text-xl font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase mb-6">Выйти<span class="text-2xl">?</span></h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-2 font-light">
                 Сессия
             </p>
-            <p class="text-white font-bold text-lg mb-2">
+            <p class="text-gray-900 dark:text-white font-bold text-lg mb-2">
                 {{ user?.name || 'Admin' }}
             </p>
-            <p class="text-red-400 text-sm font-semibold mb-6 tracking-wide">
+            <p class="text-red-500 dark:text-red-400 text-sm font-semibold mb-6 tracking-wide">
                 будет завершена
             </p>
             
             <div class="flex gap-3">
-                <button @click="showLogoutModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                <button @click="showLogoutModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-transparent hover:border-gray-300 dark:hover:border-white/10">
                     Отмена
                 </button>
                 <button @click="confirmLogout" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
@@ -387,5 +389,15 @@ onUnmounted(() => {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(239, 68, 68, 0.6);
+}
+
+:root:not(.dark) .custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+}
+:root:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.2);
+}
+:root:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(239, 68, 68, 0.4);
 }
 </style>

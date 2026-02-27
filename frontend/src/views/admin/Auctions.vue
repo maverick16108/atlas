@@ -27,19 +27,19 @@ const router = useRouter()
 
 // --- Status Options ---
 const statusOptions = [
-    { value: 'draft', label: 'Черновик', color: 'bg-gray-500/20 text-gray-400' },
-    { value: 'collecting_offers', label: 'Сбор предложений', color: 'bg-cyan-500/20 text-cyan-400' },
-    { value: 'scheduled', label: 'Запланирован', color: 'bg-purple-500/20 text-purple-400' },
-    { value: 'active', label: 'Активный', color: 'bg-amber-500/20 text-amber-400' },
-    { value: 'gpb_right', label: 'Право ГПБ', color: 'bg-blue-500/20 text-blue-400' },
-    { value: 'commission', label: 'Работа комиссии', color: 'bg-orange-500/20 text-orange-400' },
-    { value: 'completed', label: 'Завершён', color: 'bg-emerald-500/20 text-emerald-400' },
-    { value: 'paused', label: 'Приостановлен', color: 'bg-amber-800/20 text-amber-700' },
-    { value: 'cancelled', label: 'Отменён', color: 'bg-red-500/20 text-red-400' },
+    { value: 'draft', label: 'Черновик', color: 'bg-gray-100 dark:bg-gray-500/20 text-gray-700 dark:text-gray-400' },
+    { value: 'collecting_offers', label: 'Сбор предложений', color: 'bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400' },
+    { value: 'scheduled', label: 'Запланирован', color: 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400' },
+    { value: 'active', label: 'Активный', color: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400' },
+    { value: 'gpb_right', label: 'Право ГПБ', color: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400' },
+    { value: 'commission', label: 'Работа комиссии', color: 'bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400' },
+    { value: 'completed', label: 'Завершён', color: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
+    { value: 'paused', label: 'Приостановлен', color: 'bg-amber-200 dark:bg-amber-800/20 text-amber-800 dark:text-amber-700' },
+    { value: 'cancelled', label: 'Отменён', color: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400' },
 ]
 
 const getStatusClass = (status) => {
-    return statusOptions.find(s => s.value === status)?.color || 'bg-gray-500/20 text-gray-400'
+    return statusOptions.find(s => s.value === status)?.color || 'bg-gray-100 dark:bg-gray-500/20 text-gray-700 dark:text-gray-400'
 }
 
 const getStatusLabel = (status) => {
@@ -278,8 +278,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 overflow-hidden shadow-xl h-[calc(100vh-9rem)] flex flex-col">
-      <div class="p-6 border-b border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center bg-dark-900/40">
+  <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 overflow-hidden shadow-xl h-[calc(100vh-9rem)] flex flex-col">
+      <div class="p-6 border-b border-gray-200 dark:border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center bg-gray-50 dark:bg-dark-900/40">
           <div class="flex flex-col sm:flex-row gap-4 flex-1 w-full md:w-auto">
               <div class="relative w-full sm:w-auto flex-1 min-w-[200px]">
                     <!-- Search Bar -->
@@ -291,7 +291,7 @@ onUnmounted(() => {
                         v-model="searchQuery"
                         type="text" 
                         placeholder="Поиск по таблице..." 
-                        class="w-full bg-dark-900 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all placeholder-white/20" 
+                        class="w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all placeholder-white/20" 
                         @keydown.esc="clearSearchByEsc"
                     />
               </div>
@@ -300,7 +300,7 @@ onUnmounted(() => {
               <div class="relative w-full sm:w-56 flex-shrink-0">
                   <select 
                       v-model="filterStatus"
-                      class="no-arrow w-full bg-dark-900 border border-white/10 rounded-lg pl-4 pr-10 py-2 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all cursor-pointer hover:border-white/20"
+                      class="no-arrow w-full bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-4 pr-10 py-2 text-sm text-gray-900 dark:text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all cursor-pointer hover:border-gray-300 dark:hover:border-white/20"
                   >
                       <option value="">Все статусы</option>
                       <option v-for="option in statusOptions" :key="option.value" :value="option.value">
@@ -332,21 +332,21 @@ onUnmounted(() => {
       </div>
 
       <div class="overflow-x-auto relative flex-1 flex flex-col overflow-y-scroll scrollbar-none">
-          <table class="w-full text-left text-sm text-gray-400 min-w-max">
-              <thead class="bg-dark-900 text-xs uppercase font-bold text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-white/5">
+          <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400 min-w-max">
+              <thead class="bg-gray-100 dark:bg-dark-900 text-xs uppercase font-bold text-gray-900 dark:text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-gray-200 dark:border-white/5">
                   <tr>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-16" @click="sortBy('id')">
                           <div class="flex items-center gap-2">
                               №
                               <svg v-if="sortKey === 'id'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none" @click="sortBy('title')">
                           <div class="flex items-center gap-2">
                               Название
                               <svg v-if="sortKey === 'title'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-6 py-4 select-none w-[160px]">Лот</th>
@@ -354,36 +354,36 @@ onUnmounted(() => {
                           <div class="flex items-center gap-2">
                               Статус
                               <svg v-if="sortKey === 'status'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[140px]" @click="sortBy('start_at')">
                           <div class="flex items-center gap-2">
                               Начало
                               <svg v-if="sortKey === 'start_at'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[140px]" @click="sortBy('end_at')">
                           <div class="flex items-center gap-2">
                               Окончание
                               <svg v-if="sortKey === 'end_at'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-6 py-4 text-right w-28">Действия</th>
                   </tr>
               </thead>
               <tbody class="transition-opacity duration-300" :class="{ 'opacity-50': isLoading && loadingType === 'search' }">
-                  <tr v-for="auction in auctions" :key="auction.id" class="border-b border-white/5 hover:bg-white/5 transition-colors group cursor-pointer" @click="router.push(`/admin/auctions/${auction.id}`)">
+                  <tr v-for="auction in auctions" :key="auction.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors group cursor-pointer" @click="router.push(`/admin/auctions/${auction.id}`)">
                       <td class="px-6 py-4 font-mono text-xs text-gray-500">{{ auction.id }}</td>
                       <td class="px-6 py-4">
                           <div class="flex flex-col">
-                              <span class="font-bold text-white text-base">{{ auction.title }}</span>
+                              <span class="font-bold text-gray-900 dark:text-white text-base">{{ auction.title }}</span>
                               <div class="flex items-center gap-3 mt-0.5">
-                                  <span class="text-xs text-gold-400/70 font-mono"><span class="font-sans">₽</span>&nbsp;{{ auction.min_price ? Number(auction.min_price).toLocaleString('ru-RU') : '—' }}/кг</span>
-                                  <span v-if="auction.auction_participants_count > 0" class="text-xs text-gray-500">
-                                      <svg class="w-3 h-3 inline mr-0.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                  <span class="text-xs text-amber-500 font-medium dark:text-gold-400/90 font-mono"><span class="font-sans text-amber-500/80 dark:text-gold-400/60">₽</span>&nbsp;{{ auction.min_price ? Number(auction.min_price).toLocaleString('ru-RU') : '—' }}/кг</span>
+                                  <span v-if="auction.auction_participants_count > 0" class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                      <svg class="w-3.5 h-3.5 inline mr-1 -mt-0.5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                                       {{ auction.auction_participants_count }}
                                   </span>
                               </div>
@@ -391,7 +391,7 @@ onUnmounted(() => {
                       </td>
                       <td class="px-6 py-4">
                           <div v-if="auction.bar_count && auction.bar_weight" class="flex flex-col whitespace-nowrap">
-                              <span class="text-sm text-white font-mono font-bold">{{ auction.bar_count }} × {{ auction.bar_weight }} кг</span>
+                              <span class="text-sm text-gray-900 dark:text-white font-mono font-bold">{{ auction.bar_count }} × {{ auction.bar_weight }} кг</span>
                               <span class="text-xs text-gray-500 font-mono">= {{ (auction.bar_count * auction.bar_weight).toFixed(1) }} кг</span>
                           </div>
                           <span v-else class="text-xs text-gray-600">—</span>
@@ -479,11 +479,11 @@ onUnmounted(() => {
           @close="showConfirmModal = false"
       >
           <div class="text-center pt-2">
-              <h3 class="text-xl font-kanit font-bold text-white tracking-wide uppercase mb-6">Удалить<span class="text-2xl">?</span></h3>
-              <p class="text-gray-400 text-sm mb-2 font-light">
+              <h3 class="text-xl font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase mb-6">Удалить<span class="text-2xl">?</span></h3>
+              <p class="text-gray-500 dark:text-gray-400 text-sm mb-2 font-light">
                   Аукцион
               </p>
-              <p class="text-white font-bold text-lg mb-2">
+              <p class="text-gray-900 dark:text-white font-bold text-lg mb-2">
                   {{ selectedAuction?.title }}
               </p>
               <p class="text-red-400 text-sm font-semibold mb-6 tracking-wide">
@@ -491,10 +491,10 @@ onUnmounted(() => {
               </p>
               
               <div class="flex gap-3">
-                  <button @click="showConfirmModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                  <button @click="showConfirmModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-transparent hover:border-gray-200 dark:border-white/10">
                       Отмена
                   </button>
-                  <button @click="confirmDelete" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
+                  <button @click="confirmDelete" class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white dark:text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
                       Удалить
                   </button>
               </div>

@@ -168,10 +168,10 @@ const themeClasses = computed(() => {
     border: 'border-white/10',
     shadow: 'shadow-[0_0_50px_rgba(239,68,68,0.15)]',
     closeHover: 'hover:text-red-500',
-    titleBar: 'bg-red-600',
+    titleBar: 'bg-red-500',
     titleShadow: 'shadow-[0_0_10px_rgba(239,68,68,0.8)]',
-    background: 'bg-dark-800/95 text-white',
-    closeBtn: 'flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 focus:outline-none transition-all duration-200'
+    background: 'bg-white dark:bg-dark-800/95 text-gray-900 dark:text-white',
+    closeBtn: 'flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-400 focus:outline-none transition-all duration-200'
   }
 })
 </script>
@@ -192,7 +192,7 @@ const themeClasses = computed(() => {
         <div class="flex items-start justify-between mb-6 flex-shrink-0" v-if="title || $slots.header">
             <!-- Header Slot or Standard Title -->
             <slot name="header">
-                 <h3 class="text-2xl font-kanit font-bold leading-8 text-white uppercase tracking-widest flex items-center gap-3">
+                 <h3 class="text-2xl font-kanit font-bold leading-8 text-gray-900 dark:text-white uppercase tracking-widest flex items-center gap-3">
                      <span class="w-1 h-6 rounded-full" :class="[themeClasses.titleBar, themeClasses.titleShadow]"></span>
                      {{ title }}
                  </h3>

@@ -392,8 +392,8 @@ onBeforeRouteLeave((to, from, next) => {
 </script>
 
 <template>
-  <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 overflow-hidden shadow-xl h-[calc(100vh-9rem)] flex flex-col">
-      <div class="p-6 border-b border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center bg-dark-900/40">
+  <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 overflow-hidden shadow-xl h-[calc(100vh-9rem)] flex flex-col">
+      <div class="p-6 border-b border-gray-200 dark:border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center bg-gray-50 dark:bg-dark-900/40">
           <div class="flex flex-col sm:flex-row gap-4 flex-1 w-full md:w-auto">
               <div class="relative w-full sm:w-auto flex-1 min-w-[200px]">
                     <!-- Search Bar -->
@@ -405,7 +405,7 @@ onBeforeRouteLeave((to, from, next) => {
                         v-model="searchQuery"
                         type="text" 
                         placeholder="Поиск по таблице (начните вводить)..." 
-                        class="w-full bg-dark-900 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all placeholder-white/20" 
+                        class="w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all placeholder-white/20" 
                         @keydown.esc="clearSearchByEsc"
                     />
               </div>
@@ -423,53 +423,53 @@ onBeforeRouteLeave((to, from, next) => {
       </div>
 
       <div class="overflow-x-auto relative flex-1 flex flex-col overflow-y-scroll scrollbar-none">
-          <table class="w-full text-left text-sm text-gray-400 table-fixed">
-              <thead class="bg-dark-900 text-xs uppercase font-bold text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-white/5">
+          <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400 table-fixed">
+              <thead class="bg-gray-100 dark:bg-dark-900 text-xs uppercase font-bold text-gray-900 dark:text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-gray-200 dark:border-white/5">
                   <tr>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/3" @click="sortBy('name')">
                           <div class="flex items-center gap-2">
                               Модератор
                               <svg v-if="sortKey === 'name'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/4" @click="sortBy('email')">
                           <div class="flex items-center gap-2">
                               Email
                               <svg v-if="sortKey === 'email'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/6" @click="sortBy('last_login')">
                           <div class="flex items-center gap-2">
                               Последний вход
                               <svg v-if="sortKey === 'last_login_at'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/6" @click="sortBy('joined')">
                           <div class="flex items-center gap-2">
                               Добавлен
                               <svg v-if="sortKey === 'created_at'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-6 py-4 text-right w-24">Действия</th>
                   </tr>
               </thead>
               <tbody class="transition-opacity duration-300" :class="{ 'opacity-50': isLoading && loadingType === 'search' }">
-                  <tr v-for="mod in moderators" :key="mod.id" class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                  <tr v-for="mod in moderators" :key="mod.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors group">
                       <td class="px-6 py-4">
                           <div class="flex items-center gap-3">
                               <!-- Avatar Style: Red Circle + 2 Initials -->
-                              <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-sm font-bold text-white border border-red-500 shadow-[0_0_10px_rgba(220,38,38,0.3)]">
+                              <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-600 flex items-center justify-center text-sm font-bold text-red-700 dark:text-white border-transparent dark:border dark:border-red-500 shadow-none dark:shadow-[0_0_10px_rgba(220,38,38,0.3)]">
                                   {{ getInitials(mod.name) }}
                               </div>
-                              <span class="font-bold text-white text-base">{{ mod.name }}</span>
+                              <span class="font-bold text-gray-900 dark:text-white text-base">{{ mod.name }}</span>
                           </div>
                       </td>
                       <td class="px-6 py-4 font-mono text-xs">{{ mod.email }}</td>
-                      <td class="px-6 py-4 text-gray-300 font-mono text-xs">
+                      <td class="px-6 py-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
                           {{ mod.last_login }}
                       </td>
                       <td class="px-6 py-4">
@@ -560,8 +560,8 @@ onBeforeRouteLeave((to, from, next) => {
                       v-model="newMod.name" 
                       type="text" 
                       autocomplete="off"
-                      class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
-                      :class="errors.name ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500'"
+                      class="w-full bg-gray-100 dark:bg-dark-900/50 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
+                      :class="errors.name ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/20' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'"
                       placeholder="Иван Петров" 
                    />
                    <p class="text-[10px] text-gray-500 ml-1">Полное имя сотрудника для отображения в системе.</p>
@@ -577,8 +577,8 @@ onBeforeRouteLeave((to, from, next) => {
                       v-model="newMod.email" 
                       type="email" 
                       autocomplete="off"
-                      class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
-                      :class="errors.email ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500'"
+                      class="w-full bg-gray-100 dark:bg-dark-900/50 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
+                      :class="errors.email ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/20' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'"
                       placeholder="mod@atlas.ru" 
                    />
                    <p class="text-[10px] text-gray-500 ml-1">Используется для входа в панель администратора.</p>
@@ -595,13 +595,13 @@ onBeforeRouteLeave((to, from, next) => {
                           v-model="newMod.password" 
                           :type="showPassword ? 'text' : 'password'"
                           autocomplete="new-password"
-                          class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20 pr-10"
-                          :class="errors.password ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500'"
+                          class="w-full bg-gray-100 dark:bg-dark-900/50 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20 pr-10"
+                          :class="errors.password ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/20' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'"
                           placeholder="••••••" 
                        />
                        <button 
                          @click="showPassword = !showPassword"
-                         class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors focus:outline-none"
+                         class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-900 dark:text-white transition-colors focus:outline-none"
                          tabindex="-1"
                        >
                            <svg v-if="showPassword" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -620,10 +620,10 @@ onBeforeRouteLeave((to, from, next) => {
                   
                   <!-- Actions -->
                   <div class="pt-4 flex gap-3">
-                      <button @click="closeModal" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                      <button @click="closeModal" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-transparent hover:border-gray-200 dark:border-white/10">
                           Закрыть
                       </button>
-                      <button @click="saveModerator" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
+                      <button @click="saveModerator" class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white dark:text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
                           {{ isEditing ? 'Сохранить' : 'Создать' }}
                       </button>
                   </div>
@@ -640,8 +640,8 @@ onBeforeRouteLeave((to, from, next) => {
           @close="showUnsavedModal = false"
       >
           <div class="text-center pt-2">
-              <h3 class="text-xl font-kanit font-bold text-white tracking-wide uppercase mb-6">Закрыть<span class="text-2xl">?</span></h3>
-              <p class="text-gray-400 text-sm mb-2 font-light">
+              <h3 class="text-xl font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase mb-6">Закрыть<span class="text-2xl">?</span></h3>
+              <p class="text-gray-500 dark:text-gray-400 text-sm mb-2 font-light">
                   Внесенные изменения
               </p>
               <p class="text-red-400 text-sm font-semibold mb-6 tracking-wide">
@@ -649,10 +649,10 @@ onBeforeRouteLeave((to, from, next) => {
               </p>
               
               <div class="flex gap-3">
-                  <button @click="showUnsavedModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                  <button @click="showUnsavedModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-transparent hover:border-gray-200 dark:border-white/10">
                       Отмена
                   </button>
-                  <button @click="confirmDiscardChanges" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
+                  <button @click="confirmDiscardChanges" class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white dark:text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
                       Закрыть
                   </button>
               </div>
@@ -668,11 +668,11 @@ onBeforeRouteLeave((to, from, next) => {
           <!-- Using template #header to override default left-aligned header -->
           
           <div class="text-center pt-2">
-              <h3 class="text-xl font-kanit font-bold text-white tracking-wide uppercase mb-6">Удалить<span class="text-2xl">?</span></h3>
-              <p class="text-gray-400 text-sm mb-2 font-light">
+              <h3 class="text-xl font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase mb-6">Удалить<span class="text-2xl">?</span></h3>
+              <p class="text-gray-500 dark:text-gray-400 text-sm mb-2 font-light">
                   Доступ для модератора
               </p>
-              <p class="text-white font-bold text-lg mb-2">
+              <p class="text-gray-900 dark:text-white font-bold text-lg mb-2">
                   {{ selectedMod?.name }}
               </p>
               <p class="text-red-400 text-sm font-semibold mb-6 tracking-wide">
@@ -680,10 +680,10 @@ onBeforeRouteLeave((to, from, next) => {
               </p>
               
               <div class="flex gap-3">
-                  <button @click="closeModal" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                  <button @click="closeModal" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-transparent hover:border-gray-200 dark:border-white/10">
                       Отмена
                   </button>
-                  <button @click="confirmDelete" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
+                  <button @click="confirmDelete" class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white dark:text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
                       Удалить
                   </button>
               </div>

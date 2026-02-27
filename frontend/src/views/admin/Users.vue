@@ -471,8 +471,8 @@ const handleAuthPhoneInput = (event) => {
 </script>
 
 <template>
-  <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 overflow-hidden shadow-xl h-[calc(100vh-9rem)] flex flex-col">
-      <div class="p-6 border-b border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center bg-dark-900/40">
+  <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 overflow-hidden shadow-xl h-[calc(100vh-9rem)] flex flex-col">
+      <div class="p-6 border-b border-gray-200 dark:border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center bg-gray-50 dark:bg-dark-900/40">
           <div class="flex flex-col sm:flex-row gap-4 flex-1 w-full md:w-auto">
               <div class="relative w-full sm:w-auto flex-1 min-w-[200px]">
                     <!-- Search Bar -->
@@ -484,7 +484,7 @@ const handleAuthPhoneInput = (event) => {
                         v-model="searchQuery"
                         type="text" 
                         placeholder="Поиск участников..." 
-                        class="w-full bg-dark-900 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all placeholder-white/20" 
+                        class="w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all placeholder-white/20" 
                         @keydown.esc="clearSearchByEsc"
                     />
               </div>
@@ -493,7 +493,7 @@ const handleAuthPhoneInput = (event) => {
               <div class="relative w-full sm:w-56 flex-shrink-0">
                   <select 
                       v-model="filterAccreditation"
-                      class="no-arrow w-full bg-dark-900 border border-white/10 rounded-lg pl-4 pr-10 py-2 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all cursor-pointer hover:border-white/20"
+                      class="no-arrow w-full bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-4 pr-10 py-2 text-sm text-gray-900 dark:text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all cursor-pointer hover:border-gray-300 dark:hover:border-white/20"
                   >
                       <option value="all">Все участники</option>
                       <option value="accredited">Аккредитованные</option>
@@ -519,64 +519,64 @@ const handleAuthPhoneInput = (event) => {
       </div>
 
       <div class="overflow-x-auto relative flex-1 flex flex-col overflow-y-scroll scrollbar-none">
-          <table class="w-full text-left text-sm text-gray-400 table-fixed min-w-[900px]">
-              <thead class="bg-dark-900 text-xs uppercase font-bold text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-white/5">
+          <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400 table-fixed min-w-[900px]">
+              <thead class="bg-gray-100 dark:bg-dark-900 text-xs uppercase font-bold text-gray-900 dark:text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-gray-200 dark:border-white/5">
                   <tr>
                       <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[25%]" @click="sortBy('name')">
                           <div class="flex items-center gap-2">
                               Участник
                               <svg v-if="sortKey === 'name'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[17%]" @click="sortBy('email')">
                           <div class="flex items-center gap-2">
                               Контакты
                               <svg v-if="sortKey === 'email'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[14%]" @click="sortBy('auth_phone')">
                           <div class="flex items-center gap-2">
                               Телефон (вход)
                               <svg v-if="sortKey === 'auth_phone'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[14%]" @click="sortBy('is_accredited')">
                           <div class="flex items-center gap-2">
                               Статус
                               <svg v-if="sortKey === 'is_accredited'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-2 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[7%]" @click="sortBy('is_gpb')">
                           <div class="flex items-center gap-2">
                               ГПБ
                               <svg v-if="sortKey === 'is_gpb'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[14%]" @click="sortBy('created_at')">
                           <div class="flex items-center gap-2">
                               Регистрация
                               <svg v-if="sortKey === 'created_at'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                              <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                              <svg v-else class="w-4 h-4 opacity-30 text-gray-400 dark:text-gray-500 group-hover:opacity-100 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
                       <th class="px-4 py-4 text-right w-[9%]">Действия</th>
                   </tr>
               </thead>
               <tbody class="transition-opacity duration-300" :class="{ 'opacity-50': isLoading && loadingType === 'search' }">
-                  <tr v-for="user in users" :key="user.id" class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                  <tr v-for="user in users" :key="user.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors group">
                       <td class="px-4 py-4">
                           <div class="flex items-center gap-3">
                               <!-- Avatar Style: Blue Circle + 2 Initials for Clients -->
-                              <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                                   :class="user.is_gpb ? 'bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.4)]' : 'bg-emerald-600 border border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]'">
+                              <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                                   :class="user.is_gpb ? 'bg-blue-100 dark:bg-blue-500 text-blue-700 dark:text-white shadow-none dark:shadow-[0_0_12px_rgba(59,130,246,0.4)]' : 'bg-emerald-100 dark:bg-emerald-600 text-emerald-700 dark:text-white border-transparent dark:border dark:border-emerald-500 shadow-none dark:shadow-[0_0_10px_rgba(16,185,129,0.3)]'">
                                   {{ getInitials(user.name) }}
                               </div>
-                              <span class="font-bold text-white text-base truncate">{{ user.name }}</span>
+                              <span class="font-bold text-gray-900 dark:text-white text-base truncate">{{ user.name }}</span>
                           </div>
                       </td>
                       <td class="px-4 py-4 font-mono text-xs overflow-hidden">
@@ -587,21 +587,21 @@ const handleAuthPhoneInput = (event) => {
                           {{ user.auth_phone || '-' }}
                       </td>
                       <td class="px-4 py-4">
-                          <span class="px-2 py-1 rounded text-xs font-bold uppercase transition-colors select-none block text-center w-fit" 
-                             :class="user.is_accredited ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-red-500/20 text-red-400 border border-red-500/20'"
+                          <span class="px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors select-none block text-center w-fit" 
+                             :class="user.is_accredited ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'"
                           >
                               {{ user.is_accredited ? 'Аккредитован' : 'Нет доступа' }}
                           </span>
                       </td>
                       <td class="px-2 py-4">
-                          <span v-if="user.is_gpb" class="px-2 py-1 rounded text-xs font-bold uppercase select-none block text-center w-fit bg-blue-500/20 text-blue-400 border border-blue-500/20">
+                          <span v-if="user.is_gpb" class="px-2 py-1 rounded text-[10px] font-bold uppercase select-none block text-center w-fit bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400">
                               ГПБ
                           </span>
                           <span v-else class="text-gray-600 text-xs font-mono block text-center w-fit">
                               -
                           </span>
                       </td>
-                      <td class="px-4 py-4 text-gray-300 font-mono text-xs">
+                      <td class="px-4 py-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
                           {{ user.joined }}
                       </td>
                       <td class="px-4 py-4 text-right flex items-center justify-end gap-2">
@@ -692,8 +692,8 @@ const handleAuthPhoneInput = (event) => {
                       ref="nameInputRef"
                       v-model="newUser.name" 
                       type="text" 
-                      class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
-                      :class="errors.name ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500'"
+                      class="w-full bg-gray-100 dark:bg-dark-900/50 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
+                      :class="errors.name ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/20' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'"
                       placeholder="ООО Ромашка" 
                    />
               </div>
@@ -707,8 +707,8 @@ const handleAuthPhoneInput = (event) => {
                    <input 
                       v-model="newUser.email" 
                       type="email" 
-                      class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
-                      :class="errors.email ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500'"
+                      class="w-full bg-gray-100 dark:bg-dark-900/50 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
+                      :class="errors.email ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/20' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'"
                       placeholder="client@mail.ru" 
                    />
               </div>
@@ -722,8 +722,8 @@ const handleAuthPhoneInput = (event) => {
                    <input 
                       v-model="newUser.phone" 
                       type="text" 
-                      class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
-                      :class="errors.phone ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500'"
+                      class="w-full bg-gray-100 dark:bg-dark-900/50 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
+                      :class="errors.phone ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/20' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'"
                       placeholder="+7 (999) 000-00-00" 
                    />
               </div>
@@ -739,8 +739,8 @@ const handleAuthPhoneInput = (event) => {
                       @input="handleAuthPhoneInput"
                       type="text" 
                       maxlength="18"
-                      class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
-                      :class="errors.auth_phone ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500'"
+                      class="w-full bg-gray-100 dark:bg-dark-900/50 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-gray-900 dark:text-white placeholder-gray-600 focus:outline-none transition-all duration-300 font-mono text-lg tracking-wide hover:border-white/20"
+                      :class="errors.auth_phone ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/20' : 'focus:border-red-500 focus:ring-1 focus:ring-red-500/20'"
                       placeholder="+7 (999) 000-00-00" 
                    />
               </div>
@@ -755,19 +755,19 @@ const handleAuthPhoneInput = (event) => {
                       min="0" 
                       max="100" 
                       placeholder="Не задан" 
-                      :inputClass="['w-full bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition-all border-white/10']"
+                      :inputClass="['w-full bg-gray-100 dark:bg-dark-900/50 border rounded-lg px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-red-500 transition-all border-gray-200 dark:border-white/10']"
                   />
               </div>
 
               <!-- Status Toggle -->
               <div class="space-y-1">
                   <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Аккредитация</label>
-                  <div class="flex items-center gap-4 bg-dark-900/30 p-4 rounded-lg border border-white/5">
+                  <div class="flex items-center gap-4 bg-gray-50 dark:bg-dark-900/30 p-4 rounded-lg border border-gray-200 dark:border-white/5">
                       <div class="relative inline-flex items-center cursor-pointer" @click="newUser.is_accredited = !newUser.is_accredited">
-                          <div class="w-12 h-6 rounded-full transition-colors duration-300 ease-in-out" :class="newUser.is_accredited ? 'bg-green-500' : 'bg-gray-600'"></div>
-                          <div class="absolute left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ease-in-out transform" :class="newUser.is_accredited ? 'translate-x-6' : 'translate-x-0'"></div>
+                          <div class="w-12 h-6 rounded-full transition-colors duration-300 ease-in-out" :class="newUser.is_accredited ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'"></div>
+                          <div class="absolute left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ease-in-out transform shadow-sm" :class="newUser.is_accredited ? 'translate-x-6' : 'translate-x-0'"></div>
                       </div>
-                      <span class="text-sm font-bold uppercase tracking-wide" :class="newUser.is_accredited ? 'text-green-400' : 'text-gray-500'">
+                      <span class="text-sm font-bold uppercase tracking-wide" :class="newUser.is_accredited ? 'text-green-600 dark:text-green-400' : 'text-gray-500'">
                           {{ newUser.is_accredited ? 'Да' : 'Нет' }}
                       </span>
                   </div>
@@ -776,12 +776,12 @@ const handleAuthPhoneInput = (event) => {
               <!-- GPB Toggle -->
               <div class="space-y-1">
                   <label class="text-xs uppercase tracking-widest text-gray-500 font-bold ml-1">Сотрудник ГПБ</label>
-                  <div class="flex items-center gap-4 bg-dark-900/30 p-4 rounded-lg border border-white/5">
+                  <div class="flex items-center gap-4 bg-gray-50 dark:bg-dark-900/30 p-4 rounded-lg border border-gray-200 dark:border-white/5">
                       <div class="relative inline-flex items-center cursor-pointer" @click="newUser.is_gpb = !newUser.is_gpb">
-                          <div class="w-12 h-6 rounded-full transition-colors duration-300 ease-in-out" :class="newUser.is_gpb ? 'bg-blue-600' : 'bg-gray-600'"></div>
-                          <div class="absolute left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ease-in-out transform" :class="newUser.is_gpb ? 'translate-x-6' : 'translate-x-0'"></div>
+                          <div class="w-12 h-6 rounded-full transition-colors duration-300 ease-in-out" :class="newUser.is_gpb ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'"></div>
+                          <div class="absolute left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ease-in-out transform shadow-sm" :class="newUser.is_gpb ? 'translate-x-6' : 'translate-x-0'"></div>
                       </div>
-                      <span class="text-sm font-bold uppercase tracking-wide" :class="newUser.is_gpb ? 'text-blue-400' : 'text-gray-500'">
+                      <span class="text-sm font-bold uppercase tracking-wide" :class="newUser.is_gpb ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500'">
                           {{ newUser.is_gpb ? 'Да' : 'Нет' }}
                       </span>
                   </div>
@@ -790,10 +790,10 @@ const handleAuthPhoneInput = (event) => {
                   
                   <!-- Actions (full width) -->
                   <div class="col-span-2 pt-2 flex gap-3">
-                      <button @click="closeModal" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                      <button @click="closeModal" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-gray-200 dark:border-transparent hover:border-gray-300 dark:hover:border-white/10">
                           Закрыть
                       </button>
-                      <button @click="saveUser" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
+                      <button @click="saveUser" class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white dark:text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
                           {{ isEditing ? 'Сохранить' : 'Создать' }}
                       </button>
                   </div>
@@ -810,8 +810,8 @@ const handleAuthPhoneInput = (event) => {
           @close="showUnsavedModal = false"
       >
           <div class="text-center pt-2">
-              <h3 class="text-xl font-kanit font-bold text-white tracking-wide uppercase mb-6">Закрыть<span class="text-2xl">?</span></h3>
-              <p class="text-gray-400 text-sm mb-2 font-light">
+              <h3 class="text-xl font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase mb-6">Закрыть<span class="text-2xl">?</span></h3>
+              <p class="text-gray-500 dark:text-gray-400 text-sm mb-2 font-light">
                   Внесенные изменения
               </p>
               <p class="text-red-400 text-sm font-semibold mb-6 tracking-wide">
@@ -819,10 +819,10 @@ const handleAuthPhoneInput = (event) => {
               </p>
               
               <div class="flex gap-3">
-                  <button @click="showUnsavedModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                  <button @click="showUnsavedModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-transparent hover:border-gray-200 dark:border-white/10">
                       Отмена
                   </button>
-                  <button @click="confirmDiscardChanges" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
+                  <button @click="confirmDiscardChanges" class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white dark:text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
                       Закрыть
                   </button>
               </div>
@@ -836,11 +836,11 @@ const handleAuthPhoneInput = (event) => {
           @close="closeModal"
       >
           <div class="text-center pt-2">
-              <h3 class="text-xl font-kanit font-bold text-white tracking-wide uppercase mb-6">Удалить<span class="text-2xl">?</span></h3>
-              <p class="text-gray-400 text-sm mb-2 font-light">
+              <h3 class="text-xl font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase mb-6">Удалить<span class="text-2xl">?</span></h3>
+              <p class="text-gray-500 dark:text-gray-400 text-sm mb-2 font-light">
                   Доступ для участника
               </p>
-              <p class="text-white font-bold text-lg mb-2">
+              <p class="text-gray-900 dark:text-white font-bold text-lg mb-2">
                   {{ selectedUser?.name }}
               </p>
               <p class="text-red-400 text-sm font-semibold mb-6 tracking-wide">
@@ -848,10 +848,10 @@ const handleAuthPhoneInput = (event) => {
               </p>
               
               <div class="flex gap-3">
-                  <button @click="closeModal" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                  <button @click="closeModal" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors border border-transparent hover:border-gray-200 dark:border-white/10">
                       Отмена
                   </button>
-                  <button @click="confirmDelete" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
+                  <button @click="confirmDelete" class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white dark:text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all transform active:scale-95 border border-red-500/50">
                       Удалить
                   </button>
               </div>

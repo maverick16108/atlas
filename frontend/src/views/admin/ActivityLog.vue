@@ -141,11 +141,11 @@ const actionLabel = (action) => {
 
 const actionColor = (action) => {
     const map = {
-        created: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-        updated: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-        deleted: 'bg-red-500/10 text-red-400 border-red-500/30',
+        created: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30',
+        updated: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30',
+        deleted: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-300 dark:border-red-500/30',
     }
-    return map[action] || 'bg-white/5 text-gray-400 border-white/10'
+    return map[action] || 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-400 border-gray-300 dark:border-white/10'
 }
 
 const entityTypeLabel = (type) => {
@@ -155,12 +155,12 @@ const entityTypeLabel = (type) => {
 
 const entityTypeColor = (type) => {
     const map = {
-        auction: 'text-amber-400',
-        user: 'text-cyan-400',
-        moderator: 'text-purple-400',
-        bid: 'text-emerald-400',
+        auction: 'text-amber-600 dark:text-amber-400',
+        user: 'text-cyan-600 dark:text-cyan-400',
+        moderator: 'text-purple-600 dark:text-purple-400',
+        bid: 'text-emerald-600 dark:text-emerald-400',
     }
-    return map[type] || 'text-gray-400'
+    return map[type] || 'text-gray-500 dark:text-gray-400'
 }
 
 const entityTypeIcon = (type) => {
@@ -302,9 +302,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 overflow-hidden shadow-xl h-[calc(100vh-9rem)] flex flex-col">
+  <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 overflow-hidden shadow-xl h-[calc(100vh-9rem)] flex flex-col">
       <!-- Header with Search & Filters -->
-      <div class="p-6 border-b border-white/5 flex flex-col gap-4 bg-dark-900/40">
+      <div class="p-6 border-b border-gray-200 dark:border-white/5 flex flex-col gap-4 bg-gray-50 dark:bg-dark-900/40">
           <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
               <!-- Search -->
               <div class="relative w-full md:w-auto flex-1 min-w-[200px]">
@@ -316,7 +316,7 @@ onUnmounted(() => {
                         v-model="searchQuery"
                         type="text" 
                         placeholder="Поиск по таблице (начните вводить)..." 
-                        class="w-full bg-dark-900 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all placeholder-white/20" 
+                        class="w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all placeholder-white/20" 
                         @keydown.esc="clearSearchByEsc"
                     />
               </div>
@@ -325,21 +325,21 @@ onUnmounted(() => {
               <div class="flex gap-3 w-full md:w-auto">
                   <select 
                       v-model="filterEntityType"
-                      class="bg-dark-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all appearance-none cursor-pointer"
+                      class="bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all appearance-none cursor-pointer"
                   >
                       <option v-for="opt in entityTypeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                   </select>
 
                   <select 
                       v-model="filterUserRole"
-                      class="bg-dark-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all appearance-none cursor-pointer"
+                      class="bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all appearance-none cursor-pointer"
                   >
                       <option v-for="opt in userRoleOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                   </select>
 
                   <select 
                       v-model="filterAction"
-                      class="bg-dark-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all appearance-none cursor-pointer"
+                      class="bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all appearance-none cursor-pointer"
                   >
                       <option v-for="opt in actionOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                   </select>
@@ -349,8 +349,8 @@ onUnmounted(() => {
 
       <!-- Table -->
       <div class="overflow-x-auto relative flex-1 flex flex-col overflow-y-scroll scrollbar-none">
-          <table class="w-full text-left text-sm text-gray-400 table-fixed">
-              <thead class="bg-dark-900 text-xs uppercase font-bold text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-white/5">
+          <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400 table-fixed">
+              <thead class="bg-gray-100 dark:bg-dark-900 text-xs uppercase font-bold text-gray-900 dark:text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-gray-200 dark:border-white/5">
                   <tr>
                       <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[180px]" @click="sortBy('created_at')">
                           <div class="flex items-center gap-2">
@@ -393,26 +393,26 @@ onUnmounted(() => {
               <tbody class="transition-opacity duration-300" :class="{ 'opacity-50': isLoading && loadingType === 'search' }">
                   <template v-for="log in logs" :key="log.id">
                       <tr 
-                          class="border-b border-white/5 transition-colors group"
+                          class="border-b border-gray-200 dark:border-white/5 transition-colors group"
                           :class="[
-                              expandedLogId === log.id ? 'bg-white/[0.03]' : 'hover:bg-white/5',
+                              expandedLogId === log.id ? 'bg-gray-50 dark:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-white/5',
                               (hasChanges(log) || hasMetadata(log)) ? 'cursor-pointer' : ''
                           ]"
                           @click="(hasChanges(log) || hasMetadata(log)) && toggleExpand(log.id)"
                       >
                           <!-- Date/Time -->
-                          <td class="px-6 py-4 font-mono text-xs text-gray-300 whitespace-nowrap">
+                          <td class="px-6 py-4 font-mono text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                               {{ log.createdAt }}
                           </td>
 
                           <!-- User -->
                           <td class="px-6 py-4">
                               <div class="flex items-center gap-2">
-                                  <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white border shrink-0"
-                                       :class="log.userRole === 'super_admin' ? 'bg-red-600 border-red-500' : log.userRole === 'moderator' ? 'bg-purple-600 border-purple-500' : 'bg-cyan-600 border-cyan-500'">
+                                  <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+                                       :class="log.userRole === 'super_admin' ? 'bg-red-100 dark:bg-red-600 text-red-700 dark:text-white border-transparent dark:border dark:border-red-500' : log.userRole === 'moderator' ? 'bg-purple-100 dark:bg-purple-600 text-purple-700 dark:text-white border-transparent dark:border dark:border-purple-500' : 'bg-cyan-100 dark:bg-cyan-600 text-cyan-700 dark:text-white border-transparent dark:border dark:border-cyan-500'">
                                       {{ log.userName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) }}
                                   </div>
-                                  <span class="text-white text-sm font-medium truncate">{{ log.userName }}</span>
+                                  <span class="text-gray-900 dark:text-white text-sm font-medium truncate">{{ log.userName }}</span>
                               </div>
                           </td>
 
@@ -435,14 +435,14 @@ onUnmounted(() => {
                           </td>
 
                           <!-- Entity name -->
-                          <td class="px-6 py-4 text-white font-medium text-sm truncate">
+                          <td class="px-6 py-4 text-gray-900 dark:text-white font-medium text-sm truncate">
                               {{ log.entityName }}
                           </td>
 
                           <!-- Expand button -->
                           <td class="px-6 py-4 text-center">
                               <button v-if="hasChanges(log) || hasMetadata(log)"
-                                      class="text-gray-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10"
+                                      class="text-gray-500 hover:text-gray-900 dark:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10"
                                       @click.stop="toggleExpand(log.id)">
                                   <svg class="w-5 h-5 transition-transform duration-200" :class="expandedLogId === log.id ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -477,7 +477,7 @@ onUnmounted(() => {
                                       <div v-for="(value, key) in log.metadata" :key="key"
                                            class="flex items-center gap-3 py-1.5 px-3 rounded-lg bg-white/[0.02]">
                                           <span class="text-xs text-gray-500 font-bold uppercase tracking-wider min-w-[140px] shrink-0">{{ fieldLabel(key) }}</span>
-                                          <span class="text-white text-sm font-mono">{{ formatValue(value) }}</span>
+                                          <span class="text-gray-900 dark:text-white text-sm font-mono">{{ formatValue(value) }}</span>
                                       </div>
                                   </template>
                               </div>

@@ -193,22 +193,22 @@ onUnmounted(() => {
       <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
           <div v-for="(stat, index) in stats" :key="stat.name" 
                @click="stat.action && stat.action()"
-               class="bg-dark-800/80 backdrop-blur-sm p-6 rounded-xl border border-white/5 relative overflow-hidden group hover:border-emerald-500/30 transition-all duration-300 cursor-pointer active:scale-95 active:bg-dark-700/80 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-500/10"
+               class="bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm p-6 rounded-xl border border-gray-200 dark:border-white/5 relative overflow-hidden group hover:border-red-500/30 dark:hover:border-emerald-500/30 transition-all duration-300 cursor-pointer active:scale-95 hover:scale-[1.02] hover:shadow-lg hover:shadow-red-500/5 dark:hover:shadow-emerald-500/10"
                :class="{'animate-pulse': isLoading}"
                :style="`animation-delay: ${index * 100}ms`">
               
               <!-- Background Glow -->
               <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
 
-              <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">{{ stat.name }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">{{ stat.name }}</p>
               <div class="flex items-end justify-between">
-                  <h3 class="text-3xl font-kanit font-bold text-white tracking-tight">{{ stat.value }}</h3>
+                  <h3 class="text-3xl font-kanit font-bold text-gray-900 dark:text-white tracking-tight">{{ stat.value }}</h3>
                   <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide mb-1" 
                     :class="{
-                        'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': stat.type === 'up',
-                        'bg-red-500/10 text-red-400 border border-red-500/20': stat.type === 'down',
-                        'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20': stat.type === 'warn',
-                        'bg-white/5 text-gray-400 border border-white/5': stat.type === 'neutral'
+                        'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/20': stat.type === 'up',
+                        'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-500/20': stat.type === 'down',
+                        'bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-500/20': stat.type === 'warn',
+                        'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-400 border border-gray-300 dark:border-white/5': stat.type === 'neutral'
                     }">
                       {{ stat.change }}
                   </span>
@@ -220,10 +220,10 @@ onUnmounted(() => {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           <!-- Chart Section -->
-          <div class="lg:col-span-2 bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 p-6 relative overflow-hidden group hover:border-white/10 transition-colors">
+          <div class="lg:col-span-2 bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 p-6 relative overflow-hidden group hover:border-gray-300 dark:hover:border-white/10 transition-colors">
               <div class="flex justify-between items-center mb-6">
                   <div>
-                      <h3 class="text-lg font-kanit font-bold text-white">Активность аукционов</h3>
+                      <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white">Активность аукционов</h3>
                       <p class="text-xs text-gray-500 mt-1">Динамика создания новых аукционов за 30 дней</p>
                   </div>
                   <div class="flex gap-2">
@@ -243,14 +243,14 @@ onUnmounted(() => {
           <!-- Quick Actions & Status -->
           <div class="space-y-6">
               <!-- Quick Actions -->
-              <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 p-6">
-                  <h3 class="text-lg font-kanit font-bold text-white mb-4">Быстрые действия</h3>
+              <div class="bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 p-6">
+                  <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4">Быстрые действия</h3>
                   <div class="grid grid-cols-2 gap-3">
-                      <router-link :to="{ path: '/admin/users', query: { action: 'create' } }" class="p-4 bg-white/5 hover:bg-emerald-600 hover:text-white rounded-lg border border-white/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 group text-gray-300 active:scale-95 active:bg-emerald-700 hover:scale-[1.02] hover:shadow-lg">
+                      <router-link :to="{ path: '/admin/users', query: { action: 'create' } }" class="p-4 bg-gray-50 dark:bg-white/5 hover:bg-emerald-600 hover:text-white rounded-lg border border-gray-200 dark:border-white/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 group text-gray-500 dark:text-gray-300 active:scale-95 active:bg-emerald-700 hover:scale-[1.02] hover:shadow-lg">
                           <svg class="w-6 h-6 opacity-70 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
                           <span class="font-bold text-xs uppercase tracking-wide text-center">Новый участник</span>
                       </router-link>
-                      <router-link :to="{ path: '/admin/auctions', query: { action: 'create' } }" class="p-4 bg-white/5 hover:bg-blue-600 hover:text-white rounded-lg border border-white/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 group text-gray-300 active:scale-95 active:bg-blue-700 hover:scale-[1.02] hover:shadow-lg">
+                      <router-link :to="{ path: '/admin/auctions', query: { action: 'create' } }" class="p-4 bg-gray-50 dark:bg-white/5 hover:bg-blue-600 hover:text-white rounded-lg border border-gray-200 dark:border-white/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 group text-gray-500 dark:text-gray-300 active:scale-95 active:bg-blue-700 hover:scale-[1.02] hover:shadow-lg">
                            <svg class="w-6 h-6 opacity-70 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                           <span class="font-bold text-xs uppercase tracking-wide text-center">Создать Аукцион</span>
                       </router-link>
@@ -258,19 +258,19 @@ onUnmounted(() => {
               </div>
               
                <!-- System Status -->
-               <div class="bg-dark-800/80 backdrop-blur-sm rounded-xl border border-white/5 p-6">
-                  <h3 class="text-lg font-kanit font-bold text-white mb-4">Статус системы</h3>
+               <div class="bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 p-6">
+                  <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4">Статус системы</h3>
                   <div class="space-y-4 text-sm">
-                      <div class="flex justify-between items-center pb-3 border-b border-white/5">
-                          <span class="text-gray-400">База данных</span>
-                          <span class="text-emerald-400 font-bold flex items-center gap-2 text-xs uppercase tracking-wider"><span class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>Онлайн</span>
+                      <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/5">
+                          <span class="text-gray-500 dark:text-gray-400">База данных</span>
+                          <span class="text-emerald-500 dark:text-emerald-400 font-bold flex items-center gap-2 text-xs uppercase tracking-wider"><span class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>Онлайн</span>
                       </div>
-                       <div class="flex justify-between items-center pb-3 border-b border-white/5">
-                          <span class="text-gray-400">SMS Шлюз</span>
-                          <span class="text-emerald-400 font-bold flex items-center gap-2 text-xs uppercase tracking-wider"><span class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>Готов</span>
+                       <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/5">
+                          <span class="text-gray-500 dark:text-gray-400">SMS Шлюз</span>
+                          <span class="text-emerald-500 dark:text-emerald-400 font-bold flex items-center gap-2 text-xs uppercase tracking-wider"><span class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>Готов</span>
                       </div>
                       <div class="flex justify-between items-center">
-                          <span class="text-gray-400">WebSocket</span>
+                          <span class="text-gray-500 dark:text-gray-400">WebSocket</span>
                           <span class="font-bold flex items-center gap-2 text-xs uppercase tracking-wider" :class="isConnected ? 'text-emerald-400' : 'text-red-400'">
                             <span class="w-2 h-2 rounded-full" :class="isConnected ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse'"></span>
                             {{ statusText }}
