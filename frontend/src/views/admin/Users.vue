@@ -519,81 +519,81 @@ const handleAuthPhoneInput = (event) => {
       </div>
 
       <div class="overflow-x-auto relative flex-1 flex flex-col overflow-y-scroll scrollbar-none">
-          <table class="w-full text-left text-sm text-gray-400 table-fixed">
+          <table class="w-full text-left text-sm text-gray-400 table-fixed min-w-[900px]">
               <thead class="bg-dark-900 text-xs uppercase font-bold text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-white/5">
                   <tr>
-                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/3" @click="sortBy('name')">
+                      <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[25%]" @click="sortBy('name')">
                           <div class="flex items-center gap-2">
                               Участник
                               <svg v-if="sortKey === 'name'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                               <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
-                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/5" @click="sortBy('email')">
+                      <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[17%]" @click="sortBy('email')">
                           <div class="flex items-center gap-2">
                               Контакты
                               <svg v-if="sortKey === 'email'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                               <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
-                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/5" @click="sortBy('auth_phone')">
+                      <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[14%]" @click="sortBy('auth_phone')">
                           <div class="flex items-center gap-2">
                               Телефон (вход)
                               <svg v-if="sortKey === 'auth_phone'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                               <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
-                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/6" @click="sortBy('is_accredited')">
+                      <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[14%]" @click="sortBy('is_accredited')">
                           <div class="flex items-center gap-2">
                               Статус
                               <svg v-if="sortKey === 'is_accredited'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                               <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
-                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/6" @click="sortBy('is_gpb')">
+                      <th class="px-2 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[7%]" @click="sortBy('is_gpb')">
                           <div class="flex items-center gap-2">
                               ГПБ
                               <svg v-if="sortKey === 'is_gpb'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                               <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
-                      <th class="px-6 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-1/6" @click="sortBy('created_at')">
+                      <th class="px-4 py-4 cursor-pointer hover:text-red-400 transition-colors group select-none w-[14%]" @click="sortBy('created_at')">
                           <div class="flex items-center gap-2">
                               Регистрация
                               <svg v-if="sortKey === 'created_at'" class="w-4 h-4 transition-transform flex-shrink-0" :class="sortOrder === 'asc' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                               <svg v-else class="w-4 h-4 opacity-0 group-hover:opacity-50 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                           </div>
                       </th>
-                      <th class="px-6 py-4 text-right w-32">Действия</th>
+                      <th class="px-4 py-4 text-right w-[9%]">Действия</th>
                   </tr>
               </thead>
               <tbody class="transition-opacity duration-300" :class="{ 'opacity-50': isLoading && loadingType === 'search' }">
                   <tr v-for="user in users" :key="user.id" class="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                      <td class="px-6 py-4">
+                      <td class="px-4 py-4">
                           <div class="flex items-center gap-3">
                               <!-- Avatar Style: Blue Circle + 2 Initials for Clients -->
-                              <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white border"
-                                   :class="user.is_gpb ? 'bg-blue-600 border-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.3)]' : 'bg-emerald-600 border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]'">
+                              <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                                   :class="user.is_gpb ? 'bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.4)]' : 'bg-emerald-600 border border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]'">
                                   {{ getInitials(user.name) }}
                               </div>
-                              <span class="font-bold text-white text-base">{{ user.name }}</span>
+                              <span class="font-bold text-white text-base truncate">{{ user.name }}</span>
                           </div>
                       </td>
-                      <td class="px-6 py-4 font-mono text-xs overflow-hidden">
+                      <td class="px-4 py-4 font-mono text-xs overflow-hidden">
                           <div class="truncate" :title="user.email">{{ user.email }}</div>
                           <div class="text-gray-500 mt-1 truncate">{{ user.phone }}</div>
                       </td>
-                      <td class="px-6 py-4 font-mono text-xs text-gold-400">
+                      <td class="px-4 py-4 font-mono text-xs text-gold-400">
                           {{ user.auth_phone || '-' }}
                       </td>
-                      <td class="px-6 py-4">
+                      <td class="px-4 py-4">
                           <span class="px-2 py-1 rounded text-xs font-bold uppercase transition-colors select-none block text-center w-fit" 
                              :class="user.is_accredited ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-red-500/20 text-red-400 border border-red-500/20'"
                           >
                               {{ user.is_accredited ? 'Аккредитован' : 'Нет доступа' }}
                           </span>
                       </td>
-                      <td class="px-6 py-4">
+                      <td class="px-2 py-4">
                           <span v-if="user.is_gpb" class="px-2 py-1 rounded text-xs font-bold uppercase select-none block text-center w-fit bg-blue-500/20 text-blue-400 border border-blue-500/20">
                               ГПБ
                           </span>
@@ -601,10 +601,10 @@ const handleAuthPhoneInput = (event) => {
                               -
                           </span>
                       </td>
-                      <td class="px-6 py-4 text-gray-300 font-mono text-xs">
+                      <td class="px-4 py-4 text-gray-300 font-mono text-xs">
                           {{ user.joined }}
                       </td>
-                      <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
+                      <td class="px-4 py-4 text-right flex items-center justify-end gap-2">
                           <button 
                             @click="openEdit(user)"
                             class="text-gray-500 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-blue-500/10"

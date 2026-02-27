@@ -123,7 +123,8 @@ export const useAuthStore = defineStore('auth', () => {
 
             // Add avatar if missing
             if (!user.avatar) {
-                user.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Client')}&background=4ADE80&color=fff`
+                const bg = user.is_gpb ? '3B82F6' : '4ADE80'
+                user.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Client')}&background=${bg}&color=fff`
             }
 
             saveClientUser(user, token)

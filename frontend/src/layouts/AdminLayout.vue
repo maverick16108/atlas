@@ -175,7 +175,7 @@ onUnmounted(() => {
 </script>
     
     <template>
-      <div class="h-screen w-full bg-dark-900 text-white flex overflow-hidden">
+      <div class="h-screen w-full bg-dark-900 text-white flex overflow-hidden admin-dark-scroll">
         <!-- Grid Background -->
         <div class="fixed inset-0 bg-[url('/img/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-10 pointer-events-none"></div>
         
@@ -238,7 +238,12 @@ onUnmounted(() => {
                 <!-- Notifications Bell -->
                 <div class="relative" ref="notificationRef">
                     <button @click="toggleNotifications" class="relative outline-none focus:outline-none focus:ring-0 text-gray-500 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5 active:scale-95">
-                        <span v-if="unreadCount > 0" class="absolute top-0.5 right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white border-2 border-dark-800 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.4)]">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+                        <div v-if="unreadCount > 0" class="absolute top-0.5 right-0.5 rounded-full">
+                            <span class="absolute inset-0 inline-flex w-full h-full rounded-full bg-red-500 opacity-75 animate-ping"></span>
+                            <span class="relative flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white border-2 border-dark-800 shadow-[0_0_8px_rgba(239,68,68,0.4)]">
+                                {{ unreadCount > 9 ? '9+' : unreadCount }}
+                            </span>
+                        </div>
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
                     </button>
 

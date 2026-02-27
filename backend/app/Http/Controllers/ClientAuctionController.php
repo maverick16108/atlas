@@ -129,6 +129,24 @@ class ClientAuctionController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
+        // All offers (for GPB users — they see all offers like admin)
+        $allOffers = [];
+        if ($user->is_gpb && $auction->status === 'collecting_offers') {
+            $offersRaw = InitialOffer::where('auction_id', $auction->id)
+                ->with('user:id,name')
+                ->orderByDesc('created_at')
+                ->get();
+
+            $allOffers = $offersRaw->map(fn($o) => [
+                'id' => $o->id,
+                'participant' => $o->user?->name ?: ('Участник #' . $o->user_id),
+                'volume' => $o->volume,
+                'price' => $o->price,
+                'comment' => $o->comment,
+                'created_at' => $o->created_at,
+            ]);
+        }
+
         // My bids
         $myBids = Bid::where('auction_id', $auction->id)
             ->where('user_id', $user->id)
@@ -145,18 +163,27 @@ class ClientAuctionController extends Controller
         // All bids (anonymized for participants, sorted by price DESC)
         $allBids = [];
         $highestBid = null;
+        $gpbReport = null;
+        $totalBars = $auction->bar_count ?? 0;
+        $barWeight = $auction->bar_weight ?? 0;
+
         if (in_array($auction->status, ['active', 'gpb_right', 'commission', 'completed'])) {
+            // Get GPB user IDs directly (reliable, no eager-loading issues)
+            $gpbUserIds = \App\Models\User::where('is_gpb', true)->pluck('id')->toArray();
+
             $bidsRaw = Bid::where('auction_id', $auction->id)
                 ->orderByDesc('amount')
                 ->orderBy('created_at')
                 ->get();
 
-            // Build stable participant labels by user_id
-            $userIds = $bidsRaw->pluck('user_id')->unique()->values();
+            // Build stable participant labels
+            // GPB users always get 'ГПБ' label, non-GPB current user gets 'Вы'
             $userLabelMap = [];
             $labelCounter = 1;
-            foreach ($userIds as $uid) {
-                if ($uid === $user->id) {
+            foreach ($bidsRaw->pluck('user_id')->unique()->values() as $uid) {
+                if (in_array($uid, $gpbUserIds)) {
+                    $userLabelMap[$uid] = 'ГПБ';
+                } elseif ($uid === $user->id) {
                     $userLabelMap[$uid] = 'Вы';
                 } else {
                     $userLabelMap[$uid] = 'Участник ' . $labelCounter;
@@ -164,26 +191,95 @@ class ClientAuctionController extends Controller
                 }
             }
 
-            // Allocate bids to lot (winning/losing)
-            $totalBarsForAlloc = $auction->bar_count ?? 0;
-            $remainingBars = $totalBarsForAlloc;
+            // Separate GPB and regular bids using reliable user_id check
+            $gpbBidsCollection = $bidsRaw->filter(fn($b) => in_array($b->user_id, $gpbUserIds));
+            $regularBids = $bidsRaw->filter(fn($b) => !in_array($b->user_id, $gpbUserIds));
+
+            // Calculate GPB taken bars (from cheapest regular bids)
+            $gpbTakenBars = 0;
+            $bidGpbUsed = []; // bid_id => bars taken by GPB
+
+            if (in_array($auction->status, ['commission', 'completed']) && $gpbBidsCollection->count() > 0) {
+                $gpbUserId = $gpbBidsCollection->first()->user_id;
+                $gpbWantBars = $gpbBidsCollection->sum('bar_count');
+                $gpbRemaining = min($gpbWantBars, $totalBars);
+
+                // Sort regular bids ASC by price (GPB takes cheapest first)
+                $regularAsc = $regularBids->sortBy('amount')->values();
+                $takenBids = [];
+
+                foreach ($regularAsc as $bid) {
+                    if ($gpbRemaining <= 0) break;
+                    $take = min($bid->bar_count, $gpbRemaining);
+                    $pricePerGram = (float) $bid->amount;
+                    $bidGpbUsed[$bid->id] = ($bidGpbUsed[$bid->id] ?? 0) + $take;
+                    $takenBids[] = [
+                        'participant_label' => $userLabelMap[$bid->user_id] ?? 'Участник',
+                        'bar_count' => $take,
+                        'price_per_gram' => $pricePerGram,
+                        'price_per_bar' => $pricePerGram * ($barWeight * 1000),
+                        'sum' => $take * ($barWeight * 1000) * $pricePerGram,
+                        'created_at' => $bid->created_at,
+                    ];
+                    $gpbRemaining -= $take;
+                }
+
+                $gpbTakenBars = array_sum(array_column($takenBids, 'bar_count'));
+                $gpbTotalSum = array_sum(array_column($takenBids, 'sum'));
+
+                $gpbReport = [
+                    'gpb_user_name' => ($gpbUserId === $user->id) ? 'Вы (ГПБ)' : 'ГПБ',
+                    'wanted_bars' => $gpbWantBars,
+                    'total_bars' => $gpbTakenBars,
+                    'total_weight' => $gpbTakenBars * $barWeight,
+                    'total_sum' => $gpbTotalSum,
+                    'taken_bids' => $takenBids,
+                    'created_at' => $gpbBidsCollection->first()->created_at,
+                ];
+            }
+
+            // Allocate remaining bars to regular participants (highest price first)
+            $participantBars = $totalBars - $gpbTakenBars;
+            $remaining = $participantBars;
             $allocatedBids = [];
-            foreach ($bidsRaw as $bid) {
+
+            // Regular bids sorted by price DESC
+            $regularDesc = $regularBids->sortByDesc('amount')->values();
+
+            foreach ($regularDesc as $bid) {
+                $gpbUsed = $bidGpbUsed[$bid->id] ?? 0;
+                $availBars = $bid->bar_count - $gpbUsed;
+                if ($availBars <= 0) {
+                    // Entire bid was taken by GPB — show as lost to GPB
+                    $allocatedBids[] = [
+                        'id' => $bid->id,
+                        'is_mine' => $bid->user_id === $user->id,
+                        'participant_label' => $userLabelMap[$bid->user_id] ?? 'Участник',
+                        'amount' => $bid->amount,
+                        'bar_count' => $bid->bar_count,
+                        'fulfilled' => 0,
+                        'status' => 'losing',
+                        'partial' => false,
+                        'is_remainder' => false,
+                        'lost_to_gpb' => true,
+                        'created_at' => $bid->created_at,
+                    ];
+                    continue;
+                }
+
                 $fulfilled = 0;
                 $bidStatus = 'losing';
                 $partial = false;
-                $isRemainder = false;
 
-                if ($remainingBars > 0) {
-                    $fulfilled = min($bid->bar_count, $remainingBars);
-                    if ($fulfilled === $bid->bar_count) {
+                if ($remaining > 0) {
+                    $fulfilled = min($availBars, $remaining);
+                    if ($fulfilled === $availBars) {
                         $bidStatus = 'winning';
                     } else {
                         $bidStatus = 'partial';
                         $partial = true;
-                        $isRemainder = true;
                     }
-                    $remainingBars -= $fulfilled;
+                    $remaining -= $fulfilled;
                 }
 
                 $allocatedBids[] = [
@@ -191,42 +287,34 @@ class ClientAuctionController extends Controller
                     'is_mine' => $bid->user_id === $user->id,
                     'participant_label' => $userLabelMap[$bid->user_id] ?? 'Участник',
                     'amount' => $bid->amount,
-                    'bar_count' => $bid->bar_count,
+                    'bar_count' => $availBars,
                     'fulfilled' => $fulfilled,
                     'status' => $bidStatus,
                     'partial' => $partial,
-                    'is_remainder' => $isRemainder,
+                    'is_remainder' => false,
+                    'lost_to_gpb' => $gpbUsed > 0,
                     'created_at' => $bid->created_at,
                 ];
             }
 
             $allBids = $allocatedBids;
-
-            // Highest bid amount for min_step hint
             $highestBid = $bidsRaw->first()?->amount;
         }
 
         // Determine winning status
-        $totalBars = $auction->bar_count ?? 0;
-        $barWeight = $auction->bar_weight ?? 0;
         $myWinningBars = 0;
-        $myStatus = 'none'; // none, winning, losing, partial
+        $myStatus = 'none';
 
         if (count($allBids) > 0) {
-            $remaining = $totalBars;
             foreach ($allBids as $bid) {
-                if ($remaining <= 0) {
-                    break;
+                if ($bid['is_mine'] && $bid['fulfilled'] > 0) {
+                    $myWinningBars += $bid['fulfilled'];
                 }
-                $bars = min($bid['bar_count'], $remaining);
-                if ($bid['is_mine']) {
-                    $myWinningBars += $bars;
-                }
-                $remaining -= $bars;
             }
 
             $myTotalBidBars = Bid::where('auction_id', $auction->id)
                 ->where('user_id', $user->id)
+                ->whereHas('user', fn($q) => $q->where('is_gpb', false))
                 ->sum('bar_count');
 
             if ($myWinningBars > 0 && $myWinningBars >= $myTotalBidBars) {
@@ -255,12 +343,14 @@ class ClientAuctionController extends Controller
                 'gpb_minutes' => $auction->gpb_minutes,
             ],
             'my_offers' => $myOffers,
+            'all_offers' => $allOffers,
             'my_bids' => $myBids,
             'all_bids' => $allBids,
             'my_status' => $myStatus,
             'my_winning_bars' => $myWinningBars,
             'highest_bid' => $highestBid,
             'is_gpb' => (bool) $user->is_gpb,
+            'gpb_report' => $gpbReport,
         ]);
     }
 

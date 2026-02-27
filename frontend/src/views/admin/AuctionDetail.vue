@@ -251,6 +251,14 @@ const startCountdown = () => {
         timerNow.value = Date.now()
         if (countdownSeconds.value === 0) {
             stopCountdown()
+            // Re-fetch auction to get the latest end_at (admin may have extended time)
+            await fetchAuction()
+            timerNow.value = Date.now()
+            // Re-check: if end_at was extended, countdown will be > 0
+            if (countdownSeconds.value > 0) {
+                startCountdown()
+                return
+            }
             if (auction.value?.status === 'active') {
                 try {
                     const r = await axios.post(`/api/auctions/${auctionId.value}/transition-gpb`)
@@ -472,9 +480,22 @@ const confirmDiscardChanges = async () => {
     }
 }
 
-// Auto-shift End Date
-watch(() => editForm.value.start_date, (n) => {
-    if (n && editForm.value.end_date && n > editForm.value.end_date) editForm.value.end_date = n
+// Auto-shift End Date (+15 min from start)
+watch([() => editForm.value.start_date, () => editForm.value.start_time], ([newDate, newTime]) => {
+    if (newDate) {
+        const timeToUse = newTime || '10:00'
+        const startEnd = new Date(`${newDate}T${timeToUse}:00`)
+        if (!isNaN(startEnd.getTime())) {
+            startEnd.setMinutes(startEnd.getMinutes() + 15)
+            const yyyy = startEnd.getFullYear()
+            const mm = String(startEnd.getMonth() + 1).padStart(2, '0')
+            const dd = String(startEnd.getDate()).padStart(2, '0')
+            const hh = String(startEnd.getHours()).padStart(2, '0')
+            const mins = String(startEnd.getMinutes()).padStart(2, '0')
+            editForm.value.end_date = `${yyyy}-${mm}-${dd}`
+            editForm.value.end_time = `${hh}:${mins}`
+        }
+    }
 })
 
 const saveAuction = async () => {
@@ -523,6 +544,10 @@ const saveAuction = async () => {
         await fetchAuction()
         if (auction.value.status !== 'draft') {
             activeTab.value = getDefaultTab(auction.value.status)
+        }
+        // Restart countdown with fresh end_at / gpb_started_at data
+        if (['scheduled', 'active', 'gpb_right'].includes(auction.value?.status)) {
+            startCountdown()
         }
     } catch (e) {
         if (e.response?.status === 422) {
@@ -591,6 +616,8 @@ onMounted(async () => {
             fetchBids(true)
             fetchInitialOffers(true)
             if (data?.status && data.status !== oldStatus) {
+                // Auto-switch tab to match the new status
+                activeTab.value = getDefaultTab(data.status)
                 fetchParticipants()
                 if (['scheduled', 'active', 'gpb_right'].includes(data.status)) {
                     startCountdown()
@@ -1208,8 +1235,73 @@ onUnmounted(() => {
               </div>
             </div>
           </div>
-          <!-- Results table same as trading -->
-          <div class="flex-1 overflow-auto scrollbar-dark rounded-lg border border-white/10 bg-dark-900/30">
+          <!-- Results table: GPB-aware when GPB bids exist -->
+          <div v-if="gpbAllocatedBids.hasGpbBids" class="flex-1 overflow-auto scrollbar-dark rounded-lg border border-white/10 bg-dark-900/30">
+            <table class="w-full text-left border-collapse relative">
+              <thead class="sticky top-0 bg-dark-900 z-10">
+                <tr class="border-b border-white/10 text-xs text-gray-500 uppercase tracking-widest font-bold">
+                  <th class="px-4 py-3 bg-dark-900 w-8">#</th><th class="px-4 py-3 bg-dark-900">Участник</th><th class="px-4 py-3 text-right bg-dark-900">Слитков</th><th class="px-4 py-3 text-right bg-dark-900">Цена/г</th><th class="px-4 py-3 text-right bg-dark-900">Цена/слиток</th><th class="px-4 py-3 text-right bg-dark-900">Сумма</th>
+                  <th v-if="hasBasisBids" class="px-4 py-3 text-right bg-dark-900">С базисом</th><th class="px-4 py-3 text-right bg-dark-900">Дата</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- GPB Purchase Section -->
+                <tr v-if="gpbAllocatedBids.gpbBought.length > 0" class="bg-blue-500/10 border-b border-blue-500/20">
+                  <td colspan="2" class="px-4 py-2"><span class="text-xs uppercase tracking-widest text-blue-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>Выкуп ГПБ ({{ gpbAllocatedBids.gpbTotalBars }} слитков)</span></td>
+                  <td class="px-4 py-2 text-right font-mono text-sm font-bold text-blue-400">{{ gpbAllocatedBids.gpbTotalBars }}</td>
+                  <td class="px-4 py-2"></td>
+                  <td class="px-4 py-2"></td>
+                  <td class="px-4 py-2 text-right font-mono text-sm font-bold text-blue-400"><span class="font-sans">₽</span>&nbsp;{{ gpbAllocatedBids.gpbTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</td>
+                  <td v-if="hasBasisBids" class="px-4 py-2"></td>
+                  <td class="px-4 py-2"></td>
+                </tr>
+                <tr v-for="(item, idx) in gpbAllocatedBids.gpbBought" :key="'rg-'+idx" class="border-b border-blue-500/10 hover:bg-blue-500/5 transition-colors bg-blue-500/5">
+                  <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ idx + 1 }}</td>
+                  <td class="px-4 py-3"><div class="flex items-center gap-1.5"><span class="text-sm text-blue-300 font-bold">{{ gpbAllocatedBids.gpbUser?.name || 'ГПБ' }}</span><span class="text-[10px] text-blue-500/60 bg-blue-500/10 px-1.5 py-0.5 rounded">ГПБ</span></div><span class="text-xs text-gray-500">по цене {{ item.user?.name || 'Н/Д' }}</span></td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-blue-300 font-bold">{{ item.fulfilled }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-blue-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ item.pricePerGram.toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-blue-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ (item.pricePerGram * gpbAllocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-white"><span class="font-sans">₽</span>&nbsp;{{ (item.fulfilled * (gpbAllocatedBids.barWeight * 1000) * item.pricePerGram).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</td>
+                  <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
+                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(item.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(item.created_at).toLocaleTimeString('ru-RU') }}</div></td>
+                </tr>
+                <!-- Participant Winning Section -->
+                <tr v-if="gpbAllocatedBids.participantWinning.length > 0" class="bg-emerald-500/10 border-b border-emerald-500/20 border-t border-t-white/10">
+                  <td colspan="2" class="px-4 py-2"><span class="text-xs uppercase tracking-widest text-emerald-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Остаток участникам ({{ gpbAllocatedBids.participantBars }} слитков)</span></td>
+                  <td class="px-4 py-2 text-right font-mono text-sm font-bold text-emerald-400">{{ gpbAllocatedBids.participantBars }}</td>
+                  <td class="px-4 py-2"></td>
+                  <td class="px-4 py-2"></td>
+                  <td class="px-4 py-2 text-right font-mono text-sm font-bold text-emerald-400"><span class="font-sans">₽</span>&nbsp;{{ gpbAllocatedBids.participantTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</td>
+                  <td v-if="hasBasisBids" class="px-4 py-2"></td>
+                  <td class="px-4 py-2"></td>
+                </tr>
+                <tr v-for="(bid, idx) in gpbAllocatedBids.participantWinning" :key="'rpw-'+bid.id+'-'+idx" class="border-b border-emerald-500/10 hover:bg-emerald-500/5 transition-colors" :class="bid.partial ? 'bg-yellow-500/5' : 'bg-emerald-500/5'">
+                  <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ gpbAllocatedBids.gpbBought.length + idx + 1 }}</td>
+                  <td class="px-4 py-3"><span class="text-sm text-white font-bold">{{ bid.user?.name || 'Н/Д' }}</span></td>
+                  <td class="px-4 py-3 text-right font-mono text-sm font-bold" :class="bid.partial ? 'text-yellow-400' : 'text-white'">{{ bid.fulfilled }}<span v-if="bid.partial" class="text-[10px] text-yellow-500 ml-1">(частич.)</span></td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-emerald-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-emerald-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * gpbAllocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-white"><span class="font-sans">₽</span>&nbsp;{{ (bid.fulfilled * (gpbAllocatedBids.barWeight * 1000) * Number(bid.amount)).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</td>
+                  <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-amber-400 font-bold"><template v-if="bid.user?.delivery_basis"><span class="font-sans">₽</span>&nbsp;{{ (bid.fulfilled * (gpbAllocatedBids.barWeight * 1000) * Number(bid.amount) * Number(bid.user.delivery_basis) / 100).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</template><span v-else class="text-gray-600">—</span></td>
+                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
+                </tr>
+                <!-- Participant Losing Section -->
+                <tr v-if="gpbAllocatedBids.participantLosing.length > 0"><td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-500/10 border-b border-red-500/20 border-t border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ gpbAllocatedBids.participantLosing.reduce((sum, b) => sum + b.bar_count, 0) }})</span></td></tr>
+                <tr v-for="(bid, idx) in gpbAllocatedBids.participantLosing" :key="'rpl-'+bid.id+'-'+idx" class="border-b border-white/5 hover:bg-white/5 transition-colors opacity-60">
+                  <td class="px-4 py-3 text-sm text-gray-600 font-mono">{{ gpbAllocatedBids.gpbBought.length + gpbAllocatedBids.participantWinning.length + idx + 1 }}</td>
+                  <td class="px-4 py-3"><span class="text-sm text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.lostToGpb" class="text-[10px] text-blue-400/50 ml-1">(выкуп ГПБ)</span><span v-else-if="bid.isRemainder" class="text-[10px] text-yellow-500/60 ml-1">(остаток)</span></span></td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-400">{{ bid.bar_count }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * gpbAllocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
+                  <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
+                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Results table: simple (no GPB) -->
+          <div v-else class="flex-1 overflow-auto scrollbar-dark rounded-lg border border-white/10 bg-dark-900/30">
             <table class="w-full text-left border-collapse relative">
               <thead class="sticky top-0 bg-dark-900 z-10">
                 <tr class="border-b border-white/10 text-xs text-gray-500 uppercase tracking-widest font-bold">

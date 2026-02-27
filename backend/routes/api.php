@@ -51,6 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Client auction cabinet
     Route::prefix('client')->group(function () {
+        Route::get('/me', function (Request $request) {
+            return response()->json($request->user());
+        });
         Route::get('/auctions', [\App\Http\Controllers\ClientAuctionController::class, 'myAuctions']);
         Route::get('/auctions/{id}', [\App\Http\Controllers\ClientAuctionController::class, 'show']);
         Route::post('/auctions/{id}/offer', [\App\Http\Controllers\ClientAuctionController::class, 'submitOffer']);

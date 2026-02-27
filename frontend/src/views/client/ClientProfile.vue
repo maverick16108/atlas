@@ -17,7 +17,8 @@ const avatarPreview = ref(null)
 const avatarUrl = computed(() => {
     if (avatarPreview.value) return avatarPreview.value
     if (user.value?.avatar) return user.value.avatar
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value?.name || 'U')}&background=B59426&color=fff`
+    const bg = user.value?.is_gpb ? '3B82F6' : '4ADE80'
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value?.name || 'U')}&background=${bg}&color=fff`
 })
 
 const handleAvatarSelect = (event) => {

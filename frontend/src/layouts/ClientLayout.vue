@@ -145,6 +145,19 @@ onMounted(() => {
     fetchUnreadCount()
     pollInterval = setInterval(fetchUnreadCount, 30000)
 
+    // Sync profile from DB (updates is_gpb, name, etc. if changed by admin)
+    axios.get('/api/client/me').then(res => {
+        if (res.data?.id) {
+            const freshUser = res.data
+            // Regenerate avatar with correct GPB color if no custom avatar uploaded
+            if (!freshUser.avatar || freshUser.avatar.includes('ui-avatars.com')) {
+                const bg = freshUser.is_gpb ? '3B82F6' : '4ADE80'
+                freshUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(freshUser.name || 'Client')}&background=${bg}&color=fff`
+            }
+            authStore.updateClientUser(freshUser)
+        }
+    }).catch(() => {})
+
     // Real-time notifications via WebSocket
     const userId = user.value?.id
     if (userId) {
@@ -245,9 +258,12 @@ onUnmounted(() => {
                 <!-- Notifications Bell -->
                 <div class="relative" ref="notificationRef">
                     <button @click="toggleNotifications" class="relative outline-none focus:outline-none focus:ring-0 text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-white/5">
-                        <span v-if="unreadCount > 0" class="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white border-2 border-white dark:border-stone-900 animate-pulse">
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
+                        <div v-if="unreadCount > 0" class="absolute top-1 right-1 rounded-full">
+                            <span class="absolute inset-0 inline-flex w-full h-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
+                            <span class="relative flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 rounded-full text-[10px] font-bold text-white border-2 border-white dark:border-stone-900">
+                                {{ unreadCount > 9 ? '9+' : unreadCount }}
+                            </span>
+                        </div>
                         <BellIcon class="w-6 h-6" />
                     </button>
 

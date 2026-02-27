@@ -8,6 +8,9 @@ use App\Models\AuctionParticipant;
 use App\Models\Organization;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use App\Models\Bid;
+use App\Models\ClientNotification;
+use App\Models\User;
 use Illuminate\Validation\Rule;
 
 class AuctionController extends Controller
@@ -234,6 +237,11 @@ class AuctionController extends Controller
             // activity_logs may not be available
         }
 
+        $statusChangedToCompleted = false;
+        if (isset($validated['status']) && $validated['status'] === 'completed' && $auction->status !== 'completed') {
+            $statusChangedToCompleted = true;
+        }
+
         $auction->update($validated);
 
         // Log participant changes
@@ -274,6 +282,14 @@ class AuctionController extends Controller
             event(new \App\Events\AuctionUpdated($auction->id, $freshAuction->toArray()));
         } catch (\Throwable $e) {
             // Broadcasting may fail silently
+        }
+
+        if ($statusChangedToCompleted) {
+            try {
+                $this->sendCompletionNotifications($freshAuction);
+            } catch (\Throwable $e) {
+                \Log::error('Failed to send completion notifications: ' . $e->getMessage());
+            }
         }
 
         return $freshAuction;
@@ -452,5 +468,114 @@ class AuctionController extends Controller
             ->select('id', 'name', 'email', 'phone', 'inn', 'kpp', 'auth_phone')
             ->orderBy('name')
             ->get();
+    }
+
+    /**
+     * Helper to send notifications when auction is completed
+     */
+    private function sendCompletionNotifications(Auction $auction)
+    {
+        $gpbUserIds = User::where('is_gpb', true)->pluck('id')->toArray();
+        $bidsRaw = Bid::where('auction_id', $auction->id)
+            ->orderByDesc('amount')
+            ->orderBy('created_at')
+            ->get();
+
+        $gpbBidsCollection = $bidsRaw->filter(fn($b) => in_array($b->user_id, $gpbUserIds));
+        $regularBids = $bidsRaw->filter(fn($b) => !in_array($b->user_id, $gpbUserIds));
+
+        $totalBars = $auction->bar_count ?? 0;
+        
+        // Calculate GPB taking
+        $gpbTakenBars = 0;
+        $bidGpbUsed = [];
+        $gpbCompletedParticipants = [];
+
+        if ($gpbBidsCollection->count() > 0) {
+            $gpbUserId = $gpbBidsCollection->first()->user_id;
+            $gpbWantBars = $gpbBidsCollection->sum('bar_count');
+            $gpbRemaining = min($gpbWantBars, $totalBars);
+            $regularAsc = $regularBids->sortBy('amount')->values();
+
+            foreach ($regularAsc as $bid) {
+                if ($gpbRemaining <= 0) break;
+                $take = min($bid->bar_count, $gpbRemaining);
+                $bidGpbUsed[$bid->id] = ($bidGpbUsed[$bid->id] ?? 0) + $take;
+                $gpbRemaining -= $take;
+                $gpbTakenBars += $take;
+            }
+            if ($gpbTakenBars > 0) {
+                $gpbCompletedParticipants[$gpbUserId] = 'winning';
+            } else {
+                $gpbCompletedParticipants[$gpbUserId] = 'losing';
+            }
+        }
+
+        $participantBars = $totalBars - $gpbTakenBars;
+        $remaining = $participantBars;
+        $regularDesc = $regularBids->sortByDesc('amount')->values();
+
+        $userBestStatus = [];
+
+        // Save gpb statuses
+        foreach ($gpbCompletedParticipants as $gpbUid => $status) {
+            $userBestStatus[$gpbUid] = $status;
+        }
+
+        // Allocate regular bids
+        foreach ($regularDesc as $bid) {
+            $uid = $bid->user_id;
+            if (!isset($userBestStatus[$uid])) {
+                $userBestStatus[$uid] = 'losing'; // default
+            }
+
+            $gpbUsed = $bidGpbUsed[$bid->id] ?? 0;
+            $availBars = $bid->bar_count - $gpbUsed;
+            
+            if ($availBars <= 0) {
+                continue;
+            }
+
+            if ($remaining > 0) {
+                $fulfilled = min($availBars, $remaining);
+                if ($fulfilled === $availBars) {
+                    $userBestStatus[$uid] = 'winning'; // upgrade to winning
+                } else {
+                    if ($userBestStatus[$uid] !== 'winning') {
+                        $userBestStatus[$uid] = 'partial'; // upgrade to partial
+                    }
+                }
+                $remaining -= $fulfilled;
+            }
+        }
+
+        // Send notifications
+        foreach ($userBestStatus as $userId => $status) {
+            $title = '';
+            $message = '';
+            $type = 'info';
+
+            if ($status === 'winning') {
+                $title = 'Победа в торгах! 🏆';
+                $message = "Поздравляем! Вы выиграли в аукционе «{$auction->title}».";
+                $type = 'success';
+            } elseif ($status === 'partial') {
+                $title = 'Частичная победа ⚡';
+                $message = "Аукцион «{$auction->title}» завершён. Часть ваших ставок была исполнена.";
+                $type = 'warning';
+            } else {
+                $title = 'Завершение аукциона';
+                $message = "Аукцион «{$auction->title}» завершён. К сожалению, ваши ставки не сыграли. Спасибо за участие!";
+                $type = 'info';
+            }
+
+            ClientNotification::create([
+                'user_id' => $userId,
+                'title' => $title,
+                'message' => $message,
+                'type' => $type,
+                'link' => '/client/auctions/' . $auction->id,
+            ]);
+        }
     }
 }
