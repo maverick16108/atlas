@@ -31,7 +31,7 @@ const statusOptions = [
     { value: 'collecting_offers', label: 'Сбор предложений', color: 'bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400' },
     { value: 'scheduled', label: 'Запланирован', color: 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400' },
     { value: 'active', label: 'Активный', color: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400' },
-    { value: 'gpb_right', label: 'Право ГПБ', color: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400' },
+    { value: 'gpb_right', label: 'Право ГПБ', color: 'bg-gray-200 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400' },
     { value: 'commission', label: 'Работа комиссии', color: 'bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400' },
     { value: 'completed', label: 'Завершён', color: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
     { value: 'paused', label: 'Приостановлен', color: 'bg-amber-200 dark:bg-amber-800/20 text-amber-800 dark:text-amber-700' },
@@ -331,7 +331,7 @@ onUnmounted(() => {
           </button>
       </div>
 
-      <div class="overflow-x-auto relative flex-1 flex flex-col overflow-y-scroll scrollbar-none">
+      <div class="overflow-x-auto relative flex-1 flex flex-col overflow-y-scroll scrollbar-none" style="scrollbar-gutter: stable">
           <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400 min-w-max">
               <thead class="bg-gray-100 dark:bg-dark-900 text-xs uppercase font-bold text-gray-900 dark:text-white tracking-wider sticky top-0 z-20 shadow-md border-b border-gray-200 dark:border-white/5">
                   <tr>
@@ -427,27 +427,27 @@ onUnmounted(() => {
                       </td>
                   </tr>
                   <!-- Skeletons -->
-                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll' || auctions.length === 0)" v-for="i in 5" :key="`skeleton-${i}`" class="animate-pulse">
-                      <td class="px-6 py-4"><div class="h-4 w-8 bg-white/10 rounded"></div></td>
+                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll' || auctions.length === 0)" v-for="i in 5" :key="`skeleton-${i}`" class="border-b border-gray-100 dark:border-white/5">
+                      <td class="px-6 py-4"><div class="h-4 w-8 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div></td>
                       <td class="px-6 py-4">
                           <div class="flex flex-col gap-2">
-                              <div class="h-4 w-48 bg-white/10 rounded"></div>
-                              <div class="h-3 w-24 bg-white/10 rounded"></div>
+                              <div class="h-4 w-48 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
+                              <div class="h-3 w-24 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                           </div>
                       </td>
                       <td class="px-6 py-4">
                           <div class="flex flex-col gap-1">
-                              <div class="h-4 w-20 bg-white/10 rounded"></div>
-                              <div class="h-3 w-16 bg-white/10 rounded"></div>
+                              <div class="h-4 w-20 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
+                              <div class="h-3 w-16 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                           </div>
                       </td>
-                      <td class="px-6 py-4"><div class="h-6 w-20 bg-white/10 rounded"></div></td>
-                      <td class="px-6 py-4"><div class="h-4 w-24 bg-white/10 rounded"></div></td>
-                      <td class="px-6 py-4"><div class="h-4 w-24 bg-white/10 rounded"></div></td>
+                      <td class="px-6 py-4"><div class="h-6 w-20 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div></td>
+                      <td class="px-6 py-4"><div class="h-4 w-24 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div></td>
+                      <td class="px-6 py-4"><div class="h-4 w-24 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div></td>
                       <td class="px-6 py-4">
                           <div class="flex justify-end gap-2">
-                              <div class="w-8 h-8 rounded bg-white/10"></div>
-                              <div class="w-8 h-8 rounded bg-white/10"></div>
+                              <div class="w-8 h-8 rounded bg-gray-200 dark:bg-white/10 skeleton-shimmer"></div>
+                              <div class="w-8 h-8 rounded bg-gray-200 dark:bg-white/10 skeleton-shimmer"></div>
                           </div>
                       </td>
                   </tr>

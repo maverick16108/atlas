@@ -657,55 +657,55 @@ onUnmounted(() => {
     <div v-if="isLoadingPage" class="flex flex-col h-full overflow-hidden relative">
         <!-- Back button skeleton -->
         <div class="flex items-center gap-4 mb-4 flex-shrink-0">
-           <div class="w-28 h-9 bg-gray-50 dark:bg-white/5 rounded-lg skeleton-shimmer"></div>
+           <div class="w-28 h-9 bg-gray-200 dark:bg-white/5 rounded-lg skeleton-shimmer"></div>
            <div class="flex-1"></div>
-           <div class="w-20 h-7 bg-gray-50 dark:bg-white/5 rounded-full skeleton-shimmer"></div>
+           <div class="w-20 h-7 bg-gray-200 dark:bg-white/5 rounded-full skeleton-shimmer"></div>
         </div>
         <!-- Header card skeleton -->
         <div class="mb-4 rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 flex-shrink-0">
-          <div class="bg-[#0f1115] px-6 py-4">
+          <div class="bg-gray-100 dark:bg-[#0f1115] px-6 py-4">
             <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-gray-50 dark:bg-white/5 rounded-lg skeleton-shimmer"></div>
+              <div class="w-12 h-12 bg-gray-300 dark:bg-white/10 rounded-lg skeleton-shimmer"></div>
               <div class="flex-1 flex flex-col gap-2">
-                <div class="h-6 w-56 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-                <div class="h-3 w-36 bg-white/[0.03] rounded skeleton-shimmer"></div>
+                <div class="h-6 w-56 bg-gray-300 dark:bg-white/10 rounded skeleton-shimmer"></div>
+                <div class="h-3 w-36 bg-gray-200 dark:bg-white/[0.05] rounded skeleton-shimmer"></div>
               </div>
-              <div class="h-10 w-36 bg-gray-50 dark:bg-white/5 rounded-lg skeleton-shimmer"></div>
-              <div class="h-10 w-10 bg-gray-50 dark:bg-white/5 rounded-lg skeleton-shimmer"></div>
+              <div class="h-10 w-36 bg-gray-300 dark:bg-white/10 rounded-lg skeleton-shimmer"></div>
+              <div class="h-10 w-10 bg-gray-300 dark:bg-white/10 rounded-lg skeleton-shimmer"></div>
             </div>
           </div>
           <!-- Stats strip skeleton -->
-          <div class="flex items-center gap-8 border-t border-gray-200 dark:border-white/5 bg-white/[0.02] px-6 py-3">
-            <div class="h-5 w-32 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-5 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-5 w-28 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-5 w-24 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+          <div class="flex items-center gap-8 border-t border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02] px-6 py-3">
+            <div class="h-5 w-32 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-5 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-5 w-28 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-5 w-24 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
             <div class="flex-1"></div>
-            <div class="h-4 w-40 bg-white/[0.03] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-40 bg-gray-200 dark:bg-white/[0.03] rounded skeleton-shimmer"></div>
           </div>
         </div>
         <!-- Tabs skeleton -->
         <div class="flex border-b border-gray-200 dark:border-white/10 mb-4 flex-shrink-0 gap-2">
-          <div class="h-8 w-32 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-          <div class="h-8 w-24 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-          <div class="h-8 w-28 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-          <div class="h-8 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+          <div class="h-8 w-32 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+          <div class="h-8 w-24 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+          <div class="h-8 w-28 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+          <div class="h-8 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
         </div>
         <!-- Table skeleton -->
         <div class="flex-1 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30 overflow-hidden">
           <div class="flex items-center gap-4 px-4 py-3 border-b border-gray-200 dark:border-white/10">
-            <div class="h-3 w-24 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-24 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
             <div class="flex-1"></div>
-            <div class="h-3 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-3 w-16 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-3 w-16 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-16 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-16 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
           </div>
           <div v-for="i in 6" :key="i" class="flex items-center gap-4 px-4 py-3.5 border-b border-gray-200 dark:border-white/5">
-            <div class="h-4 rounded skeleton-shimmer" :style="{ width: (60 + i * 15) + 'px', background: 'rgba(255,255,255,0.04)' }"></div>
+            <div class="h-4 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer" :style="{ width: (60 + i * 15) + 'px' }"></div>
             <div class="flex-1"></div>
-            <div class="h-4 w-16 bg-white/[0.04] rounded skeleton-shimmer"></div>
-            <div class="h-4 w-20 bg-white/[0.04] rounded skeleton-shimmer"></div>
-            <div class="h-4 w-14 bg-white/[0.03] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-16 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-20 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-14 bg-gray-200 dark:bg-white/[0.03] rounded skeleton-shimmer"></div>
           </div>
         </div>
     </div>
@@ -856,7 +856,7 @@ onUnmounted(() => {
              <!-- Participants -->
              <div class="flex items-center gap-2 min-w-[100px]">
                <span class="text-gray-500 text-xs uppercase font-bold tracking-wider">Участники</span>
-               <span v-if="isLoadingParticipants" class="inline-block min-w-[26px] h-5 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></span>
+               <span v-if="isLoadingParticipants" class="inline-block min-w-[26px] h-5 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></span>
                <span v-else class="text-gray-900 dark:text-white font-bold min-w-[26px] text-center">{{ auction.invite_all ? allParticipants.length : selectedParticipantIds.length }}</span>
              </div>
              <!-- Min Price -->
@@ -890,13 +890,13 @@ onUnmounted(() => {
       <div class="flex border-b border-gray-200 dark:border-white/10 mb-4 flex-shrink-0 min-h-[42px]">
         <button type="button" @click="activeTab = 'offers'" class="px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all relative flex items-center gap-2" :class="activeTab === 'offers' ? 'text-cyan-600 dark:text-cyan-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-300'">
           Предложения
-          <span v-if="isLoadingOffers" class="inline-flex items-center justify-center min-w-[26px] h-6 px-2 text-[11px] rounded-full bg-gray-50 dark:bg-white/5 skeleton-shimmer">&nbsp;</span>
+          <span v-if="isLoadingOffers" class="inline-flex items-center justify-center min-w-[26px] h-6 px-2 text-[11px] rounded-full bg-gray-200 dark:bg-white/5 skeleton-shimmer">&nbsp;</span>
           <span v-else class="inline-flex items-center justify-center min-w-[26px] h-6 px-2 text-[11px] font-bold rounded-full" :class="(activeTab === 'offers' && Number(offersDisplayCount) > 0) ? 'bg-[#e0fbfe] text-[#0092a7] dark:bg-cyan-500/20 dark:text-cyan-400' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-gray-400'">{{ offersDisplayCount }}</span>
           <div v-if="activeTab === 'offers'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500 rounded-full"></div>
         </button>
         <button type="button" @click="() => { activeTab = 'trading'; startCountdown() }" class="px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all relative flex items-center gap-2" :class="activeTab === 'trading' ? 'text-amber-500 dark:text-amber-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-300'">
           Торги
-          <span v-if="isLoadingBids" class="inline-flex items-center justify-center min-w-[26px] h-6 px-2 text-[11px] rounded-full bg-gray-50 dark:bg-white/5 skeleton-shimmer">&nbsp;</span>
+          <span v-if="isLoadingBids" class="inline-flex items-center justify-center min-w-[26px] h-6 px-2 text-[11px] rounded-full bg-gray-200 dark:bg-white/5 skeleton-shimmer">&nbsp;</span>
           <span v-else class="inline-flex items-center justify-center min-w-[26px] h-6 px-2 text-[11px] font-bold rounded-full" :class="(activeTab === 'trading' && Number(bidsDisplayCount) > 0) ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-gray-400'">{{ bidsDisplayCount }}</span>
           <div v-if="activeTab === 'trading'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500 rounded-full"></div>
         </button>
@@ -918,18 +918,18 @@ onUnmounted(() => {
       <div v-show="activeTab === 'offers'" class="flex flex-col">
         <div v-if="isLoadingOffers" class="flex-1 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30 overflow-hidden">
           <div class="flex items-center gap-4 px-4 py-3 border-b border-gray-200 dark:border-white/10">
-            <div class="h-3 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
             <div class="flex-1"></div>
-            <div class="h-3 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-3 w-16 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-3 w-14 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-16 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-14 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
           </div>
           <div v-for="i in 5" :key="i" class="flex items-center gap-4 px-4 py-3.5 border-b border-gray-200 dark:border-white/5">
-            <div class="h-4 rounded skeleton-shimmer" :style="{ width: (50 + i * 20) + 'px', background: 'rgba(255,255,255,0.04)' }"></div>
+            <div class="h-4 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer" :style="{ width: (50 + i * 20) + 'px' }"></div>
             <div class="flex-1"></div>
-            <div class="h-4 w-14 bg-white/[0.04] rounded skeleton-shimmer"></div>
-            <div class="h-4 w-20 bg-white/[0.04] rounded skeleton-shimmer"></div>
-            <div class="h-4 w-16 bg-white/[0.03] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-14 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-20 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-16 bg-gray-200 dark:bg-white/[0.03] rounded skeleton-shimmer"></div>
           </div>
         </div>
         <div v-else-if="initialOffers.length === 0" class="flex-1 flex flex-col items-center justify-center text-gray-500">
@@ -982,20 +982,20 @@ onUnmounted(() => {
 
         <div v-if="isLoadingBids" class="flex-1 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30 overflow-hidden">
           <div class="flex items-center gap-4 px-4 py-3 border-b border-gray-200 dark:border-white/10">
-            <div class="h-3 w-8 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-3 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-8 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
             <div class="flex-1"></div>
-            <div class="h-3 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-3 w-16 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-3 w-14 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-16 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-14 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
           </div>
           <div v-for="i in 5" :key="i" class="flex items-center gap-4 px-4 py-3.5 border-b border-gray-200 dark:border-white/5">
-            <div class="h-4 w-6 bg-white/[0.04] rounded skeleton-shimmer"></div>
-            <div class="h-4 rounded skeleton-shimmer" :style="{ width: (50 + i * 18) + 'px', background: 'rgba(255,255,255,0.04)' }"></div>
+            <div class="h-4 w-6 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer" :style="{ width: (50 + i * 18) + 'px' }"></div>
             <div class="flex-1"></div>
-            <div class="h-4 w-14 bg-white/[0.04] rounded skeleton-shimmer"></div>
-            <div class="h-4 w-20 bg-white/[0.04] rounded skeleton-shimmer"></div>
-            <div class="h-4 w-16 bg-white/[0.03] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-14 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-20 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-16 bg-gray-200 dark:bg-white/[0.03] rounded skeleton-shimmer"></div>
           </div>
         </div>
         <div v-else-if="auctionBids.length === 0" class="flex-1 flex flex-col items-center justify-center text-gray-500">
@@ -1041,15 +1041,15 @@ onUnmounted(() => {
                 </tr>
                 <!-- Losing -->
                 <tr v-if="allocatedBids.losing.length > 0"><td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-red-500/10 dark:border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-500 dark:text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ allocatedBids.losing.reduce((sum, b) => sum + b.bar_count, 0) }})</span></td></tr>
-                <tr v-for="(bid, idx) in allocatedBids.losing" :key="'l-'+bid.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors opacity-60">
-                  <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-600 font-mono">{{ allocatedBids.winning.length + idx + 1 }}</td>
-                  <td class="px-4 py-3"><span class="text-sm text-gray-700 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.isRemainder" class="text-[10px] text-yellow-600/80 dark:text-yellow-500/60 ml-1">(остаток)</span></span></td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-400">{{ bid.bar_count }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * allocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                  <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
+                <tr v-for="(bid, idx) in allocatedBids.losing" :key="'l-'+bid.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors">
+                  <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-600 font-mono">{{ allocatedBids.winning.length + idx + 1 }}</td>
+                  <td class="px-4 py-3"><span class="text-sm text-gray-800 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.isRemainder" class="text-[10px] text-yellow-600/80 dark:text-yellow-500/60 ml-1">(остаток)</span></span></td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-400">{{ bid.bar_count }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * allocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-600">—</td>
+                  <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-600">—</td>
+                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500 dark:text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                 </tr>
               </tbody>
 
@@ -1064,26 +1064,20 @@ onUnmounted(() => {
           <svg class="w-5 h-5 text-emerald-500 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span class="text-sm font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Право ГПБ завершено</span>
         </div>
-        <div v-else-if="auction.status === 'gpb_right' && gpbAllocatedBids.hasGpbBids" class="flex items-center justify-end gap-3 px-5 py-3.5 rounded-lg border border-gray-200 dark:border-white/5 bg-gradient-to-r from-gray-50 to-white dark:from-white/5 dark:to-transparent shadow-sm dark:shadow-none flex-shrink-0">
-          <div class="flex items-center gap-1.5">
-            <span class="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">Итого лот</span>
-            <span class="text-lg text-gray-900 dark:text-white font-bold font-mono"><span class="font-sans text-gray-400 dark:text-gray-500">₽</span>&nbsp;{{ gpbAllocatedBids.grandTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</span>
-          </div>
-        </div>
         <div v-if="isLoadingBids" class="flex-1 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30 overflow-hidden">
           <div class="flex items-center gap-4 px-4 py-3 border-b border-gray-200 dark:border-white/10">
-            <div class="h-3 w-8 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-3 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-8 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
             <div class="flex-1"></div>
-            <div class="h-3 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-            <div class="h-3 w-16 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-16 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
           </div>
           <div v-for="i in 4" :key="i" class="flex items-center gap-4 px-4 py-3.5 border-b border-gray-200 dark:border-white/5">
-            <div class="h-4 w-6 bg-white/[0.04] rounded skeleton-shimmer"></div>
-            <div class="h-4 rounded skeleton-shimmer" :style="{ width: (50 + i * 18) + 'px', background: 'rgba(255,255,255,0.04)' }"></div>
+            <div class="h-4 w-6 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer" :style="{ width: (50 + i * 18) + 'px' }"></div>
             <div class="flex-1"></div>
-            <div class="h-4 w-14 bg-white/[0.04] rounded skeleton-shimmer"></div>
-            <div class="h-4 w-20 bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-14 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+            <div class="h-4 w-20 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
           </div>
         </div>
         <div v-else-if="auctionBids.length === 0" class="flex-1 flex flex-col items-center justify-center text-gray-500">
@@ -1145,15 +1139,15 @@ onUnmounted(() => {
                 </tr>
                 <!-- Participant losing -->
                 <tr v-if="gpbAllocatedBids.participantLosing.length > 0"><td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-red-500/10 dark:border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-500 dark:text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ gpbAllocatedBids.participantLosing.reduce((sum, b) => sum + b.bar_count, 0) }})</span></td></tr>
-                <tr v-for="(bid, idx) in gpbAllocatedBids.participantLosing" :key="'gpbl-'+bid.id+'-'+idx" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors opacity-60">
-                  <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-600 font-mono">{{ gpbAllocatedBids.gpbBought.length + gpbAllocatedBids.participantWinning.length + idx + 1 }}</td>
-                  <td class="px-4 py-3"><span class="text-sm text-gray-700 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.lostToGpb" class="text-[10px] text-blue-500/80 dark:text-blue-400/50 ml-1">(выкуп ГПБ)</span><span v-else-if="bid.isRemainder" class="text-[10px] text-yellow-600/80 dark:text-yellow-500/60 ml-1">(остаток)</span></span></td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-400">{{ bid.bar_count }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * gpbAllocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                  <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
+                <tr v-for="(bid, idx) in gpbAllocatedBids.participantLosing" :key="'gpbl-'+bid.id+'-'+idx" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors">
+                  <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-600 font-mono">{{ gpbAllocatedBids.gpbBought.length + gpbAllocatedBids.participantWinning.length + idx + 1 }}</td>
+                  <td class="px-4 py-3"><span class="text-sm text-gray-800 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.lostToGpb" class="text-[10px] text-blue-500/80 dark:text-blue-400/50 ml-1">(выкуп ГПБ)</span><span v-else-if="bid.isRemainder" class="text-[10px] text-yellow-600/80 dark:text-yellow-500/60 ml-1">(остаток)</span></span></td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-400">{{ bid.bar_count }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * gpbAllocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-600">—</td>
+                  <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-600">—</td>
+                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500 dark:text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                 </tr>
               </tbody>
             </table>
@@ -1166,24 +1160,24 @@ onUnmounted(() => {
         <div v-if="isLoadingBids" class="flex-1 flex flex-col gap-3">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-shrink-0">
             <div v-for="i in 4" :key="i" class="p-3 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-50 dark:bg-dark-900/40">
-              <div class="h-2.5 w-16 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer mb-2"></div>
-              <div class="h-6 w-20 bg-white/[0.04] rounded skeleton-shimmer"></div>
+              <div class="h-2.5 w-16 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer mb-2"></div>
+              <div class="h-6 w-20 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
             </div>
           </div>
           <div class="flex-1 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30 overflow-hidden">
             <div class="flex items-center gap-4 px-4 py-3 border-b border-gray-200 dark:border-white/10">
-              <div class="h-3 w-8 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-              <div class="h-3 w-20 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+              <div class="h-3 w-8 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+              <div class="h-3 w-20 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
               <div class="flex-1"></div>
-              <div class="h-3 w-16 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
-              <div class="h-3 w-14 bg-gray-50 dark:bg-white/5 rounded skeleton-shimmer"></div>
+              <div class="h-3 w-16 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
+              <div class="h-3 w-14 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer"></div>
             </div>
             <div v-for="i in 4" :key="'r'+i" class="flex items-center gap-4 px-4 py-3.5 border-b border-gray-200 dark:border-white/5">
-              <div class="h-4 w-6 bg-white/[0.04] rounded skeleton-shimmer"></div>
-              <div class="h-4 rounded skeleton-shimmer" :style="{ width: (50 + i * 18) + 'px', background: 'rgba(255,255,255,0.04)' }"></div>
+              <div class="h-4 w-6 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+              <div class="h-4 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer" :style="{ width: (50 + i * 18) + 'px' }"></div>
               <div class="flex-1"></div>
-              <div class="h-4 w-14 bg-white/[0.04] rounded skeleton-shimmer"></div>
-              <div class="h-4 w-20 bg-white/[0.04] rounded skeleton-shimmer"></div>
+              <div class="h-4 w-14 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
+              <div class="h-4 w-20 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
             </div>
           </div>
         </div>
@@ -1265,7 +1259,7 @@ onUnmounted(() => {
                 </tr>
                 <tr v-for="(item, idx) in gpbAllocatedBids.gpbBought" :key="'rg-'+idx" class="border-b border-blue-500/10 hover:bg-blue-500/10 dark:hover:bg-blue-500/5 transition-colors bg-blue-500/5">
                   <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ idx + 1 }}</td>
-                  <td class="px-4 py-3"><div class="flex items-center gap-1.5"><span class="text-sm text-blue-500 dark:text-blue-300 font-bold">{{ gpbAllocatedBids.gpbUser?.name || 'ГПБ' }}</span><span class="text-[10px] text-blue-700 dark:text-blue-500 bg-blue-100 dark:bg-blue-500/10 px-1.5 py-0.5 rounded">ГПБ</span></div><span class="text-xs text-gray-500">по цене {{ item.user?.name || 'Н/Д' }}</span></td>
+                  <td class="px-4 py-3"><div class="flex items-center gap-1.5"><span class="text-sm text-blue-500 dark:text-blue-300 font-bold">{{ gpbAllocatedBids.gpbUser?.name || 'ГПБ' }}</span><span class="text-[10px] text-blue-700 dark:text-blue-500 bg-gray-200 dark:bg-blue-500/10 px-1.5 py-0.5 rounded">ГПБ</span></div><span class="text-xs text-gray-500">по цене {{ item.user?.name || 'Н/Д' }}</span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-blue-600 dark:text-blue-300 font-bold">{{ item.fulfilled }}</td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-blue-600 dark:text-blue-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ item.pricePerGram.toLocaleString('ru-RU') }}</td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-blue-600 dark:text-blue-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ (item.pricePerGram * gpbAllocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
@@ -1295,15 +1289,15 @@ onUnmounted(() => {
                 </tr>
                 <!-- Participant Losing Section -->
                 <tr v-if="gpbAllocatedBids.participantLosing.length > 0"><td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-red-500/10 dark:border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-500 dark:text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ gpbAllocatedBids.participantLosing.reduce((sum, b) => sum + b.bar_count, 0) }})</span></td></tr>
-                <tr v-for="(bid, idx) in gpbAllocatedBids.participantLosing" :key="'rpl-'+bid.id+'-'+idx" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors opacity-60">
-                  <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-600 font-mono">{{ gpbAllocatedBids.gpbBought.length + gpbAllocatedBids.participantWinning.length + idx + 1 }}</td>
-                  <td class="px-4 py-3"><span class="text-sm text-gray-700 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.lostToGpb" class="text-[10px] text-blue-500/80 dark:text-blue-400/50 ml-1">(выкуп ГПБ)</span><span v-else-if="bid.isRemainder" class="text-[10px] text-yellow-600/80 dark:text-yellow-500/60 ml-1">(остаток)</span></span></td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-400">{{ bid.bar_count }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * gpbAllocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                  <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
+                <tr v-for="(bid, idx) in gpbAllocatedBids.participantLosing" :key="'rpl-'+bid.id+'-'+idx" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors">
+                  <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-600 font-mono">{{ gpbAllocatedBids.gpbBought.length + gpbAllocatedBids.participantWinning.length + idx + 1 }}</td>
+                  <td class="px-4 py-3"><span class="text-sm text-gray-800 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.lostToGpb" class="text-[10px] text-blue-500/80 dark:text-blue-400/50 ml-1">(выкуп ГПБ)</span><span v-else-if="bid.isRemainder" class="text-[10px] text-yellow-600/80 dark:text-yellow-500/60 ml-1">(остаток)</span></span></td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-400">{{ bid.bar_count }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ (Number(bid.amount) * gpbAllocatedBids.barWeight * 1000).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-600">—</td>
+                  <td v-if="hasBasisBids" class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-600">—</td>
+                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500 dark:text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                 </tr>
               </tbody>
             </table>
@@ -1333,13 +1327,13 @@ onUnmounted(() => {
                   <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                 </tr>
                 <tr v-if="allocatedBids.losing.length > 0"><td colspan="6" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-red-500/10 dark:border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-500 dark:text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ allocatedBids.losing.reduce((s,b) => s + b.bar_count, 0) }})</span></td></tr>
-                <tr v-for="(bid, idx) in allocatedBids.losing" :key="'rl-'+bid.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors opacity-60">
-                  <td class="px-4 py-3 text-sm text-gray-600 font-mono">{{ allocatedBids.winning.length + idx + 1 }}</td>
-                  <td class="px-4 py-3"><span class="text-sm text-gray-500 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}</span></td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-400">{{ bid.bar_count }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
-                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-600">—</td>
-                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
+                <tr v-for="(bid, idx) in allocatedBids.losing" :key="'rl-'+bid.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors">
+                  <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-600 font-mono">{{ allocatedBids.winning.length + idx + 1 }}</td>
+                  <td class="px-4 py-3"><span class="text-sm text-gray-800 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}</span></td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-400">{{ bid.bar_count }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ Number(bid.amount).toLocaleString('ru-RU') }}</td>
+                  <td class="px-4 py-3 text-right font-mono text-sm text-gray-500 dark:text-gray-600">—</td>
+                  <td class="px-4 py-3 text-right font-mono text-xs text-gray-500 dark:text-gray-600"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                 </tr>
               </tbody>
             </table>

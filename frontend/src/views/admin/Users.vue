@@ -573,7 +573,7 @@ const handleAuthPhoneInput = (event) => {
                           <div class="flex items-center gap-3">
                               <!-- Avatar Style: Blue Circle + 2 Initials for Clients -->
                               <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-                                   :class="user.is_gpb ? 'bg-blue-100 dark:bg-blue-500 text-blue-700 dark:text-white shadow-none dark:shadow-[0_0_12px_rgba(59,130,246,0.4)]' : 'bg-emerald-100 dark:bg-emerald-600 text-emerald-700 dark:text-white border-transparent dark:border dark:border-emerald-500 shadow-none dark:shadow-[0_0_10px_rgba(16,185,129,0.3)]'">
+                                   :class="user.is_gpb ? 'bg-gray-200 dark:bg-blue-500 text-blue-700 dark:text-white shadow-none dark:shadow-[0_0_12px_rgba(59,130,246,0.4)]' : 'bg-emerald-100 dark:bg-emerald-600 text-emerald-700 dark:text-white border-transparent dark:border dark:border-emerald-500 shadow-none dark:shadow-[0_0_10px_rgba(16,185,129,0.3)]'">
                                   {{ getInitials(user.name) }}
                               </div>
                               <span class="font-bold text-gray-900 dark:text-white text-base truncate">{{ user.name }}</span>
@@ -594,7 +594,7 @@ const handleAuthPhoneInput = (event) => {
                           </span>
                       </td>
                       <td class="px-2 py-4">
-                          <span v-if="user.is_gpb" class="px-2 py-1 rounded text-[10px] font-bold uppercase select-none block text-center w-fit bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400">
+                          <span v-if="user.is_gpb" class="px-2 py-1 rounded text-[10px] font-bold uppercase select-none block text-center w-fit bg-gray-200 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400">
                               ГПБ
                           </span>
                           <span v-else class="text-gray-600 text-xs font-mono block text-center w-fit">
@@ -627,32 +627,32 @@ const handleAuthPhoneInput = (event) => {
                   </tr>
                   
                   <!-- Skeletons -->
-                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll')" v-for="i in 5" :key="`skeleton-${i}`" class="animate-pulse">
+                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll')" v-for="i in 5" :key="`skeleton-${i}`" class="border-b border-gray-100 dark:border-white/5">
                       <td class="px-6 py-4">
                           <div class="flex items-center gap-3">
                               <div class="w-10 h-10 rounded-full bg-white/10"></div>
-                              <div class="h-4 w-32 bg-white/10 rounded"></div>
+                              <div class="h-4 w-32 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                           </div>
                       </td>
                       <td class="px-6 py-4">
-                          <div class="h-8 w-40 bg-white/10 rounded"></div>
+                          <div class="h-8 w-40 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                       </td>
                       <td class="px-6 py-4">
-                          <div class="h-6 w-24 bg-white/10 rounded"></div>
+                          <div class="h-6 w-24 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                       </td>
                       <td class="px-6 py-4">
-                          <div class="h-6 w-20 bg-white/10 rounded"></div>
+                          <div class="h-6 w-20 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                       </td>
                       <td class="px-6 py-4">
-                          <div class="h-4 w-12 bg-white/10 rounded"></div>
+                          <div class="h-4 w-12 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                       </td>
                       <td class="px-6 py-4">
-                          <div class="h-4 w-20 bg-white/10 rounded"></div>
+                          <div class="h-4 w-20 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                       </td>
                       <td class="px-6 py-4">
                           <div class="flex justify-end gap-2">
-                              <div class="w-8 h-8 rounded bg-white/10"></div>
-                              <div class="w-8 h-8 rounded bg-white/10"></div>
+                              <div class="w-8 h-8 rounded bg-gray-200 dark:bg-white/10 skeleton-shimmer"></div>
+                              <div class="w-8 h-8 rounded bg-gray-200 dark:bg-white/10 skeleton-shimmer"></div>
                           </div>
                       </td>
                   </tr>

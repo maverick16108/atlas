@@ -497,26 +497,26 @@ onBeforeRouteLeave((to, from, next) => {
                       </td>
                   </tr>
                   <!-- Skeletons (Initial & Scroll State) -->
-                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll')" v-for="i in 5" :key="`skeleton-${i}`" class="animate-pulse">
+                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll')" v-for="i in 5" :key="`skeleton-${i}`" class="border-b border-gray-100 dark:border-white/5">
                       <td class="px-6 py-4">
                           <div class="flex items-center gap-3">
                               <div class="w-10 h-10 rounded-full bg-white/10"></div>
-                              <div class="h-4 w-32 bg-white/10 rounded"></div>
+                              <div class="h-4 w-32 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                           </div>
                       </td>
                       <td class="px-6 py-4">
-                          <div class="h-4 w-40 bg-white/10 rounded"></div>
+                          <div class="h-4 w-40 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                       </td>
                       <td class="px-6 py-4">
-                          <div class="h-4 w-24 bg-white/10 rounded"></div>
+                          <div class="h-4 w-24 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                       </td>
                       <td class="px-6 py-4">
-                          <div class="h-4 w-20 bg-white/10 rounded"></div>
+                          <div class="h-4 w-20 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div>
                       </td>
                       <td class="px-6 py-4">
                           <div class="flex justify-end gap-2">
-                              <div class="w-8 h-8 rounded bg-white/10"></div>
-                              <div class="w-8 h-8 rounded bg-white/10"></div>
+                              <div class="w-8 h-8 rounded bg-gray-200 dark:bg-white/10 skeleton-shimmer"></div>
+                              <div class="w-8 h-8 rounded bg-gray-200 dark:bg-white/10 skeleton-shimmer"></div>
                           </div>
                       </td>
                   </tr>

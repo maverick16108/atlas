@@ -142,7 +142,7 @@ const actionLabel = (action) => {
 const actionColor = (action) => {
     const map = {
         created: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30',
-        updated: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30',
+        updated: 'bg-gray-200 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30',
         deleted: 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-300 dark:border-red-500/30',
     }
     return map[action] || 'bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-400 border-gray-300 dark:border-white/10'
@@ -486,13 +486,13 @@ onUnmounted(() => {
                   </template>
 
                   <!-- Skeletons -->
-                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll')" v-for="i in 8" :key="`skeleton-${i}`" class="animate-pulse">
-                      <td class="px-6 py-4"><div class="h-4 w-32 bg-white/10 rounded"></div></td>
-                      <td class="px-6 py-4"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-white/10"></div><div class="h-4 w-24 bg-white/10 rounded"></div></div></td>
-                      <td class="px-6 py-4"><div class="h-5 w-20 bg-white/10 rounded"></div></td>
-                      <td class="px-6 py-4"><div class="h-4 w-20 bg-white/10 rounded"></div></td>
-                      <td class="px-6 py-4"><div class="h-4 w-36 bg-white/10 rounded"></div></td>
-                      <td class="px-6 py-4"><div class="h-4 w-6 bg-white/10 rounded mx-auto"></div></td>
+                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll')" v-for="i in 8" :key="`skeleton-${i}`" class="border-b border-gray-100 dark:border-white/5">
+                      <td class="px-6 py-4"><div class="h-4 w-32 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div></td>
+                      <td class="px-6 py-4"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-white/10"></div><div class="h-4 w-24 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div></div></td>
+                      <td class="px-6 py-4"><div class="h-5 w-20 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div></td>
+                      <td class="px-6 py-4"><div class="h-4 w-20 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div></td>
+                      <td class="px-6 py-4"><div class="h-4 w-36 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer"></div></td>
+                      <td class="px-6 py-4"><div class="h-4 w-6 bg-gray-200 dark:bg-white/10 rounded skeleton-shimmer mx-auto"></div></td>
                   </tr>
               </tbody>
           </table>
