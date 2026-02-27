@@ -191,9 +191,15 @@ class ClientAuctionController extends Controller
                 }
             }
 
-            // Separate GPB and regular bids using reliable user_id check
-            $gpbBidsCollection = $bidsRaw->filter(fn($b) => in_array($b->user_id, $gpbUserIds));
-            $regularBids = $bidsRaw->filter(fn($b) => !in_array($b->user_id, $gpbUserIds));
+            // Separate GPB and regular bids ONLY for commission/completed (GPB purchase phase)
+            // During active/gpb_right, GPB bids compete as regular bids
+            if (in_array($auction->status, ['commission', 'completed'])) {
+                $gpbBidsCollection = $bidsRaw->filter(fn($b) => in_array($b->user_id, $gpbUserIds));
+                $regularBids = $bidsRaw->filter(fn($b) => !in_array($b->user_id, $gpbUserIds));
+            } else {
+                $gpbBidsCollection = collect();
+                $regularBids = $bidsRaw;
+            }
 
             // Calculate GPB taken bars (from cheapest regular bids)
             $gpbTakenBars = 0;
