@@ -11,7 +11,7 @@ const { isConnected, statusText } = useConnectionStatus()
 const route = useRoute()
 const router = useRouter()
 
-const auctionId = route.params.id
+const auctionId = computed(() => route.params.id)
 const auction = ref(null)
 const myOffers = ref([])
 const allOffers = ref([])
@@ -129,7 +129,7 @@ const getStatusInfo = (status) => statusOptions[status] || statusOptions.draft
 
 const fetchAuction = async () => {
     try {
-        const response = await axios.get(`/api/client/auctions/${auctionId}`)
+        const response = await axios.get(`/api/client/auctions/${auctionId.value}`)
         const oldBidsCount = allBids.value.length
         auction.value = response.data.auction
         myOffers.value = response.data.my_offers || []
@@ -226,7 +226,7 @@ const submitOffer = async () => {
 
     isSubmittingOffer.value = true
     try {
-        await axios.post(`/api/client/auctions/${auctionId}/offer`, {
+        await axios.post(`/api/client/auctions/${auctionId.value}/offer`, {
             volume: offerForm.value.volume,
             price: offerForm.value.price,
             comment: offerForm.value.comment || null,
@@ -269,7 +269,7 @@ const placeBid = async () => {
 
     isSubmittingBid.value = true
     try {
-        const response = await axios.post(`/api/client/auctions/${auctionId}/bid`, {
+        const response = await axios.post(`/api/client/auctions/${auctionId.value}/bid`, {
             bar_count: bidForm.value.bar_count,
             amount: bidForm.value.amount,
         })
@@ -341,7 +341,7 @@ const submitGpbPurchase = async () => {
     isSubmittingGpb.value = true
     try {
         // GPB sends bar_count + minimum price from taken bids
-        const response = await axios.post(`/api/client/auctions/${auctionId}/bid`, {
+        const response = await axios.post(`/api/client/auctions/${auctionId.value}/bid`, {
             bar_count: gpbForm.value.bar_count,
             amount: gpbPreview.value.minPrice,
         })
@@ -375,12 +375,14 @@ const totalWeight = computed(() => {
     return ((auction.value.bar_count || 0) * (auction.value.bar_weight || 0)).toFixed(3)
 })
 
-onMounted(async () => {
-    await fetchAuction()
-    startTimer()
+let currentChannel = null
 
-    // Subscribe to real-time updates via WebSocket
-    echo.channel(`auction.${auctionId}`)
+const subscribeWebSocket = () => {
+    if (currentChannel) {
+        echo.leaveChannel(`auction.${currentChannel}`)
+    }
+    currentChannel = auctionId.value
+    echo.channel(`auction.${currentChannel}`)
         .listen('.bid.placed', () => {
             fetchAuction()
         })
@@ -388,14 +390,30 @@ onMounted(async () => {
             fetchAuction()
         })
         .listen('.auction.updated', () => {
-            // Full refetch to get all updated data (bids, offers, status, etc.)
             fetchAuction()
         })
+}
+
+onMounted(async () => {
+    await fetchAuction()
+    startTimer()
+    subscribeWebSocket()
+})
+
+// Re-fetch and re-subscribe when navigating between auctions
+watch(auctionId, async (newId, oldId) => {
+    if (newId && newId !== oldId) {
+        isLoading.value = true
+        await fetchAuction()
+        subscribeWebSocket()
+    }
 })
 
 onUnmounted(() => {
     if (timerInterval) clearInterval(timerInterval)
-    echo.leaveChannel(`auction.${auctionId}`)
+    if (currentChannel) {
+        echo.leaveChannel(`auction.${currentChannel}`)
+    }
 })
 </script>
 
