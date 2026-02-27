@@ -15,6 +15,8 @@ const perPage = 50
 const isLoading = ref(false)
 const hasMore = ref(true)
 const loadingType = ref('initial')
+let searchTimeout = null
+let abortController = null
 
 // --- Delete ---
 const showConfirmModal = ref(false)
@@ -54,6 +56,13 @@ const formatDate = (iso) => {
 const loadMore = async (reset = false) => {
     if (isLoading.value && !reset) return
 
+    // Отменяем предыдущий запрос при reset (новый поиск/фильтр)
+    if (reset && abortController) {
+        abortController.abort()
+    }
+    abortController = new AbortController()
+    const currentController = abortController
+
     if (reset) {
         page.value = 1
         hasMore.value = true
@@ -74,8 +83,11 @@ const loadMore = async (reset = false) => {
         if (searchQuery.value) params.search = searchQuery.value
         if (filterStatus.value) params.status = filterStatus.value
 
-        const response = await axios.get('/api/auctions', { params })
+        const response = await axios.get('/api/auctions', { params, signal: currentController.signal })
         const data = response.data.data || response.data
+
+        // Игнорируем ответ, если запрос был отменён (новый запрос уже ушёл)
+        if (currentController.signal.aborted) return
 
         if (reset) {
             auctions.value = data
@@ -91,10 +103,13 @@ const loadMore = async (reset = false) => {
         }
 
     } catch (e) {
+        if (e.name === 'CanceledError' || e.name === 'AbortError') return
         console.error('Failed to load auctions:', e)
     } finally {
-        isLoading.value = false
-        loadingType.value = 'initial'
+        if (!currentController.signal.aborted) {
+            isLoading.value = false
+            loadingType.value = 'initial'
+        }
     }
 }
 
@@ -197,7 +212,14 @@ const handleEnterKey = (e) => {
 // --- Intersection Observer ---
 const observerTarget = ref(null)
 
-watch([searchQuery, filterStatus], () => {
+watch(searchQuery, () => {
+    clearTimeout(searchTimeout)
+    searchTimeout = setTimeout(() => {
+        resetList()
+    }, 300)
+})
+
+watch(filterStatus, () => {
     resetList()
 })
 
@@ -205,6 +227,7 @@ onMounted(() => {
     const route = useRoute()
 
     // Handle Search/Filter from Query
+    const hasSearchFromUrl = !!route.query.search || !!route.query.status
     if (route.query.search) {
         searchQuery.value = route.query.search
     }
@@ -213,7 +236,10 @@ onMounted(() => {
         filterStatus.value = route.query.status
     }
 
-    resetList()
+    // Если search/status заданы из URL, watcher сам вызовет resetList
+    if (!hasSearchFromUrl) {
+        resetList()
+    }
 
     // Handle Actions
     if (route.query.action === 'create') {
@@ -245,6 +271,8 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('keydown', handleGlobalKeydown)
     window.removeEventListener('keydown', handleEnterKey)
+    clearTimeout(searchTimeout)
+    if (abortController) abortController.abort()
 })
 </script>
 
