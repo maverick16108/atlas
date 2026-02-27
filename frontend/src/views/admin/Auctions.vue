@@ -427,7 +427,7 @@ onUnmounted(() => {
                       </td>
                   </tr>
                   <!-- Skeletons -->
-                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll')" v-for="i in 5" :key="`skeleton-${i}`" class="animate-pulse">
+                  <tr v-if="isLoading && (loadingType === 'initial' || loadingType === 'scroll' || auctions.length === 0)" v-for="i in 5" :key="`skeleton-${i}`" class="animate-pulse">
                       <td class="px-6 py-4"><div class="h-4 w-8 bg-white/10 rounded"></div></td>
                       <td class="px-6 py-4">
                           <div class="flex flex-col gap-2">
