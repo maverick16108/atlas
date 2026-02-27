@@ -66,6 +66,7 @@ const loadMore = async (reset = false) => {
     if (reset) {
         page.value = 1
         hasMore.value = true
+        auctions.value = []
         loadingType.value = searchQuery.value || filterStatus.value ? 'search' : 'initial'
     } else {
         loadingType.value = 'scroll'
