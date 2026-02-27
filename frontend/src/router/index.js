@@ -56,6 +56,12 @@ const routes = [
         meta: { layout: 'AdminLayout', role: 'super_admin', title: 'Журнал' }
     },
     {
+        path: '/admin/profile',
+        name: 'AdminProfile',
+        component: () => import('../views/admin/AdminProfile.vue'),
+        meta: { layout: 'AdminLayout', role: 'admin', title: 'Профиль' }
+    },
+    {
         path: '/client',
         name: 'ClientDashboard',
         component: () => import('../views/client/ClientDashboard.vue'),
