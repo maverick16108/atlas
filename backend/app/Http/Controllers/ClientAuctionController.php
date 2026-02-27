@@ -521,9 +521,10 @@ class ClientAuctionController extends Controller
         // If GPB bid during gpb_right → auto-transition to commission
         if ($auction->status === 'gpb_right' && $user->is_gpb) {
             $auction->update(['status' => 'commission']);
-            ActivityLog::log('updated', 'auction', $auction->id, $auction->title, null, [
+            ActivityLog::log('updated', 'auction', $auction->id, $auction->title, [
                 'status' => ['old' => 'gpb_right', 'new' => 'commission'],
-                'reason' => 'GPB exercised priority purchase right',
+            ], [
+                'reason' => 'ГПБ реализовал право приоритетной покупки',
             ]);
             // Broadcast status change to all connected clients
             try {

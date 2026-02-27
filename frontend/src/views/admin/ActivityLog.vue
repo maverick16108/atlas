@@ -200,6 +200,7 @@ const fieldLabel = (field) => {
         inn: 'ИНН',
         kpp: 'КПП',
         address: 'Адрес',
+        reason: 'Причина',
     }
     return map[field] || field
 }
@@ -220,6 +221,14 @@ const formatValue = (value) => {
     if (value === null || value === undefined) return '—'
     if (typeof value === 'boolean') return value ? 'Да' : 'Нет'
     if (Array.isArray(value)) return value.length > 0 ? `[${value.join(', ')}]` : '—'
+    if (typeof value === 'object') {
+        if ('old' in value && 'new' in value) {
+            const oldStr = statusLabels[value.old] || value.old || '—'
+            const newStr = statusLabels[value.new] || value.new || '—'
+            return `${oldStr} → ${newStr}`
+        }
+        return JSON.stringify(value)
+    }
     if (typeof value === 'string' && statusLabels[value]) return statusLabels[value]
     if (typeof value === 'string' && value.length > 80) return value.substring(0, 80) + '...'
     return String(value)
