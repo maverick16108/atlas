@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/notifications/unread-count', [\App\Http\Controllers\AdminNotificationController::class, 'unreadCount']);
         Route::post('/notifications/{id}/read', [\App\Http\Controllers\AdminNotificationController::class, 'markAsRead']);
         Route::post('/notifications/read-all', [\App\Http\Controllers\AdminNotificationController::class, 'markAllAsRead']);
+        Route::post('/avatar', [\App\Http\Controllers\ClientAuctionController::class, 'uploadAvatar']);
     });
 
     // Client auction cabinet

@@ -719,10 +719,10 @@ onUnmounted(() => {
           Аукционы
         </button>
         <div class="flex-1"></div>
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-sm text-[10px] font-bold uppercase tracking-widest transition-all duration-500"
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-sm text-[10px] font-bold uppercase tracking-widest transition-all duration-500 shadow-sm dark:shadow-none bg-white dark:bg-dark-800/80 border"
              :class="isConnected
-               ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
-               : 'bg-red-500/10 border border-red-500/30 text-red-400 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.2)]'"
+               ? 'border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-500'
+               : 'border-red-200 dark:border-red-500/30 text-red-500 dark:text-red-400 animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.2)]'"
         >
           <span class="relative flex h-2 w-2">
             <span v-if="isConnected" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
