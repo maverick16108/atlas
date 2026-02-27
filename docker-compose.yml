@@ -101,6 +101,38 @@ services:
     networks:
       - atlas_net
 
+  # ── Laravel Scheduler (Cron) ─────────────────────────────────────
+  # Запускает все задачи из routes/console.php каждую минуту:
+  # уведомления за 15 мин до начала аукциона, уведомления о завершении.
+  cron:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: atlas_cron
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: atlas
+      DB_USERNAME: atlas
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+      REVERB_HOST: reverb
+      REVERB_PORT: 8080
+      REVERB_APP_ID: atlas-local
+      REVERB_APP_KEY: atlas-reverb-key
+      REVERB_APP_SECRET: atlas-reverb-secret
+    depends_on:
+      - db
+      - redis
+    command: ["php", "artisan", "schedule:work"]
+    networks:
+      - atlas_net
+
   # ── Nginx Reverse Proxy ───────────────────────────────────────────
   # Входная точка для всех HTTP-запросов. Проксирует PHP на backend:9000,
   # WebSocket /app и /apps на reverb:8080, отдаёт статику из public/.

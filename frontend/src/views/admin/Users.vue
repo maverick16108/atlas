@@ -572,7 +572,8 @@ const handleAuthPhoneInput = (event) => {
                       <td class="px-6 py-4">
                           <div class="flex items-center gap-3">
                               <!-- Avatar Style: Blue Circle + 2 Initials for Clients -->
-                              <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold text-white border border-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.3)]">
+                              <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white border"
+                                   :class="user.is_gpb ? 'bg-blue-600 border-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.3)]' : 'bg-emerald-600 border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]'">
                                   {{ getInitials(user.name) }}
                               </div>
                               <span class="font-bold text-white text-base">{{ user.name }}</span>
@@ -593,7 +594,7 @@ const handleAuthPhoneInput = (event) => {
                           </span>
                       </td>
                       <td class="px-6 py-4">
-                          <span v-if="user.is_gpb" class="px-2 py-1 rounded text-xs font-bold uppercase transition-colors select-none block text-center w-fit bg-blue-500/20 text-blue-400 border border-blue-500/20">
+                          <span v-if="user.is_gpb" class="px-2 py-1 rounded text-xs font-bold uppercase select-none block text-center w-fit bg-blue-500/20 text-blue-400 border border-blue-500/20">
                               ГПБ
                           </span>
                           <span v-else class="text-gray-600 text-xs font-mono block text-center w-fit">

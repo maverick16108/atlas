@@ -108,7 +108,7 @@ class SendAuctionReminders extends Command
 
         // Auction participants
         if ($auction->invite_all) {
-            $userIds = User::where('role', 'participant')->pluck('id')->toArray();
+            $userIds = User::where('role', 'client')->pluck('id')->toArray();
         } else {
             $userIds = $auction->participants()->pluck('users.id')->toArray();
         }

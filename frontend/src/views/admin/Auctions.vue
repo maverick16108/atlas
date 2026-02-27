@@ -134,7 +134,7 @@ const createDraftAndNavigate = async () => {
     if (isCreating.value) return
     isCreating.value = true
     try {
-        const response = await axios.post('/api/auctions', { status: 'draft' })
+        const response = await axios.post('/api/auctions', { status: 'draft', min_price: 9000 })
         const newId = response.data.id
         router.push({ name: 'AdminAuctionDetail', params: { id: newId }, query: { new: '1' } })
     } catch (e) {

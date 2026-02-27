@@ -426,10 +426,10 @@ class AuctionController extends Controller
             try {
                 \App\Models\ClientNotification::create([
                     'user_id' => $userId,
+                    'auction_id' => $auction->id,
                     'type' => 'auction_invite',
                     'title' => 'Приглашение на аукцион',
                     'message' => "Вы приглашены на аукцион: {$auction->title}",
-                    'data' => ['auction_id' => $auction->id],
                 ]);
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning("Failed to create notification for user {$userId}: " . $e->getMessage());

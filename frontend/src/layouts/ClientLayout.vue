@@ -6,6 +6,7 @@ import { useTheme } from '../composables/useTheme'
 import { useI18n } from 'vue-i18n'
 import StandardModal from '../components/ui/StandardModal.vue'
 import axios from 'axios'
+import echo from '@/echo.js'
 import { Bars3Icon, XMarkIcon, BellIcon } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
@@ -42,6 +43,8 @@ let pollInterval = null
 
 const typeIcons = {
     auction_invite: { icon: '📨', color: 'text-blue-400 bg-blue-500/10' },
+    auction_reminder: { icon: '⏰', color: 'text-amber-400 bg-amber-500/10' },
+    auction_completed: { icon: '🏁', color: 'text-emerald-400 bg-emerald-500/10' },
     bid_outbid: { icon: '⚡', color: 'text-red-400 bg-red-500/10' },
     auction_started: { icon: '🔴', color: 'text-green-400 bg-green-500/10' },
     auction_ended: { icon: '🏁', color: 'text-emerald-400 bg-emerald-500/10' },
@@ -141,10 +144,25 @@ const timeAgo = (iso) => {
 onMounted(() => {
     fetchUnreadCount()
     pollInterval = setInterval(fetchUnreadCount, 30000)
+
+    // Real-time notifications via WebSocket
+    const userId = user.value?.id
+    if (userId) {
+        echo.channel(`notifications.user.${userId}`)
+            .listen('.new.notification', (data) => {
+                // Prepend new notification to the list
+                notifications.value.unshift(data)
+                unreadCount.value++
+            })
+    }
 })
 
 onUnmounted(() => {
     if (pollInterval) clearInterval(pollInterval)
+    const userId = user.value?.id
+    if (userId) {
+        echo.leaveChannel(`notifications.user.${userId}`)
+    }
 })
 </script>
 
@@ -190,10 +208,12 @@ onUnmounted(() => {
         <!-- User Profile (Bottom Sidebar) -->
         <div class="p-4 border-t border-gray-200 dark:border-white/5 bg-gray-50/50 dark:bg-white/5">
             <div @click="handleLogout" class="flex items-center gap-3 px-3 py-3 bg-white dark:bg-stone-800 rounded-xl border border-gray-200 dark:border-white/5 hover:border-gold-500/30 transition-all cursor-pointer group shadow-sm hover:shadow-md">
-                <img :src="user?.avatar" alt="Avatar" class="w-10 h-10 rounded-full border border-gold-500/30 shadow-sm object-cover" />
+                <img :src="user?.avatar" alt="Avatar" class="w-10 h-10 rounded-full shadow-sm object-cover border-2"
+                     :class="user?.is_gpb ? 'border-blue-500 shadow-blue-500/30' : 'border-emerald-500 shadow-emerald-500/30'" />
                 <div class="flex-1 overflow-hidden">
                     <p class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ user?.name || 'Клиент' }}</p>
-                    <p class="text-xs text-gold-500 truncate">{{ user?.is_accredited ? 'Аккредитован' : 'Гость' }}</p>
+                    <p v-if="user?.is_gpb" class="text-xs text-blue-400 font-bold truncate">ГПБ</p>
+                    <p v-else class="text-xs text-emerald-500 truncate">{{ user?.is_accredited ? 'Аккредитован' : 'Гость' }}</p>
                 </div>
                 <div class="text-gray-400 dark:text-gray-500 group-hover:text-gold-500 transition-colors p-2">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

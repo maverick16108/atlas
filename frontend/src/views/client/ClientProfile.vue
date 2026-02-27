@@ -135,8 +135,10 @@ const uploadAvatar = async (file) => {
                       <!-- Avatar with upload -->
                       <div class="relative group flex-shrink-0 mb-6">
                           <div class="relative w-32 h-32 mx-auto">
-                              <div class="absolute inset-0 bg-gold-500 rounded-full blur-lg opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                              <img :src="avatarUrl" class="relative w-full h-full rounded-full border-4 border-gold-500/30 object-cover" />
+                              <div class="absolute inset-0 rounded-full blur-lg opacity-20 group-hover:opacity-30 transition-opacity"
+                                   :class="user?.is_gpb ? 'bg-blue-500' : 'bg-emerald-500'"></div>
+                              <img :src="avatarUrl" class="relative w-full h-full rounded-full border-4 object-cover"
+                                   :class="user?.is_gpb ? 'border-blue-500/30' : 'border-emerald-500/30'" />
                               <!-- Upload overlay -->
                               <label class="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10">
                                   <svg v-if="!isUploading" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -159,7 +161,8 @@ const uploadAvatar = async (file) => {
                       <!-- Name + hint -->
                       <div class="w-full">
                           <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 leading-tight">{{ user?.name || 'Участник' }}</h3>
-                          <p class="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-5">КЛИЕНТ</p>
+                          <p v-if="user?.is_gpb" class="text-[11px] text-blue-400 uppercase tracking-widest font-bold mb-5">ГПБ</p>
+                          <p v-else class="text-[11px] text-emerald-500 uppercase tracking-widest font-bold mb-5">{{ user?.is_accredited ? 'Аккредитован' : 'КЛИЕНТ' }}</p>
                           <div class="bg-gray-50 dark:bg-white/5 rounded-lg p-4 w-full">
                               <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed text-center">
                                   Нажмите на фотографию, чтобы загрузить новый аватар профиля.
