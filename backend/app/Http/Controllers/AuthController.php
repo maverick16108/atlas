@@ -200,6 +200,11 @@ class AuthController extends Controller
         
         $user->save();
 
-        return response()->json(['message' => 'Application submitted successfully']);
+    // Notify admin dashboard in real-time
+    try {
+        event(new \App\Events\AdminStatsUpdated('new_accreditation'));
+    } catch (\Throwable $e) {}
+
+    return response()->json(['message' => 'Application submitted successfully']);
     }
 }

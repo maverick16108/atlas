@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useConnectionStatus } from '@/composables/useConnectionStatus.js'
+import echo from '@/echo.js'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -168,6 +169,20 @@ const fetchStats = async () => {
 
 onMounted(() => {
     fetchStats()
+
+    // Real-time: refresh stats on any auction/bid change
+    echo.channel('auctions')
+        .listen('.bid.placed', () => fetchStats())
+        .listen('.auction.updated', () => fetchStats())
+
+    // Real-time: refresh stats on user changes (accreditation requests etc.)
+    echo.channel('admin')
+        .listen('.stats.updated', () => fetchStats())
+})
+
+onUnmounted(() => {
+    echo.leaveChannel('auctions')
+    echo.leaveChannel('admin')
 })
 </script>
 
