@@ -16,9 +16,17 @@ class DashboardController extends Controller
         $pendingUsers = User::where('role', 'client')->where('is_accredited', false)->count();
 
         // 2. Auction Stats
-        $activeAuctions = Auction::whereIn('status', ['active', 'collecting_offers', 'gpb_right'])->count();
+        $activeAuctions = Auction::where('status', 'active')->count();
+        $collectingOffers = Auction::where('status', 'collecting_offers')->count();
+        $gpbRight = Auction::where('status', 'gpb_right')->count();
         $commissionAuctions = Auction::where('status', 'commission')->count();
         $completedAuctions = Auction::where('status', 'completed')->count();
+
+        // Build active subtitle
+        $activeParts = [];
+        if ($collectingOffers > 0) $activeParts[] = "Сбор: {$collectingOffers}";
+        if ($gpbRight > 0) $activeParts[] = "ГПБ: {$gpbRight}";
+        $activeSubtitle = count($activeParts) > 0 ? implode(' · ', $activeParts) : ($activeAuctions > 0 ? 'Идёт торг' : 'Нет активных');
 
         // 3. Chart Data (Last 30 days auctions)
         $endDate = Carbon::now();
@@ -60,8 +68,8 @@ class DashboardController extends Controller
                 [
                     'name' => 'Активные аукционы',
                     'value' => number_format($activeAuctions),
-                    'change' => 'Идет торг',
-                    'type' => 'up'
+                    'change' => $activeSubtitle,
+                    'type' => $activeAuctions > 0 ? 'up' : 'neutral'
                 ],
                 [
                     'name' => 'Работа комиссии',

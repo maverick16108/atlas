@@ -181,9 +181,9 @@ class ClientAuctionController extends Controller
             $userLabelMap = [];
             $labelCounter = 1;
             foreach ($bidsRaw->pluck('user_id')->unique()->values() as $uid) {
-                if (in_array($uid, $gpbUserIds)) {
+                if (in_array((int) $uid, $gpbUserIds)) {
                     $userLabelMap[$uid] = 'ГПБ';
-                } elseif ($uid === $user->id) {
+                } elseif ((int) $uid === (int) $user->id) {
                     $userLabelMap[$uid] = 'Вы';
                 } else {
                     $userLabelMap[$uid] = 'Участник ' . $labelCounter;
@@ -259,7 +259,7 @@ class ClientAuctionController extends Controller
                     // Entire bid was taken by GPB — show as lost to GPB
                     $allocatedBids[] = [
                         'id' => $bid->id,
-                        'is_mine' => $bid->user_id === $user->id,
+                        'is_mine' => (int) $bid->user_id === (int) $user->id,
                         'participant_label' => $userLabelMap[$bid->user_id] ?? 'Участник',
                         'amount' => $bid->amount,
                         'bar_count' => $bid->bar_count,
@@ -290,7 +290,7 @@ class ClientAuctionController extends Controller
 
                 $allocatedBids[] = [
                     'id' => $bid->id,
-                    'is_mine' => $bid->user_id === $user->id,
+                    'is_mine' => (int) $bid->user_id === (int) $user->id,
                     'participant_label' => $userLabelMap[$bid->user_id] ?? 'Участник',
                     'amount' => $bid->amount,
                     'bar_count' => $availBars,
@@ -585,7 +585,7 @@ class ClientAuctionController extends Controller
             foreach ($bids as $bid) {
                 if ($remaining <= 0) break;
                 $bars = min($bid->bar_count, $remaining);
-                if ($bid->user_id === $user->id && $bars > 0) {
+                if ((int) $bid->user_id === (int) $user->id && $bars > 0) {
                     $wonCount++;
                     break; // Count auction once
                 }
