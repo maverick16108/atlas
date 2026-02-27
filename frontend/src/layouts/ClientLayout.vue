@@ -369,11 +369,11 @@ onUnmounted(() => {
         @close="showLogoutModal = false"
     >
         <div class="text-center pt-2">
-            <h3 class="text-xl font-kanit font-bold text-gray-100 tracking-wide uppercase mb-6">Выйти<span class="text-2xl">?</span></h3>
-            <p class="text-gray-400 text-sm mb-2 font-light">
+            <h3 class="text-xl font-kanit font-bold text-gray-900 dark:text-gray-100 tracking-wide uppercase mb-6">Выйти<span class="text-2xl">?</span></h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-2 font-light">
                 Сессия
             </p>
-            <p class="text-gray-100 font-bold text-lg mb-2">
+            <p class="text-gray-900 dark:text-gray-100 font-bold text-lg mb-2">
                 {{ user?.name || 'Клиент' }}
             </p>
             <p class="text-gold-500 text-sm font-semibold mb-6 tracking-wide">
@@ -381,7 +381,7 @@ onUnmounted(() => {
             </p>
             
             <div class="flex gap-3">
-                <button @click="showLogoutModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 transition-all">
+                <button @click="showLogoutModal = false" class="flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-widest client-btn-secondary">
                     Отмена
                 </button>
                 <button @click="confirmLogout" class="flex-1 py-3 bg-gold-600 hover:bg-gold-500 text-white rounded-lg font-bold text-xs uppercase tracking-widest shadow-lg shadow-gold-500/20 transition-all transform active:scale-95 border border-gold-500/50">

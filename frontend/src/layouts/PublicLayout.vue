@@ -284,6 +284,7 @@ watch(
         :is-open="isModalOpen" 
         :title="t('form.title')" 
         theme="gold"
+        force-dark
         max-width="max-w-[550px]"
         @close="closeModal"
     >
