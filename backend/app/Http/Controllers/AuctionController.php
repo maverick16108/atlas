@@ -571,10 +571,10 @@ class AuctionController extends Controller
 
             ClientNotification::create([
                 'user_id' => $userId,
+                'auction_id' => $auction->id,
                 'title' => $title,
                 'message' => $message,
                 'type' => $type,
-                'link' => '/client/auctions/' . $auction->id,
             ]);
         }
     }
