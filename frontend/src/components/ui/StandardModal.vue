@@ -128,13 +128,13 @@ onUnmounted(() => {
 const themeClasses = computed(() => {
   if (props.theme === 'gold') {
     return {
-      border: 'border-gray-200 dark:border-gold-500/30',
-      shadow: 'shadow-2xl dark:shadow-[0_0_50px_rgba(212,175,55,0.15)]',
+      border: 'border-gold-500/30',
+      shadow: 'shadow-[0_0_50px_rgba(212,175,55,0.15)]',
       closeHover: 'hover:text-gold-400',
       titleBar: 'bg-gold-500',
       titleShadow: 'shadow-[0_0_10px_rgba(212,175,55,0.8)]',
-      background: 'bg-white text-gray-900 dark:bg-stone-900 dark:text-gray-100',
-      closeBtn: 'client-btn-close'
+      background: 'bg-stone-900 text-gray-100',
+      closeBtn: 'flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 focus:outline-none transition-all duration-200'
     }
   }
   if (props.theme === 'emerald') {
