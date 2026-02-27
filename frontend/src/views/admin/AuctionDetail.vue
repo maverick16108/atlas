@@ -780,7 +780,7 @@ onUnmounted(() => {
                  <!-- Status Section -->
                  <div class="px-4 py-2 flex items-center gap-2.5 backdrop-blur-sm"
                       :class="[
-                        ['active', 'gpb_right', 'scheduled'].includes(auction.status) ? 'bg-white/50 dark:bg-white/5 rounded-l-lg' :
+                        ['active', 'gpb_right', 'scheduled'].includes(auction.status) ? 'bg-blue-50 dark:bg-white/5 rounded-l-lg' :
                         auction.status === 'collecting_offers' ? 'bg-cyan-500/10 dark:bg-cyan-500/20 rounded-lg' :
                         auction.status === 'completed' ? 'bg-emerald-500/10 dark:bg-emerald-500/20 rounded-lg' :
                         auction.status === 'commission' ? 'bg-orange-500/10 dark:bg-orange-500/20 rounded-lg' :
