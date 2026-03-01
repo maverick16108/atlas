@@ -273,8 +273,8 @@ onUnmounted(() => {
     <!-- Main Content -->
     <main class="flex-1 flex flex-col relative z-10 overflow-hidden bg-gray-100 dark:bg-dark-900 transition-colors duration-300">
         <!-- Topbar -->
-        <header class="h-20 min-h-[5rem] px-4 md:px-8 flex items-center justify-between client-header z-30 transition-transform duration-300 will-change-transform absolute top-0 left-0 right-0 lg:relative"
-                :class="isHeaderHidden ? '-translate-y-full lg:translate-y-0' : 'translate-y-0'">
+        <header class="h-20 min-h-[5rem] px-4 md:px-8 flex items-center justify-between client-header z-30 transition-[margin] duration-300 ease-in-out"
+                :class="isHeaderHidden ? '-mt-20 lg:mt-0' : 'mt-0'">
             <div class="flex items-center gap-4">
                 <!-- Mobile Menu Button -->
                 <button @click="isSidebarOpen = true" class="lg:hidden p-2 -ml-2 text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-white/5 transition-colors">
@@ -377,7 +377,7 @@ onUnmounted(() => {
         </header>
 
         <!-- View Content with Scroll -->
-        <div ref="scrollContentRef" class="flex-1 overflow-y-auto p-4 md:p-8 pt-24 lg:pt-4 custom-scrollbar bg-gray-100 dark:bg-dark-900">
+        <div ref="scrollContentRef" class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar bg-gray-100 dark:bg-dark-900">
              <router-view v-slot="{ Component }">
                 <transition 
                     enter-active-class="transition ease-out duration-300" 
