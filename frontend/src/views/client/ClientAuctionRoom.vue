@@ -1202,7 +1202,7 @@ onUnmounted(() => {
                           <!-- GPB Buyer Row -->
                           <tr class="border-b border-blue-100 dark:border-blue-500/10 bg-blue-50/30 dark:bg-blue-500/5">
                               <td class="px-4 py-3 text-sm text-gray-500 font-mono">1</td>
-                              <td class="px-4 py-3">
+                              <td class="px-4 py-3 whitespace-nowrap">
                                   <span class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ gpbReport.gpb_user_name }}</span>
                                   <span class="text-[10px] text-blue-500 bg-blue-100 dark:bg-blue-500/20 px-1.5 py-0.5 rounded ml-1.5 font-bold uppercase">ГПБ</span>
                               </td>
@@ -1215,7 +1215,7 @@ onUnmounted(() => {
                           <!-- Taken Bids Details (indented, from whom) -->
                           <tr v-for="(item, idx) in gpbReport.taken_bids" :key="'gpb-'+idx" class="border-b border-gray-100 dark:border-white/5 text-gray-500 dark:text-gray-500">
                               <td class="px-4 py-2 font-mono text-xs"></td>
-                              <td class="px-4 py-2 text-xs pl-8">← {{ item.participant_label }}</td>
+                              <td class="px-4 py-2 text-xs pl-8 whitespace-nowrap">← {{ item.participant_label }}</td>
                               <td class="px-4 py-2 text-center font-mono text-xs">{{ item.bar_count }}</td>
                               <td class="px-4 py-2 text-right font-mono text-xs"><span class="font-sans">₽</span>&nbsp;{{ formatPrice(item.price_per_gram) }}</td>
                               <td class="px-4 py-2 text-right font-mono text-xs"><span class="font-sans">₽</span>&nbsp;{{ formatPrice(item.price_per_bar) }}</td>
@@ -1246,7 +1246,7 @@ onUnmounted(() => {
                                 bid.is_mine ? 'ring-1 ring-inset ring-gold-500/20' : ''
                               ]">
                               <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ idx + 1 }}</td>
-                              <td class="px-4 py-3"><span class="text-sm font-bold" :class="bid.is_mine ? 'text-gold-400' : 'text-gray-900 dark:text-white'">{{ bid.participant_label }}</span></td>
+                              <td class="px-4 py-3 whitespace-nowrap"><span class="text-sm font-bold" :class="bid.is_mine ? 'text-gold-400' : 'text-gray-900 dark:text-white'">{{ bid.participant_label }}</span></td>
                               <td class="px-4 py-3 text-center font-mono text-sm font-bold" :class="bid.partial ? 'text-yellow-500' : 'text-gray-900 dark:text-white'">
                                   {{ bid.fulfilled }}
                                   <span v-if="bid.partial" class="text-[10px] text-yellow-500 ml-1 inline-block">(частич.)</span>
@@ -1275,7 +1275,7 @@ onUnmounted(() => {
                               class="border-b border-gray-100 dark:border-white/5"
                               :class="bid.is_mine ? 'bg-yellow-50/50 ring-1 ring-inset ring-amber-500/20 dark:bg-amber-900/10 dark:opacity-80' : 'bg-gray-50 dark:bg-transparent dark:opacity-60'">
                               <td class="px-4 py-3 text-sm text-gray-600 font-mono">{{ winningBids.length + idx + 1 }}</td>
-                              <td class="px-4 py-3">
+                              <td class="px-4 py-3 whitespace-nowrap">
                                   <span class="text-sm font-bold" :class="bid.is_mine ? 'text-gold-400/70' : 'text-gray-400'">{{ bid.participant_label }}</span>
                                   <span v-if="bid.lost_to_gpb" class="text-[10px] text-blue-400 bg-blue-100 dark:bg-blue-500/20 px-1 py-0.5 rounded ml-1 font-bold">ГПБ</span>
                               </td>
@@ -1329,7 +1329,7 @@ onUnmounted(() => {
                                 bid.is_mine ? 'ring-1 ring-inset ring-gold-500/20' : ''
                               ]">
                               <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ idx + 1 }}</td>
-                              <td class="px-4 py-3"><span class="text-sm font-bold" :class="bid.is_mine ? 'text-gold-400' : 'text-gray-900 dark:text-white'">{{ bid.participant_label }}</span></td>
+                              <td class="px-4 py-3 whitespace-nowrap"><span class="text-sm font-bold" :class="bid.is_mine ? 'text-gold-400' : 'text-gray-900 dark:text-white'">{{ bid.participant_label }}</span></td>
                               <td class="px-4 py-3 text-center font-mono text-sm font-bold" :class="bid.partial ? 'text-yellow-500' : 'text-gray-900 dark:text-white'">
                                   {{ bid.fulfilled }}
                                   <span v-if="bid.partial" class="text-[10px] text-yellow-500 ml-1 inline-block">(частич.)</span>
@@ -1358,7 +1358,7 @@ onUnmounted(() => {
                               class="border-b border-gray-100 dark:border-white/5"
                               :class="bid.is_mine ? 'bg-yellow-50/50 ring-1 ring-inset ring-amber-500/20 dark:bg-amber-900/10 dark:opacity-80' : 'bg-gray-50 dark:bg-transparent dark:opacity-60'">
                               <td class="px-4 py-3 text-sm text-gray-600 font-mono">{{ winningBids.length + idx + 1 }}</td>
-                              <td class="px-4 py-3"><span class="text-sm font-bold" :class="bid.is_mine ? 'text-gold-400/70' : 'text-gray-400'">{{ bid.participant_label }}</span></td>
+                              <td class="px-4 py-3 whitespace-nowrap"><span class="text-sm font-bold" :class="bid.is_mine ? 'text-gold-400/70' : 'text-gray-400'">{{ bid.participant_label }}</span></td>
                               <td class="px-4 py-3 text-center font-mono text-sm text-gray-400">{{ bid.bar_count }}</td>
                               <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ formatPrice(bid.amount) }}</td>
                               <td class="px-4 py-3 text-right font-mono text-sm text-gray-500"><span class="font-sans">₽</span>&nbsp;{{ formatPrice(Number(bid.amount) * (auction.bar_weight * 1000 || 1)) }}</td>

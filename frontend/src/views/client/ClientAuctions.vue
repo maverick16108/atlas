@@ -190,22 +190,22 @@ onUnmounted(() => {
               </div>
 
               <!-- Details bar -->
-              <div class="flex items-center gap-6 mt-4 text-xs text-gray-500">
-                  <div class="flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-3 mt-4 text-xs text-gray-500">
+                  <div class="flex items-center gap-1.5 whitespace-nowrap">
                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       {{ formatDate(auction.start_at) }}
                   </div>
-                  <div v-if="auction.bar_count && auction.bar_weight" class="flex items-center gap-1.5 font-mono">
+                  <div v-if="auction.bar_count && auction.bar_weight" class="flex items-center gap-1.5 font-mono whitespace-nowrap">
                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                       {{ auction.bar_count }} сл. · {{ (auction.bar_count * auction.bar_weight).toFixed(1) }} кг
                   </div>
-                  <div v-if="auction.min_price" class="flex items-center gap-1.5 font-mono text-base font-bold text-gold-600 dark:text-gold-400">
+                  <div v-if="auction.min_price" class="flex items-center gap-1.5 font-mono text-base font-bold text-gold-600 dark:text-gold-400 whitespace-nowrap">
                       <span class="font-sans text-sm opacity-80">₽</span>&nbsp;{{ formatPrice(auction.min_price) }}<span class="text-xs font-sans font-normal opacity-60">/г</span>
                   </div>
-                  <div v-if="auction.my_bids_count" class="text-gold-600 dark:text-gold-400 font-bold">
+                  <div v-if="auction.my_bids_count" class="text-gold-600 dark:text-gold-400 font-bold whitespace-nowrap">
                       {{ auction.my_bids_count }} ставок
                   </div>
-                  <div v-if="auction.my_offers_count" class="text-cyan-600 dark:text-cyan-400 font-bold">
+                  <div v-if="auction.my_offers_count" class="text-cyan-600 dark:text-cyan-400 font-bold whitespace-nowrap">
                       {{ auction.my_offers_count }} предл.
                   </div>
               </div>
