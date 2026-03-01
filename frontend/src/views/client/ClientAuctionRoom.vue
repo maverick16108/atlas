@@ -232,7 +232,6 @@ const submitOffer = async () => {
             comment: offerForm.value.comment || null,
         })
         successMessage.value = 'Предложение отправлено!'
-        offerForm.value.volume = auction.value.bar_count
         offerForm.value.comment = ''
         await fetchAuction()
         setTimeout(() => { successMessage.value = '' }, 3000)
@@ -752,13 +751,13 @@ onUnmounted(() => {
                   </div>
                   <div v-else class="space-y-3">
                       <div v-for="offer in myOffers" :key="offer.id" class="bg-white dark:bg-dark-900/50 rounded-lg p-4 shadow-sm dark:shadow-none border border-gray-100 dark:border-white/5">
-                          <div class="flex justify-between items-center">
-                              <div>
-                                  <span class="text-sm text-gray-900 dark:text-white font-bold font-mono">{{ Number(offer.volume).toLocaleString() }} слитков</span>
-                                  <span class="text-gray-500 mx-2">×</span>
-                                  <span class="text-sm text-cyan-400 font-bold font-mono"><span class="font-sans">₽</span>&nbsp;{{ formatPrice(offer.price) }}/г</span>
+                          <div class="flex flex-col sm:flex-row justify-between sm:items-center items-start gap-1.5 sm:gap-2">
+                              <div class="flex flex-wrap items-baseline gap-x-2">
+                                  <span class="text-sm text-gray-900 dark:text-white font-bold font-mono whitespace-nowrap">{{ Number(offer.volume).toLocaleString() }} слитков</span>
+                                  <span class="text-gray-500 text-xs">×</span>
+                                  <span class="text-sm text-cyan-400 font-bold font-mono whitespace-nowrap"><span class="font-sans">₽</span>&nbsp;{{ formatPrice(offer.price) }}/г</span>
                               </div>
-                              <span class="text-xs text-gray-500 font-mono">{{ formatDate(offer.created_at) }}</span>
+                              <span class="text-xs text-gray-500 font-mono shrink-0">{{ formatDate(offer.created_at) }}</span>
                           </div>
                           <p v-if="offer.comment" class="text-xs text-gray-400 mt-2">{{ offer.comment }}</p>
                       </div>
