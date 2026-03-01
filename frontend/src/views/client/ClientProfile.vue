@@ -30,12 +30,12 @@ const hasCustomAvatar = computed(() => {
 const processFile = (file) => {
     if (!file) return
 
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-        uploadError.value = 'Допустимые форматы: JPG, PNG, WebP'
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'].includes(file.type)) {
+        uploadError.value = 'Допустимые форматы: JPG, PNG, WebP, HEIC'
         return
     }
-    if (file.size > 2 * 1024 * 1024) {
-        uploadError.value = 'Максимальный размер файла: 2 МБ'
+    if (file.size > 10 * 1024 * 1024) {
+        uploadError.value = 'Максимальный размер файла: 10 МБ'
         return
     }
 

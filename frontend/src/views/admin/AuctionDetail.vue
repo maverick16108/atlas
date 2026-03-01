@@ -1029,7 +1029,7 @@ onUnmounted(() => {
                   <td v-if="hasBasisBids" class="px-4 py-2"></td>
                   <td class="px-4 py-2"></td>
                 </tr>
-                <tr v-for="(bid, idx) in allocatedBids.winning" :key="'w-'+bid.id" class="border-b border-white dark:border-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/5 transition-colors" :class="bid.partial ? 'bg-yellow-50 dark:bg-yellow-500/5' : 'bg-emerald-500/5'">
+                <tr v-for="(bid, idx) in allocatedBids.winning" :key="'w-'+bid.id" class="border-b border-white dark:border-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/10 transition-colors" :class="bid.partial ? 'bg-yellow-50 dark:bg-yellow-500/5' : 'bg-emerald-500/5'">
                   <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ idx + 1 }}</td>
                   <td class="px-4 py-3"><span class="text-sm text-gray-900 dark:text-white font-bold">{{ bid.user?.name || 'Н/Д' }}</span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm font-bold" :class="bid.partial ? 'text-yellow-600 dark:text-yellow-400' : 'text-emerald-700 dark:text-white'">{{ bid.fulfilled }}<span v-if="bid.partial" class="text-[10px] text-yellow-600 dark:text-yellow-500 ml-1">(частич.)</span></td>
@@ -1127,7 +1127,7 @@ onUnmounted(() => {
                   <td v-if="hasBasisBids" class="px-4 py-2"></td>
                   <td class="px-4 py-2"></td>
                 </tr>
-                <tr v-for="(bid, idx) in gpbAllocatedBids.participantWinning" :key="'gpbw-'+bid.id+'-'+idx" class="border-b border-white dark:border-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/5 transition-colors" :class="bid.partial ? 'bg-yellow-50 dark:bg-yellow-500/5' : 'bg-emerald-500/5'">
+                <tr v-for="(bid, idx) in gpbAllocatedBids.participantWinning" :key="'gpbw-'+bid.id+'-'+idx" class="border-b border-white dark:border-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/10 transition-colors" :class="bid.partial ? 'bg-yellow-50 dark:bg-yellow-500/5' : 'bg-emerald-500/5'">
                   <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ gpbAllocatedBids.gpbBought.length + idx + 1 }}</td>
                   <td class="px-4 py-3"><span class="text-sm text-gray-900 dark:text-white font-bold">{{ bid.user?.name || 'Н/Д' }}</span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm font-bold" :class="bid.partial ? 'text-yellow-600 dark:text-yellow-400' : 'text-emerald-700 dark:text-white'">{{ bid.fulfilled }}<span v-if="bid.partial" class="text-[10px] text-yellow-600 dark:text-yellow-500 ml-1">(частич.)</span></td>
@@ -1277,7 +1277,7 @@ onUnmounted(() => {
                   <td v-if="hasBasisBids" class="px-4 py-2"></td>
                   <td class="px-4 py-2"></td>
                 </tr>
-                <tr v-for="(bid, idx) in gpbAllocatedBids.participantWinning" :key="'rpw-'+bid.id+'-'+idx" class="border-b border-white dark:border-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/5 transition-colors" :class="bid.partial ? 'bg-yellow-50 dark:bg-yellow-500/5' : 'bg-emerald-500/5'">
+                <tr v-for="(bid, idx) in gpbAllocatedBids.participantWinning" :key="'rpw-'+bid.id+'-'+idx" class="border-b border-white dark:border-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/10 transition-colors" :class="bid.partial ? 'bg-yellow-50 dark:bg-yellow-500/5' : 'bg-emerald-500/5'">
                   <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ gpbAllocatedBids.gpbBought.length + idx + 1 }}</td>
                   <td class="px-4 py-3"><span class="text-sm text-gray-900 dark:text-white font-bold">{{ bid.user?.name || 'Н/Д' }}</span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm font-bold" :class="bid.partial ? 'text-yellow-600 dark:text-yellow-400' : 'text-emerald-700 dark:text-white'">{{ bid.fulfilled }}<span v-if="bid.partial" class="text-[10px] text-yellow-600 dark:text-yellow-500 ml-1">(частич.)</span></td>
@@ -1318,7 +1318,7 @@ onUnmounted(() => {
                   <td class="px-4 py-2 text-right font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400"><span class="font-sans">₽</span>&nbsp;{{ allocatedBids.lotTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) }}</td>
                   <td class="px-4 py-2"></td>
                 </tr>
-                <tr v-for="(bid, idx) in allocatedBids.winning" :key="'rw-'+bid.id" class="border-b border-white dark:border-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/5 transition-colors" :class="bid.partial ? 'bg-yellow-50 dark:bg-yellow-500/5' : 'bg-emerald-500/5'">
+                <tr v-for="(bid, idx) in allocatedBids.winning" :key="'rw-'+bid.id" class="border-b border-white dark:border-emerald-500/10 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/10 transition-colors" :class="bid.partial ? 'bg-yellow-50 dark:bg-yellow-500/5' : 'bg-emerald-500/5'">
                   <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ idx + 1 }}</td>
                   <td class="px-4 py-3"><span class="text-sm text-gray-900 dark:text-white font-bold">{{ bid.user?.name || 'Н/Д' }}</span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm font-bold" :class="bid.partial ? 'text-yellow-600 dark:text-yellow-400' : 'text-emerald-700 dark:text-white'">{{ bid.fulfilled }}<span v-if="bid.partial" class="text-[10px] text-yellow-600 dark:text-yellow-500 ml-1">(частич.)</span></td>
