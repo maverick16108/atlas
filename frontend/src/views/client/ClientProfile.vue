@@ -107,7 +107,7 @@ const removeAvatar = async () => {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8 items-start">
           
           <!-- Left Column (Settings & Info) -->
-          <div class="order-2 lg:order-1 lg:col-span-2 space-y-8">
+          <div class="order-2 lg:order-1 lg:col-span-2 space-y-4 lg:space-y-8">
               <!-- Info card (read-only) -->
               <div class="bg-white dark:bg-stone-900/80 backdrop-blur-sm rounded-xl p-8 border border-gray-200 dark:border-white/5 shadow-sm">
                   <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-gray-100 mb-6 border-b border-gray-200 dark:border-white/5 pb-4">Данные участника</h3>
