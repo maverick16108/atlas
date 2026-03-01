@@ -1,3 +1,9 @@
+<script>
+export default {
+    name: 'ClientAuctions'
+}
+</script>
+
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'

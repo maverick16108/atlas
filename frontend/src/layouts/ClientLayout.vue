@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from 'vue-i18n'
@@ -57,6 +57,24 @@ const onContentScroll = () => {
         ticking = false
     })
 }
+
+// Keep track of scroll positions for each route
+const scrollPositions = ref({})
+
+watch(() => route.path, (newPath, oldPath) => {
+    // Save scroll pos of old path before transitioning
+    if (scrollContentRef.value) {
+        scrollPositions.value[oldPath] = scrollContentRef.value.scrollTop
+    }
+    
+    // Restore scroll pos for new path after a tiny delay for transition
+    setTimeout(() => {
+        if (scrollContentRef.value) {
+            const pos = scrollPositions.value[newPath] || 0
+            scrollContentRef.value.scrollTop = pos
+        }
+    }, 50)
+})
 
 const handleLogout = () => {
     showLogoutModal.value = true
@@ -379,6 +397,7 @@ onUnmounted(() => {
         <div ref="scrollContentRef" class="flex-1 overflow-y-auto overscroll-y-auto touch-pan-y w-full pt-20 md:pt-28 lg:pt-8 p-4 md:p-8 custom-scrollbar bg-gray-100 dark:bg-dark-900">
              <router-view v-slot="{ Component }">
                 <transition 
+                    mode="out-in"
                     enter-active-class="transition ease-out duration-300" 
                     enter-from-class="opacity-0 translate-y-4" 
                     enter-to-class="opacity-100 translate-y-0" 
@@ -386,7 +405,9 @@ onUnmounted(() => {
                     leave-from-class="opacity-100 translate-y-0" 
                     leave-to-class="opacity-0 -translate-y-4"
                 >
-                    <component :is="Component" />
+                    <keep-alive include="ClientAuctions">
+                        <component :is="Component" :key="$route.path" />
+                    </keep-alive>
                 </transition>
              </router-view>
         </div>
