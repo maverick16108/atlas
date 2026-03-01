@@ -221,7 +221,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="h-[100dvh] w-full bg-gray-100 dark:bg-dark-900 text-gray-900 dark:text-gray-100 flex overflow-hidden overscroll-none transition-colors duration-300">
+  <div class="fixed inset-0 bg-gray-100 dark:bg-dark-900 text-gray-900 dark:text-gray-100 flex overflow-hidden overscroll-none transition-colors duration-300">
     
     <!-- Mobile Sidebar Backdrop -->
     <div v-if="isSidebarOpen" @click="isSidebarOpen = false" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"></div>

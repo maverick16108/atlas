@@ -28,6 +28,45 @@ const previousBidsCount = ref(0)
 const newBidsFlash = ref(false)
 const goBack = () => router.push('/client/auctions')
 
+// Swipe to go back logic
+const touchStartX = ref(0)
+const touchEndX = ref(0)
+const touchStartY = ref(0)
+const touchEndY = ref(0)
+
+const onTouchStart = (e) => {
+    touchStartX.value = e.changedTouches[0].screenX
+    touchStartY.value = e.changedTouches[0].screenY
+}
+const onTouchEnd = (e) => {
+    touchEndX.value = e.changedTouches[0].screenX
+    touchEndY.value = e.changedTouches[0].screenY
+    handleSwipe(e)
+}
+const handleSwipe = (e) => {
+    const diffX = touchEndX.value - touchStartX.value
+    const diffY = Math.abs(touchEndY.value - touchStartY.value)
+    
+    // Trigger if swiped right by >80px and vertical movement is <50px (mostly horizontal)
+    if (diffX > 80 && diffY < 50) {
+        // Prevent if swiping inside a horizontal scroll container (like a table)
+        let isInsideHorizontalScroll = false
+        let p = e.target
+        while (p && p !== document.body) {
+            // Check if element has horizontal scrolling
+            if (p.scrollWidth > p.clientWidth) {
+                isInsideHorizontalScroll = true
+                break
+            }
+            p = p.parentElement
+        }
+
+        if (!isInsideHorizontalScroll) {
+            goBack()
+        }
+    }
+}
+
 // Forms
 const offerForm = ref({ volume: 1, price: '', comment: '' })
 const bidForm = ref({ bar_count: 1, amount: '' })
@@ -425,7 +464,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4" @touchstart="onTouchStart" @touchend="onTouchEnd">
     
 
     <!-- Loading -->
