@@ -221,7 +221,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="h-screen w-full bg-gray-100 dark:bg-dark-900 text-gray-900 dark:text-gray-100 flex overflow-hidden transition-colors duration-300">
+  <div class="h-[100dvh] w-full bg-gray-100 dark:bg-dark-900 text-gray-900 dark:text-gray-100 flex overflow-hidden overscroll-none transition-colors duration-300">
     
     <!-- Mobile Sidebar Backdrop -->
     <div v-if="isSidebarOpen" @click="isSidebarOpen = false" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"></div>
@@ -376,7 +376,7 @@ onUnmounted(() => {
             </div>
         </header>
 
-        <div ref="scrollContentRef" class="flex-1 overflow-y-auto w-full pt-20 md:pt-28 lg:pt-8 p-4 md:p-8 custom-scrollbar bg-gray-100 dark:bg-dark-900">
+        <div ref="scrollContentRef" class="flex-1 overflow-y-auto overscroll-y-auto touch-pan-y w-full pt-20 md:pt-28 lg:pt-8 p-4 md:p-8 custom-scrollbar bg-gray-100 dark:bg-dark-900">
              <router-view v-slot="{ Component }">
                 <transition 
                     enter-active-class="transition ease-out duration-300" 

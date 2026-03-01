@@ -180,7 +180,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="space-y-8">
+  <div class="flex flex-col gap-6 lg:gap-8">
       <!-- Stats Grid -->
       <div v-if="isLoading" class="flex items-center justify-center py-16">
           <div class="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
@@ -208,7 +208,7 @@ onUnmounted(() => {
 
 
           <!-- Price Trend Chart -->
-          <div v-if="chartData" class="hidden md:block bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-white/10 p-6 shadow-sm dark:shadow-none -mt-4 mb-4">
+          <div v-if="chartData" class="hidden md:block bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-white/10 p-6 shadow-sm dark:shadow-none">
               <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
                   <h2 class="text-lg font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase">Динамика цен</h2>
                   <div class="text-xs text-gray-500 font-medium bg-gray-100 dark:bg-white/5 px-2 py-1 rounded">Цена за грамм (₽)</div>
@@ -219,7 +219,7 @@ onUnmounted(() => {
           </div>
           <!-- Recent Auctions -->
           <!-- Recent Auctions -->
-          <div class="md:bg-white/80 md:dark:bg-dark-800/80 md:backdrop-blur-sm md:rounded-2xl md:border md:border-gray-200 md:dark:border-white/10 md:p-6 md:shadow-sm">
+          <div class="bg-transparent md:bg-white/80 md:dark:bg-dark-800/80 md:backdrop-blur-sm md:rounded-2xl md:border md:border-gray-200 md:dark:border-white/10 md:p-6 md:shadow-sm">
               <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
                   <h2 class="text-lg font-kanit font-bold text-gray-900 dark:text-white tracking-wide uppercase">Последние аукционы</h2>
                   <button @click="router.push('/client/auctions')" class="text-xs text-gold-600 hover:text-gold-500 dark:text-gold-500 dark:hover:text-gold-400 font-bold uppercase tracking-wider transition-colors whitespace-nowrap flex items-center shrink-0">

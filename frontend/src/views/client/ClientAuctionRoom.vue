@@ -425,7 +425,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 lg:gap-6">
+  <div class="flex flex-col gap-4">
     
 
     <!-- Loading -->
@@ -465,7 +465,7 @@ onUnmounted(() => {
       </div>
 
       <!-- Auction Info Card - Glamorous & Compact -->
-      <div class="mb-6 relative rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-md dark:shadow-none group flex-shrink-0 bg-white dark:bg-[#0f1115]">
+      <div class="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-md dark:shadow-none group flex-shrink-0 bg-white dark:bg-[#0f1115]">
         <!-- Background with subtle animated gradient -->
         <div class="absolute inset-0 bg-gradient-to-br from-gold-50/80 via-white to-blue-50/30 dark:from-blue-900/10 dark:via-transparent dark:to-red-900/10"></div>
         <div class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-gold-400/10 blur-3xl rounded-full pointer-events-none dark:hidden"></div>
@@ -686,7 +686,7 @@ onUnmounted(() => {
           </div>
 
           <!-- ===== Regular participant: Offer Form + My Offers ===== -->
-          <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <!-- Submit Offer Form -->
               <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-cyan-500/20 shadow-sm dark:shadow-none p-6">
                   <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
@@ -744,7 +744,7 @@ onUnmounted(() => {
               </div>
 
               <!-- My Offers List -->
-              <div class="md:bg-white md:dark:bg-dark-800/80 md:backdrop-blur-sm md:rounded-2xl border-0 md:border md:border-gray-200 md:dark:border-white/10 md:shadow-sm dark:shadow-none py-6 md:p-6 px-2 md:px-0">
+              <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6">
                   <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-5">Мои предложения</h3>
                   <div v-if="myOffers.length === 0" class="text-center py-8 text-gray-500">
                       <p class="text-sm">Вы ещё не отправляли предложений</p>
@@ -767,7 +767,7 @@ onUnmounted(() => {
       </div>
 
       <!-- ======== ACTIVE TRADING SECTION ======== -->
-      <div v-if="auction.status === 'active' || (auction.status === 'gpb_right' && isGpb)" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div v-if="auction.status === 'active' || (auction.status === 'gpb_right' && isGpb)" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <!-- ===== GPB Priority Purchase Card ===== -->
           <div v-if="isGpb && auction.status === 'gpb_right'" class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-blue-300 dark:border-blue-500/30 p-6 lg:col-span-1 transition-all duration-500 shadow-[0_0_25px_rgba(59,130,246,0.1)]">
               <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
