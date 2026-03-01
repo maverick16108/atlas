@@ -400,9 +400,9 @@ onUnmounted(() => {
                     enter-active-class="transition ease-out duration-300" 
                     enter-from-class="opacity-0 translate-y-4 pointer-events-none" 
                     enter-to-class="opacity-100 translate-y-0" 
-                    leave-active-class="transition ease-in duration-150 pointer-events-none" 
-                    leave-from-class="opacity-100 translate-y-0" 
-                    leave-to-class="opacity-0 -translate-y-4"
+                    leave-active-class="transition-none hidden opacity-0" 
+                    leave-from-class="opacity-0 hidden" 
+                    leave-to-class="opacity-0 hidden"
                 >
                     <keep-alive include="ClientAuctions">
                         <component :is="Component" :key="$route.path" class="col-start-1 row-start-1 w-full min-w-0" />

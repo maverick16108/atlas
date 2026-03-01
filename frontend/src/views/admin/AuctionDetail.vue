@@ -1159,7 +1159,7 @@ onUnmounted(() => {
       <div v-show="activeTab === 'results'" class="flex flex-col gap-4">
         <div v-if="isLoadingBids" class="flex-1 flex flex-col gap-3">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-shrink-0">
-            <div v-for="i in 4" :key="i" class="p-3 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-50 dark:bg-dark-900/40">
+            <div v-for="i in 4" :key="i" class="p-3 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/40">
               <div class="h-2.5 w-16 bg-gray-200 dark:bg-white/5 rounded skeleton-shimmer mb-2"></div>
               <div class="h-6 w-20 bg-gray-200 dark:bg-white/[0.04] rounded skeleton-shimmer"></div>
             </div>

@@ -104,7 +104,7 @@ const removeAvatar = async () => {
 
 <template>
   <div class="max-w-5xl mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8 items-start">
           
           <!-- Left Column (Settings & Info) -->
           <div class="order-2 lg:order-1 lg:col-span-2 space-y-8">
