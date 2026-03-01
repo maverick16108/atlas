@@ -43,6 +43,7 @@ const onTouchEnd = (e) => {
     touchEndY.value = e.changedTouches[0].screenY
     handleSwipe(e)
 }
+
 const handleSwipe = (e) => {
     const diffX = touchEndX.value - touchStartX.value
     const diffY = Math.abs(touchEndY.value - touchStartY.value)
@@ -62,9 +63,19 @@ const handleSwipe = (e) => {
         }
 
         if (!isInsideHorizontalScroll) {
+            // Force browser to unfocus and reset touch state
+            if (document.activeElement) {
+                document.activeElement.blur()
+            }
+            
+            // Force hardware scroll repaint to kill stuck touch contexts
+            const originalOverflow = document.body.style.overflow
+            document.body.style.overflow = 'hidden'
+            
             setTimeout(() => {
+                document.body.style.overflow = originalOverflow
                 goBack()
-            }, 50)
+            }, 10)
         }
     }
 }
@@ -442,6 +453,8 @@ const handleEsc = (e) => {
 
 onMounted(async () => {
     document.addEventListener('keydown', handleEsc)
+    window.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchend', onTouchEnd, { passive: true })
     await fetchAuction()
     startTimer()
     subscribeWebSocket()
@@ -458,6 +471,8 @@ watch(auctionId, async (newId, oldId) => {
 
 onUnmounted(() => {
     document.removeEventListener('keydown', handleEsc)
+    window.removeEventListener('touchstart', onTouchStart)
+    window.removeEventListener('touchend', onTouchEnd)
     if (timerInterval) clearInterval(timerInterval)
     if (currentChannel) {
         echo.leaveChannel(`auction.${currentChannel}`)
@@ -466,7 +481,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4" @touchstart="onTouchStart" @touchend="onTouchEnd">
+  <div class="flex flex-col gap-4">
     
 
     <!-- Loading -->
