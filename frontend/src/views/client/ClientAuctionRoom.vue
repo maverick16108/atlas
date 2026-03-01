@@ -744,7 +744,7 @@ onUnmounted(() => {
               </div>
 
               <!-- My Offers List -->
-              <div class="md:bg-white md:dark:bg-dark-800/80 md:backdrop-blur-sm md:rounded-2xl border-0 md:border md:border-gray-200 md:dark:border-white/10 md:shadow-sm dark:shadow-none py-6 md:p-6 -mx-2 md:mx-0 px-2 md:px-0">
+              <div class="mt-8 lg:mt-0 md:bg-white md:dark:bg-dark-800/80 md:backdrop-blur-sm md:rounded-2xl border-0 md:border md:border-gray-200 md:dark:border-white/10 md:shadow-sm dark:shadow-none py-6 md:p-6 px-2 md:px-0">
                   <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-5">Мои предложения</h3>
                   <div v-if="myOffers.length === 0" class="text-center py-8 text-gray-500">
                       <p class="text-sm">Вы ещё не отправляли предложений</p>

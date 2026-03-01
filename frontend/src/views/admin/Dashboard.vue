@@ -220,8 +220,8 @@ onUnmounted(() => {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           <!-- Chart Section -->
-          <div class="lg:col-span-2 bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 p-6 relative overflow-hidden group hover:border-gray-300 dark:hover:border-white/10 transition-colors">
-              <div class="flex justify-between items-center mb-6">
+          <div class="lg:col-span-2 bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 p-6 relative overflow-hidden group hover:border-gray-300 dark:hover:border-white/10 transition-colors h-full flex flex-col">
+              <div class="flex justify-between items-center mb-6 shrink-0">
                   <div>
                       <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white">Активность аукционов</h3>
                       <p class="text-xs text-gray-500 mt-1">Динамика создания новых аукционов за 30 дней</p>
@@ -231,7 +231,7 @@ onUnmounted(() => {
                   </div>
               </div>
               
-              <div class="h-[300px] w-full relative">
+              <div class="flex-1 min-h-[300px] w-full relative">
                   <Line v-if="!isLoading && chartData.datasets.length > 0" :data="chartData" :options="chartOptions" />
                   <div v-else class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
                       <span v-if="isLoading">Загрузка данных...</span>
@@ -241,9 +241,9 @@ onUnmounted(() => {
           </div>
 
           <!-- Quick Actions & Status -->
-          <div class="space-y-6">
+          <div class="flex flex-col gap-6 h-full">
               <!-- Quick Actions -->
-              <div class="bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 p-6">
+              <div class="bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 p-6 shrink-0">
                   <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4">Быстрые действия</h3>
                   <div class="grid grid-cols-2 gap-3">
                       <router-link :to="{ path: '/admin/users', query: { action: 'create' } }" class="p-4 bg-gray-50 dark:bg-white/5 hover:bg-emerald-600 hover:text-white rounded-lg border border-gray-200 dark:border-white/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 group text-gray-500 dark:text-gray-300 active:scale-95 active:bg-emerald-700 hover:scale-[1.02] hover:shadow-lg">
@@ -258,9 +258,9 @@ onUnmounted(() => {
               </div>
               
                <!-- System Status -->
-               <div class="bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 p-6">
-                  <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4">Статус системы</h3>
-                  <div class="space-y-4 text-sm">
+               <div class="bg-white dark:bg-dark-800/80 shadow-sm dark:shadow-none backdrop-blur-sm rounded-xl border border-gray-200 dark:border-white/5 p-6 flex-1 flex flex-col justify-between">
+                  <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4 shrink-0">Статус системы</h3>
+                  <div class="space-y-4 text-sm flex-1 flex flex-col justify-between">
                       <div class="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-white/5">
                           <span class="text-gray-500 dark:text-gray-400">База данных</span>
                           <span class="text-emerald-500 dark:text-emerald-400 font-bold flex items-center gap-2 text-xs uppercase tracking-wider"><span class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>Онлайн</span>
