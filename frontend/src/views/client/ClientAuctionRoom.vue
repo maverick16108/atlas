@@ -62,7 +62,9 @@ const handleSwipe = (e) => {
         }
 
         if (!isInsideHorizontalScroll) {
-            goBack()
+            setTimeout(() => {
+                goBack()
+            }, 50)
         }
     }
 }

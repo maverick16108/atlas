@@ -394,19 +394,18 @@ onUnmounted(() => {
             </div>
         </header>
 
-        <div ref="scrollContentRef" class="flex-1 overflow-y-auto overscroll-y-auto touch-pan-y w-full pt-20 md:pt-28 lg:pt-8 p-4 md:p-8 custom-scrollbar bg-gray-100 dark:bg-dark-900">
+        <div ref="scrollContentRef" class="flex-1 overflow-y-auto overscroll-y-auto touch-pan-y w-full pt-20 md:pt-28 lg:pt-8 p-4 md:p-8 custom-scrollbar bg-gray-100 dark:bg-dark-900 grid grid-cols-1 grid-rows-1 items-start">
              <router-view v-slot="{ Component }">
                 <transition 
-                    mode="out-in"
                     enter-active-class="transition ease-out duration-300" 
-                    enter-from-class="opacity-0 translate-y-4" 
+                    enter-from-class="opacity-0 translate-y-4 pointer-events-none" 
                     enter-to-class="opacity-100 translate-y-0" 
-                    leave-active-class="transition ease-in duration-200" 
+                    leave-active-class="transition ease-in duration-150 pointer-events-none" 
                     leave-from-class="opacity-100 translate-y-0" 
                     leave-to-class="opacity-0 -translate-y-4"
                 >
                     <keep-alive include="ClientAuctions">
-                        <component :is="Component" :key="$route.path" />
+                        <component :is="Component" :key="$route.path" class="col-start-1 row-start-1 w-full min-w-0" />
                     </keep-alive>
                 </transition>
              </router-view>
