@@ -29,30 +29,33 @@ const isSidebarOpen = ref(false)
 const scrollContentRef = ref(null)
 const isHeaderHidden = ref(false)
 let lastScrollTop = 0
-let lastDirection = null
-let directionChangeScrollTop = 0
-const SCROLL_THRESHOLD = 50
+let ticking = false
 
 const onContentScroll = () => {
-    if (!scrollContentRef.value) return
-    // Only on mobile (< 1024px)
-    if (window.innerWidth >= 1024) { isHeaderHidden.value = false; return }
-    const st = scrollContentRef.value.scrollTop
-    const direction = st > lastScrollTop ? 'down' : 'up'
-
-    if (direction !== lastDirection) {
-        directionChangeScrollTop = st
-        lastDirection = direction
-    }
-
-    const delta = Math.abs(st - directionChangeScrollTop)
-
-    if (direction === 'down' && delta > SCROLL_THRESHOLD && st > 80) {
-        isHeaderHidden.value = true
-    } else if (direction === 'up' && delta > SCROLL_THRESHOLD) {
-        isHeaderHidden.value = false
-    }
-    lastScrollTop = st
+    if (ticking) return
+    ticking = true
+    requestAnimationFrame(() => {
+        if (!scrollContentRef.value) { ticking = false; return }
+        // Only on mobile (< 1024px)
+        if (window.innerWidth >= 1024) { isHeaderHidden.value = false; ticking = false; return }
+        
+        const st = scrollContentRef.value.scrollTop
+        const diff = st - lastScrollTop
+        
+        // Dead-zone: ignore tiny movements (< 5px) to filter scroll noise
+        if (Math.abs(diff) < 5) { ticking = false; return }
+        
+        if (diff > 0 && st > 60) {
+            // Scrolling down & past header height — hide
+            isHeaderHidden.value = true
+        } else if (diff < 0) {
+            // Scrolling up — show
+            isHeaderHidden.value = false
+        }
+        
+        lastScrollTop = st
+        ticking = false
+    })
 }
 
 const handleLogout = () => {
