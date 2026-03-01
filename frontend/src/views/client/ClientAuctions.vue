@@ -116,10 +116,10 @@ onUnmounted(() => {
 
 <template>
   <div class="space-y-6">
-      <div class="flex flex-wrap items-center gap-1 border-b border-gray-200 dark:border-white/10 pb-0">
+      <div class="flex items-center gap-1 border-b border-gray-200 dark:border-white/10 pb-0 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <button v-for="f in filters" :key="f.id"
                   @click="activeFilter = f.id; fetchAuctions()"
-                  class="px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all relative"
+                  class="whitespace-nowrap flex-shrink-0 px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all relative"
                   :class="activeFilter === f.id
                       ? 'text-gold-600 dark:text-gold-400 border-b-2 border-gold-500'
                       : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-300 border-b-2 border-transparent'">

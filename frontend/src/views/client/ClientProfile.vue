@@ -62,7 +62,7 @@ const uploadAvatar = async (file) => {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           
           <!-- Left Column (Settings & Info) -->
-          <div class="lg:col-span-2 space-y-8">
+          <div class="order-2 lg:order-1 lg:col-span-2 space-y-8">
               <!-- Info card (read-only) -->
               <div class="bg-white dark:bg-stone-900/80 backdrop-blur-sm rounded-xl p-8 border border-gray-200 dark:border-white/5 shadow-sm">
                   <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-gray-100 mb-6 border-b border-gray-200 dark:border-white/5 pb-4">Данные участника</h3>
@@ -130,7 +130,7 @@ const uploadAvatar = async (file) => {
           </div>
 
           <!-- Right Column (Avatar & Name) -->
-          <div class="lg:col-span-1">
+          <div class="order-1 lg:order-2 lg:col-span-1">
               <div class="bg-white dark:bg-stone-900/80 backdrop-blur-sm rounded-xl p-8 border border-gray-200 dark:border-white/5 shadow-sm text-center">
                   <div class="flex flex-col items-center">
                       <!-- Avatar with upload -->

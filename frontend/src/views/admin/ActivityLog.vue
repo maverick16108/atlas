@@ -418,7 +418,7 @@ onUnmounted(() => {
 
                           <!-- Action badge -->
                           <td class="px-6 py-4">
-                              <span class="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border"
+                              <span class="px-2 py-1 rounded text-xs font-bold uppercase whitespace-nowrap"
                                     :class="actionColor(log.action)">
                                   {{ actionLabel(log.action) }}
                               </span>

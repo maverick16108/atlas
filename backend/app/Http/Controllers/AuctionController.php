@@ -207,12 +207,11 @@ class AuctionController extends Controller
                 }
             }
 
-            // If GPB time has passed → can't set gpb_right, active, scheduled, collecting_offers
+            // If GPB time has passed → can't set gpb_right
             if ($gpbStartedAt && $now->gte(\Carbon\Carbon::parse($gpbStartedAt)->addMinutes($gpbMinutes))) {
-                $blockedByGpb = ['collecting_offers', 'scheduled', 'active', 'gpb_right'];
-                if (in_array($validated['status'], $blockedByGpb)) {
+                if ($validated['status'] === 'gpb_right') {
                     return response()->json([
-                        'message' => 'Время права ГПБ истекло. Невозможно установить статус "' . $validated['status'] . '".',
+                        'message' => 'Время права ГПБ истекло. Невозможно установить статус "gpb_right".',
                         'errors' => ['status' => ['Время права ГПБ истекло']]
                     ], 422);
                 }

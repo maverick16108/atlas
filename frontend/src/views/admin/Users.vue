@@ -587,18 +587,18 @@ const handleAuthPhoneInput = (event) => {
                           {{ user.auth_phone || '-' }}
                       </td>
                       <td class="px-4 py-4">
-                          <span class="px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors select-none block text-center w-fit" 
+                          <span class="px-2 py-1 rounded text-xs font-bold uppercase whitespace-nowrap select-none" 
                              :class="user.is_accredited ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400'"
                           >
                               {{ user.is_accredited ? 'Аккредитован' : 'Нет доступа' }}
                           </span>
                       </td>
                       <td class="px-2 py-4">
-                          <span v-if="user.is_gpb" class="px-2 py-1 rounded text-[10px] font-bold uppercase select-none block text-center w-fit bg-gray-200 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400">
+                          <span v-if="user.is_gpb" class="px-2 py-1 rounded text-xs font-bold uppercase select-none bg-gray-200 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 whitespace-nowrap">
                               ГПБ
                           </span>
-                          <span v-else class="text-gray-600 text-xs font-mono block text-center w-fit">
-                              -
+                          <span v-else class="text-gray-600 dark:text-gray-400 text-xs font-mono">
+                              —
                           </span>
                       </td>
                       <td class="px-4 py-4 text-gray-500 dark:text-gray-400 font-mono text-xs">

@@ -25,6 +25,27 @@ const navigation = computed(() => [
 const showLogoutModal = ref(false)
 const isSidebarOpen = ref(false)
 
+// ===== Auto-hide header on mobile scroll =====
+const scrollContentRef = ref(null)
+const isHeaderHidden = ref(false)
+let lastScrollTop = 0
+const SCROLL_THRESHOLD = 10
+
+const onContentScroll = () => {
+    if (!scrollContentRef.value) return
+    // Only on mobile (< 1024px)
+    if (window.innerWidth >= 1024) { isHeaderHidden.value = false; return }
+    const st = scrollContentRef.value.scrollTop
+    if (st > lastScrollTop && st > SCROLL_THRESHOLD) {
+        // Scrolling down
+        isHeaderHidden.value = true
+    } else if (st < lastScrollTop) {
+        // Scrolling up
+        isHeaderHidden.value = false
+    }
+    lastScrollTop = st
+}
+
 const handleLogout = () => {
     showLogoutModal.value = true
 }
@@ -145,6 +166,11 @@ onMounted(() => {
     fetchUnreadCount()
     pollInterval = setInterval(fetchUnreadCount, 30000)
 
+    // Attach scroll listener
+    if (scrollContentRef.value) {
+        scrollContentRef.value.addEventListener('scroll', onContentScroll, { passive: true })
+    }
+
     // Sync profile from DB (updates is_gpb, name, etc. if changed by admin)
     axios.get('/api/client/me').then(res => {
         if (res.data?.id) {
@@ -172,6 +198,9 @@ onMounted(() => {
 
 onUnmounted(() => {
     if (pollInterval) clearInterval(pollInterval)
+    if (scrollContentRef.value) {
+        scrollContentRef.value.removeEventListener('scroll', onContentScroll)
+    }
     const userId = user.value?.id
     if (userId) {
         echo.leaveChannel(`notifications.user.${userId}`)
@@ -232,7 +261,8 @@ onUnmounted(() => {
     <!-- Main Content -->
     <main class="flex-1 flex flex-col relative z-10 overflow-hidden bg-gray-100 dark:bg-dark-900 transition-colors duration-300">
         <!-- Topbar -->
-        <header class="h-20 min-h-[5rem] px-4 md:px-8 flex items-center justify-between client-header sticky top-0 z-30 transition-colors duration-300">
+        <header class="h-20 min-h-[5rem] px-4 md:px-8 flex items-center justify-between client-header z-30 transition-all duration-300"
+                :class="isHeaderHidden ? '-mt-20 lg:mt-0 opacity-0 lg:opacity-100' : 'mt-0 opacity-100'">
             <div class="flex items-center gap-4">
                 <!-- Mobile Menu Button -->
                 <button @click="isSidebarOpen = true" class="lg:hidden p-2 -ml-2 text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-white/5 transition-colors">
@@ -335,7 +365,7 @@ onUnmounted(() => {
         </header>
 
         <!-- View Content with Scroll -->
-        <div class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar bg-gray-100 dark:bg-dark-900">
+        <div ref="scrollContentRef" class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar bg-gray-100 dark:bg-dark-900">
              <router-view v-slot="{ Component }">
                 <transition 
                     enter-active-class="transition ease-out duration-300" 

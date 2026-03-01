@@ -478,45 +478,40 @@ onUnmounted(() => {
           <!-- Main Row: Title, Status, Timer -->
           <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between pl-6 pr-6 py-4 gap-4">
             <!-- Left: Title & ID -->
-            <div class="flex items-center gap-5 min-w-0 flex-1">
-              <div class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-inner flex-shrink-0">
-                 <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none mb-0.5">№</span>
-                 <span class="text-xl font-mono font-bold text-gray-900 dark:text-white leading-none">{{ auction.id }}</span>
+            <div class="flex items-start md:items-center gap-3 md:gap-5 min-w-0 flex-1">
+              <div class="flex flex-col items-center justify-center w-11 h-11 md:w-14 md:h-14 rounded-lg md:rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-inner flex-shrink-0 mt-0.5 md:mt-0">
+                 <span class="text-[8px] md:text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none mb-0.5">№</span>
+                 <span class="text-base md:text-xl font-mono font-bold text-gray-900 dark:text-white leading-none">{{ auction.id }}</span>
               </div>
               <div class="min-w-0 flex-1">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white font-kanit tracking-wide truncate leading-tight" :title="auction.title">{{ auction.title }}</h1>
-                <p v-if="auction.description" class="text-xs text-gray-500 truncate mt-0.5">{{ auction.description }}</p>
+                <h1 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white font-kanit tracking-wide leading-tight md:truncate" :title="auction.title">{{ auction.title }}</h1>
+                <p v-if="auction.description" class="text-[11px] md:text-xs text-gray-500 mt-1 md:mt-0.5 md:truncate">{{ auction.description }}</p>
               </div>
             </div>
 
             <!-- Right: Live Controls (Status + Timer) -->
-            <div class="flex items-center gap-4 self-end md:self-auto">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
               <!-- Live Status & Timer Container -->
-              <div class="relative group/status flex items-center overflow-hidden rounded-lg border transition-all duration-300"
+              <div class="relative group/status flex items-center overflow-hidden rounded-lg border transition-all duration-300 w-full"
                    :class="[
-                     auction.status === 'active' ? 'border-amber-200 dark:border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.05)] dark:shadow-none' :
-                     auction.status === 'gpb_right' ? 'border-blue-200 dark:border-blue-500/30' :
-                     auction.status === 'scheduled' ? 'border-purple-200 dark:border-purple-500/30' :
-                     auction.status === 'collecting_offers' ? 'border-cyan-200 dark:border-cyan-500/30' :
-                     auction.status === 'completed' ? 'border-emerald-200 dark:border-emerald-500/30' :
-                     auction.status === 'commission' ? 'border-orange-200 dark:border-orange-500/30' :
-                     auction.status === 'paused' ? 'border-amber-200 dark:border-amber-800/30' :
-                     auction.status === 'cancelled' ? 'border-red-200 dark:border-red-500/30' :
-                     'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10'
+                     auction.status === 'active' ? 'border-amber-200 dark:border-amber-500/30 bg-white dark:bg-[#161920] shadow-[0_0_15px_rgba(245,158,11,0.05)] dark:shadow-none' :
+                     auction.status === 'gpb_right' ? 'border-blue-200 dark:border-blue-500/30 bg-white dark:bg-[#161920]' :
+                     auction.status === 'scheduled' ? 'border-purple-200 dark:border-purple-500/30 bg-white dark:bg-[#161920]' :
+                     auction.status === 'collecting_offers' ? 'border-cyan-200 dark:border-cyan-500/30 bg-cyan-50/100 dark:bg-cyan-950/40' :
+                     auction.status === 'completed' ? 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/100 dark:bg-emerald-950/40' :
+                     auction.status === 'commission' ? 'border-orange-200 dark:border-orange-500/30 bg-orange-50/100 dark:bg-orange-950/40' :
+                     auction.status === 'paused' ? 'border-amber-200 dark:border-amber-800/30 bg-amber-50/100 dark:bg-amber-950/40' :
+                     auction.status === 'cancelled' ? 'border-red-200 dark:border-red-500/30 bg-red-50/100 dark:bg-red-950/40' :
+                     'bg-gray-50/100 dark:bg-white/5 border-gray-200 dark:border-white/10'
                    ]">
                  <!-- Animated Glow Background for active states (behind everything) -->
                  <div v-if="['active', 'gpb_right', 'scheduled'].includes(auction.status)" class="absolute inset-0 bg-gradient-to-r from-transparent via-gray-900/5 dark:via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
 
                  <!-- Status Section -->
-                 <div class="px-4 py-2 flex items-center gap-2.5 backdrop-blur-sm"
+                 <div class="px-4 py-2 flex items-center justify-start gap-2.5 w-full md:w-auto"
                       :class="[
                         ['active', 'gpb_right'].includes(auction.status) ? 'bg-gray-50 dark:bg-white/5 rounded-l-lg' :
                         auction.status === 'scheduled' ? 'bg-purple-50 dark:bg-white/5 rounded-l-lg' :
-                        auction.status === 'collecting_offers' ? 'bg-cyan-50 dark:bg-cyan-950/40 rounded-lg' :
-                        auction.status === 'completed' ? 'bg-emerald-50 dark:bg-emerald-950/40 rounded-lg' :
-                        auction.status === 'commission' ? 'bg-orange-50 dark:bg-orange-950/40 rounded-lg' :
-                        auction.status === 'paused' ? 'bg-amber-50 dark:bg-amber-950/40 rounded-lg' :
-                        auction.status === 'cancelled' ? 'bg-red-50 dark:bg-red-950/40 rounded-lg' :
                         'rounded-lg'
                       ]">
                     <div class="relative flex h-2.5 w-2.5">
@@ -589,33 +584,33 @@ onUnmounted(() => {
           </div>
           
           <!-- Stats Strip - Glassmorphism -->
-          <div class="flex flex-wrap items-center border-t border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02] backdrop-blur-sm px-6 py-3 gap-x-8 gap-y-3 text-sm min-h-[44px]">
+          <div class="flex flex-col md:flex-row md:flex-wrap items-start md:items-center border-t border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02] backdrop-blur-sm px-6 py-4 gap-y-4 gap-x-8 text-sm min-h-[44px]">
              <!-- Lot -->
-             <div class="flex items-center gap-2 min-w-[160px]">
-               <span class="text-gray-500 text-xs uppercase font-bold tracking-wider">Лот</span>
-               <span class="text-gray-900 dark:text-white font-bold">{{ auction.bar_count }} <span class="text-gray-500 font-normal">×</span> {{ auction.bar_weight }} <span class="text-gray-500 font-normal">кг</span> <span class="text-gray-500 font-normal">=</span> {{ totalWeight }} <span class="text-gray-500 font-normal">кг</span></span>
+             <div class="flex items-center gap-2 min-w-[160px] flex-shrink-0">
+               <span class="text-gray-500 text-[10px] md:text-xs uppercase font-bold tracking-wider">Лот</span>
+               <span class="text-gray-900 dark:text-white font-bold text-xs md:text-sm">{{ auction.bar_count }} <span class="text-gray-500 font-normal">×</span> {{ auction.bar_weight }} <span class="text-gray-500 font-normal">кг</span> <span class="text-gray-500 font-normal">=</span> {{ totalWeight }} <span class="text-gray-500 font-normal">кг</span></span>
              </div>
              <!-- Min Price -->
-             <div class="flex items-center gap-2">
-               <span class="text-gray-500 text-xs uppercase font-bold tracking-wider">Мин. цена</span>
-               <span class="text-emerald-600 dark:text-emerald-400 font-bold font-mono">{{ formatPrice(auction.min_price) }} <span class="text-emerald-600/60 dark:text-emerald-500/60 font-sans font-normal text-xs">₽/г</span></span>
+             <div class="flex items-center gap-2 flex-shrink-0">
+               <span class="text-gray-500 text-[10px] md:text-xs uppercase font-bold tracking-wider">Мин. цена</span>
+               <span class="text-emerald-600 dark:text-emerald-400 font-bold font-mono text-xs md:text-sm">{{ formatPrice(auction.min_price) }} <span class="text-emerald-600/60 dark:text-emerald-500/60 font-sans font-normal text-[10px] md:text-xs">₽/г</span></span>
              </div>
              <!-- Step -->
-             <div class="flex items-center gap-2">
-               <span class="text-gray-500 text-xs uppercase font-bold tracking-wider">Шаг</span>
-               <span class="text-gray-900 dark:text-white font-bold font-mono">{{ formatPrice(auction.min_step) }} <span class="text-gray-500 font-sans font-normal text-xs">₽</span></span>
-               <span class="text-gray-600 text-xs">({{ auction.step_time }} мин)</span>
+             <div class="flex items-center gap-2 flex-shrink-0">
+               <span class="text-gray-500 text-[10px] md:text-xs uppercase font-bold tracking-wider">Шаг</span>
+               <span class="text-gray-900 dark:text-white font-bold font-mono text-xs md:text-sm">{{ formatPrice(auction.min_step) }} <span class="text-gray-500 font-sans font-normal text-[10px] md:text-xs">₽</span></span>
+               <span class="text-gray-600 text-[10px] md:text-xs">({{ auction.step_time }} мин)</span>
              </div>
              <!-- Gpb -->
-             <div class="flex items-center gap-2">
-               <span class="text-gray-500 text-xs uppercase font-bold tracking-wider">Право ГПБ</span>
-               <span class="text-gray-900 dark:text-white font-bold">{{ auction.gpb_minutes || 30 }} <span class="text-gray-500 font-normal text-xs">мин</span></span>
+             <div class="flex items-center gap-2 flex-shrink-0">
+               <span class="text-gray-500 text-[10px] md:text-xs uppercase font-bold tracking-wider">Право ГПБ</span>
+               <span class="text-gray-900 dark:text-white font-bold text-xs md:text-sm">{{ auction.gpb_minutes || 30 }} <span class="text-gray-500 font-normal text-[10px] md:text-xs">мин</span></span>
              </div>
-             <!-- Spacer -->
-             <div class="flex-1"></div>
+             <!-- Spacer (Desktop only) -->
+             <div class="hidden lg:block flex-1"></div>
              <!-- Date -->
-             <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-200 font-medium my-auto">
-               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+             <div class="flex items-center gap-2 text-xs md:text-sm text-gray-500 dark:text-gray-400 font-medium md:my-auto w-full lg:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-none border-gray-200 dark:border-white/10">
+               <svg class="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                <span>{{ formatDate(auction.start_at) }} — {{ formatDate(auction.end_at) }}</span>
              </div>
           </div>
@@ -739,13 +734,13 @@ onUnmounted(() => {
               </div>
 
               <!-- My Offers List -->
-              <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6">
+              <div class="md:bg-white md:dark:bg-dark-800/80 md:backdrop-blur-sm md:rounded-2xl border-0 md:border md:border-gray-200 md:dark:border-white/10 md:shadow-sm dark:shadow-none py-6 md:p-6 -mx-2 md:mx-0 px-2 md:px-0">
                   <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-5">Мои предложения</h3>
                   <div v-if="myOffers.length === 0" class="text-center py-8 text-gray-500">
                       <p class="text-sm">Вы ещё не отправляли предложений</p>
                   </div>
                   <div v-else class="space-y-3">
-                      <div v-for="offer in myOffers" :key="offer.id" class="bg-gray-50 dark:bg-dark-900/50 rounded-lg p-4 border border-gray-100 dark:border-white/5">
+                      <div v-for="offer in myOffers" :key="offer.id" class="bg-white dark:bg-dark-900/50 rounded-lg p-4 shadow-sm dark:shadow-none border border-gray-100 dark:border-white/5">
                           <div class="flex justify-between items-center">
                               <div>
                                   <span class="text-sm text-gray-900 dark:text-white font-bold font-mono">{{ Number(offer.volume).toLocaleString() }} слитков</span>
@@ -940,13 +935,13 @@ onUnmounted(() => {
           </div>
 
           <!-- All Bids Table -->
-          <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6 lg:col-span-2">
-              <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4">Ход торгов</h3>
+          <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-none lg:rounded-2xl border-y lg:border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none py-6 lg:p-6 lg:col-span-2 -mx-4 lg:mx-0">
+              <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4 px-4 lg:px-0">Ход торгов</h3>
 
               <div v-if="allBids.length === 0" class="text-center py-12 text-gray-500">
                   <p class="text-sm">Ставок пока нет</p>
               </div>
-              <div v-else class="overflow-x-auto overflow-y-hidden rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30">
+              <div v-else class="overflow-x-auto overflow-y-hidden rounded-none lg:rounded-lg border-y lg:border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30">
                   <table class="w-full text-left border-collapse relative">
                       <thead class="sticky top-0 bg-gray-50 dark:bg-dark-900 z-10">
                           <tr class="border-b border-gray-200 dark:border-white/10 text-xs text-gray-500 uppercase tracking-widest font-bold">
@@ -1105,11 +1100,11 @@ onUnmounted(() => {
           </div>
 
           <!-- All Bids for completed/GPB (Hidden for GPB during active phase) -->
-          <div v-show="!(isGpb && auction.status === 'active')" class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6 mt-6">
-              <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4">Результаты торгов</h3>
+          <div v-show="!(isGpb && auction.status === 'active')" class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-none md:rounded-2xl border-y md:border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none py-6 md:p-6 -mx-4 md:mx-0 lg:col-span-2">
+              <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4 px-4 md:px-0">Результаты торгов</h3>
 
               <!-- GPB Purchase Report (matching admin format) -->
-              <div v-if="gpbReport" class="mb-4 overflow-auto rounded-lg border border-blue-300 dark:border-blue-500/20 bg-gray-50 dark:bg-dark-900/30">
+              <div v-if="gpbReport" class="mb-4 overflow-auto rounded-none md:rounded-lg border-y md:border-x-0 md:border-y-0 md:border border-blue-300 dark:border-blue-500/20 bg-gray-50 dark:bg-dark-900/30">
                   <table class="w-full text-left border-collapse">
                       <thead>
                           <tr class="border-b border-gray-200 dark:border-white/10 text-xs text-gray-500 uppercase tracking-widest font-bold">
@@ -1229,10 +1224,10 @@ onUnmounted(() => {
               </div>
 
               <!-- Regular results table (when no GPB) -->
-              <div v-if="!gpbReport && allBids.length === 0" class="text-center py-12 text-gray-500">
+              <div v-if="!gpbReport && allBids.length === 0" class="text-center py-12 text-gray-500 px-4">
                   <p class="text-sm">Ставок нет</p>
               </div>
-              <div v-if="!gpbReport && allBids.length > 0" class="overflow-x-auto overflow-y-hidden rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30">
+              <div v-if="!gpbReport && allBids.length > 0" class="overflow-x-auto overflow-y-hidden rounded-none md:rounded-lg border-y md:border-x-0 md:border-y-0 md:border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30">
                   <table class="w-full text-left border-collapse relative">
                       <thead class="sticky top-0 bg-gray-50 dark:bg-dark-900 z-10">
                           <tr class="border-b border-gray-200 dark:border-white/10 text-xs text-gray-500 uppercase tracking-widest font-bold">
@@ -1311,10 +1306,10 @@ onUnmounted(() => {
       </div>
 
       <!-- My Offers for non-collecting statuses -->
-      <div v-if="auction.status === 'scheduled' && myOffers.length > 0" class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6">
+      <div v-if="auction.status === 'scheduled' && myOffers.length > 0" class="md:bg-white md:dark:bg-dark-800/80 md:backdrop-blur-sm md:rounded-2xl border-0 md:border md:border-gray-200 md:dark:border-white/10 md:shadow-sm dark:shadow-none py-6 md:p-6 -mx-2 md:mx-0 px-2 md:px-0 mt-6 md:mt-0">
           <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-4">Мои предложения</h3>
           <div class="space-y-2">
-              <div v-for="offer in myOffers" :key="offer.id" class="flex justify-between items-center py-2 px-3 rounded bg-gray-50 dark:bg-dark-900/40 border border-gray-100 dark:border-white/5">
+              <div v-for="offer in myOffers" :key="offer.id" class="flex justify-between items-center py-3 px-4 rounded-lg bg-white dark:bg-dark-900/50 shadow-sm dark:shadow-none border border-gray-100 dark:border-white/5">
                   <div>
                       <span class="text-sm text-gray-900 dark:text-white font-mono font-bold">{{ Number(offer.volume).toLocaleString() }} сл.</span>
                       <span class="text-gray-500 mx-2">×</span>
