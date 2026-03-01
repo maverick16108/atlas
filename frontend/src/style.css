@@ -297,16 +297,20 @@ select option {
 
 /* Custom Datetime-local Styling */
 input[type="datetime-local"] {
-  color-scheme: dark;
   padding-right: 40px !important;
+}
+.dark input[type="datetime-local"] {
+  color-scheme: dark;
 }
 
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
   opacity: 0.5;
   cursor: pointer;
   position: absolute;
   right: 12px;
+}
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
 
 input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
@@ -320,11 +324,13 @@ input[type="date"] {
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
   opacity: 0.5;
   cursor: pointer;
   position: absolute;
   right: 12px;
+}
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
@@ -337,8 +343,11 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   opacity: 0.5;
   cursor: pointer;
-  filter: invert(1);
   margin-right: 0;
+}
+.dark input[type="number"]::-webkit-inner-spin-button,
+.dark input[type="number"]::-webkit-outer-spin-button {
+  filter: invert(1);
 }
 
 input[type="number"]::-webkit-inner-spin-button:hover,
@@ -353,11 +362,13 @@ input[type="time"] {
 }
 
 input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
   opacity: 0.5;
   cursor: pointer;
   position: absolute;
   right: 12px;
+}
+.dark input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
 
 input[type="time"]::-webkit-calendar-picker-indicator:hover {

@@ -22,4 +22,12 @@ app.component('PublicLayout', PublicLayout)
 app.component('ClientLayout', ClientLayout)
 app.component('AdminLayout', AdminLayout)
 
+// Apply theme immediately before mount (prevents flash)
+const savedTheme = localStorage.getItem('theme')
+if (savedTheme === 'dark' || (!savedTheme && window.matchMedia?.('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark')
+} else {
+    document.documentElement.classList.remove('dark')
+}
+
 app.mount('#app')

@@ -13,6 +13,7 @@ const user = computed(() => authStore.adminUser)
 const fileInput = ref(null)
 const isUploading = ref(false)
 const uploadError = ref('')
+const isDragging = ref(false)
 
 const staffAvatar = computed(() => {
     if (user.value?.avatar && !user.value.avatar.includes('ui-avatars.com')) {
@@ -39,24 +40,42 @@ const triggerFileInput = () => {
     fileInput.value?.click()
 }
 
-const handleFileChange = async (e) => {
-    const file = e.target.files?.[0]
+const processFile = (file) => {
     if (!file) return
 
-    // Validate file type
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
         uploadError.value = 'Допустимые форматы: JPG, PNG, WebP'
         return
     }
-
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
         uploadError.value = 'Максимальный размер файла: 2 МБ'
         return
     }
 
     uploadError.value = ''
+    handleUpload(file)
+}
+
+const handleFileChange = (e) => {
+    processFile(e.target.files?.[0])
+}
+
+const handleDrop = (event) => {
+    isDragging.value = false
+    processFile(event.dataTransfer?.files?.[0])
+}
+
+const handleDragOver = () => {
+    isDragging.value = true
+}
+
+const handleDragLeave = () => {
+    isDragging.value = false
+}
+
+const handleUpload = async (file) => {
     isUploading.value = true
+    uploadError.value = ''
 
     try {
         const formData = new FormData()
@@ -66,7 +85,6 @@ const handleFileChange = async (e) => {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
 
-        // Update the store
         if (authStore.adminUser) {
             authStore.adminUser.avatar = data.avatar
             localStorage.setItem('admin_user', JSON.stringify(authStore.adminUser))
@@ -75,7 +93,6 @@ const handleFileChange = async (e) => {
         uploadError.value = err.response?.data?.message || 'Ошибка загрузки'
     } finally {
         isUploading.value = false
-        // Reset file input
         if (fileInput.value) fileInput.value.value = ''
     }
 }
@@ -90,7 +107,6 @@ const removeAvatar = async () => {
             localStorage.setItem('admin_user', JSON.stringify(authStore.adminUser))
         }
     } catch (err) {
-        // If delete endpoint doesn't exist, just clear locally
         if (authStore.adminUser) {
             authStore.adminUser.avatar = null
             localStorage.setItem('admin_user', JSON.stringify(authStore.adminUser))
@@ -169,20 +185,26 @@ const removeAvatar = async () => {
           <div class="lg:col-span-1">
               <div class="bg-white dark:bg-dark-800/80 backdrop-blur-sm rounded-xl p-8 border border-gray-200 dark:border-white/5 shadow-sm text-center">
                   <div class="flex flex-col items-center">
-                      <!-- Avatar with upload -->
-                      <div class="relative flex-shrink-0 mb-6">
+                      <!-- Avatar with upload + drag-and-drop -->
+                      <div class="relative flex-shrink-0 mb-6"
+                           @drop.prevent="handleDrop"
+                           @dragover.prevent="handleDragOver"
+                           @dragleave.prevent="handleDragLeave">
                           <div class="relative w-32 h-32 mx-auto group cursor-pointer" @click="triggerFileInput">
-                              <div class="absolute inset-0 rounded-full blur-lg opacity-20 bg-red-500"></div>
-                              <img :src="staffAvatar" class="relative w-full h-full rounded-full border-4 border-red-500/30 object-cover" />
+                              <div class="absolute inset-0 rounded-full blur-lg opacity-20 transition-opacity"
+                                   :class="isDragging ? 'opacity-40 bg-red-500' : 'bg-red-500'"></div>
+                              <img :src="staffAvatar" class="relative w-full h-full rounded-full border-4 object-cover transition-all"
+                                   :class="isDragging ? 'border-red-500/60 scale-105' : 'border-red-500/30'" />
                               
-                              <!-- Hover overlay -->
-                              <div class="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                              <!-- Hover / drag overlay -->
+                              <div class="absolute inset-0 rounded-full bg-black/50 transition-opacity duration-200 flex items-center justify-center"
+                                   :class="isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'">
                                   <div v-if="isUploading" class="flex flex-col items-center gap-1">
                                       <svg class="w-6 h-6 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                   </div>
                                   <div v-else class="flex flex-col items-center gap-1">
                                       <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                      <span class="text-white text-[10px] font-bold uppercase tracking-wider">Изменить</span>
+                                      <span class="text-white text-[10px] font-bold uppercase tracking-wider">{{ isDragging ? 'Отпустите' : 'Изменить' }}</span>
                                   </div>
                               </div>
                           </div>
@@ -216,7 +238,7 @@ const removeAvatar = async () => {
                           <p class="text-[11px] text-red-500 dark:text-red-400 uppercase tracking-widest font-bold mb-5">{{ roleName }}</p>
                           <div class="bg-gray-50 dark:bg-white/5 rounded-lg p-4 w-full">
                               <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed text-center">
-                                  Для изменения данных обратитесь к суперадминистратору системы.
+                                  Нажмите на фотографию или перетащите файл, чтобы загрузить новый аватар.
                               </p>
                           </div>
                       </div>

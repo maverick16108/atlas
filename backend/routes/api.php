@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/notifications/{id}/read', [\App\Http\Controllers\AdminNotificationController::class, 'markAsRead']);
         Route::post('/notifications/read-all', [\App\Http\Controllers\AdminNotificationController::class, 'markAllAsRead']);
         Route::post('/avatar', [\App\Http\Controllers\ClientAuctionController::class, 'uploadAvatar']);
+        Route::delete('/avatar', [\App\Http\Controllers\ClientAuctionController::class, 'deleteAvatar']);
     });
 
     // Client auction cabinet
@@ -61,6 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auctions/{id}/bid', [\App\Http\Controllers\ClientAuctionController::class, 'placeBid']);
         Route::get('/stats', [\App\Http\Controllers\ClientAuctionController::class, 'myStats']);
         Route::post('/avatar', [\App\Http\Controllers\ClientAuctionController::class, 'uploadAvatar']);
+        Route::delete('/avatar', [\App\Http\Controllers\ClientAuctionController::class, 'deleteAvatar']);
 
         // Notifications
         Route::get('/notifications', [\App\Http\Controllers\ClientNotificationController::class, 'index']);

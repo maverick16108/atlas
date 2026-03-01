@@ -653,4 +653,21 @@ class ClientAuctionController extends Controller
             'user' => $user,
         ]);
     }
+
+    /**
+     * Delete user avatar.
+     */
+    public function deleteAvatar(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->avatar) {
+            $oldPath = str_replace('/storage/', '', $user->avatar);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            $user->avatar = null;
+            $user->save();
+        }
+
+        return response()->json(['message' => 'Аватар удалён']);
+    }
 }

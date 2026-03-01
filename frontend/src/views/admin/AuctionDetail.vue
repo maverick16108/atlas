@@ -1587,27 +1587,4 @@ onUnmounted(() => {
 .no-arrow::-ms-expand {
     display: none;
 }
-
-/* Make native date/time picker icons visible in light theme */
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-    filter: brightness(0); /* Force black color */
-    opacity: 0.5;
-    cursor: pointer;
-}
-input[type="date"]::-webkit-calendar-picker-indicator:hover,
-input[type="time"]::-webkit-calendar-picker-indicator:hover {
-    opacity: 0.8;
-}
-
-/* In dark mode, invert the icons to white */
-:global(.dark) input[type="date"]::-webkit-calendar-picker-indicator,
-:global(.dark) input[type="time"]::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(1);
-    opacity: 0.6;
-}
-:global(.dark) input[type="date"]::-webkit-calendar-picker-indicator:hover,
-:global(.dark) input[type="time"]::-webkit-calendar-picker-indicator:hover {
-    opacity: 0.9;
-}
 </style>

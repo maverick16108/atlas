@@ -697,25 +697,36 @@ onUnmounted(() => {
                   <form @submit.prevent="submitOffer" class="space-y-4">
                       <div class="space-y-1">
                           <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Количество слитков</label>
-                          <div class="relative group">
+                          <div class="flex items-center gap-2">
+                              <button type="button" tabindex="-1" @click="offerForm.volume = Math.max((offerForm.volume || 1) - 1, 1)"
+                                  class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-cyan-50 dark:active:bg-cyan-900/40 active:border-cyan-500/30 transition-colors">
+                                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                              </button>
                               <input v-model.number="offerForm.volume" type="number" min="1" :max="auction.bar_count"
-                                 class="w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-4 pr-10 py-3 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all"
+                                 class="flex-1 min-w-0 h-12 bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono text-lg text-center focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all"
                                  :class="formErrors.volume ? 'border-red-500/50' : ''" />
-                              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity bg-gray-200/50 dark:bg-white/5 rounded divide-y divide-gray-300 dark:divide-white/10 border border-gray-300 dark:border-white/10 overflow-hidden">
-                                  <button type="button" tabindex="-1" @click="offerForm.volume = Math.min((offerForm.volume || 1) + 1, auction.bar_count || 999)" class="w-6 h-4 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-white dark:hover:bg-white/10 transition-colors active:bg-cyan-50 dark:active:bg-cyan-900/40">
-                                      <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
-                                  </button>
-                                  <button type="button" tabindex="-1" @click="offerForm.volume = Math.max((offerForm.volume || 1) - 1, 1)" class="w-6 h-4 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-white dark:hover:bg-white/10 transition-colors active:bg-cyan-50 dark:active:bg-cyan-900/40">
-                                      <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                                  </button>
-                              </div>
+                              <button type="button" tabindex="-1" @click="offerForm.volume = Math.min((offerForm.volume || 1) + 1, auction.bar_count || 999)"
+                                  class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-cyan-50 dark:active:bg-cyan-900/40 active:border-cyan-500/30 transition-colors">
+                                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                              </button>
                           </div>
                           <p v-if="formErrors.volume" class="text-red-400 text-xs">{{ formErrors.volume }}</p>
                       </div>
                       <div class="space-y-1">
                           <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Цена за грамм (₽)</label>
-                          <ModernNumberInput v-model="offerForm.price" :step="auction.min_step || 1" :min="auction.min_price"
-                                 :inputClass="['w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-gray-900 dark:text-white font-mono focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all [color-scheme:light] dark:[color-scheme:dark]', formErrors.price ? 'border-red-500/50' : '']" />
+                          <div class="flex items-center gap-2">
+                              <button type="button" tabindex="-1" @click="offerForm.price = parseFloat(((Number(offerForm.price) || Number(auction.min_price) || 0) - Number(auction.min_step || 1)).toFixed(2)); if (offerForm.price < Number(auction.min_price)) offerForm.price = Number(auction.min_price)"
+                                  class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-cyan-50 dark:active:bg-cyan-900/40 active:border-cyan-500/30 transition-colors">
+                                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                              </button>
+                              <input v-model.number="offerForm.price" type="number" step="0.01" min="0.01" :placeholder="auction.min_price ? `от ₽ ${Number(auction.min_price).toLocaleString('ru-RU')}` : '0.00'"
+                                 class="flex-1 min-w-0 h-12 bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono text-lg text-center focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all"
+                                 :class="formErrors.price ? 'border-red-500/50' : ''" />
+                              <button type="button" tabindex="-1" @click="offerForm.price = parseFloat(((Number(offerForm.price) || Number(auction.min_price) || 0) + Number(auction.min_step || 1)).toFixed(2))"
+                                  class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-cyan-50 dark:active:bg-cyan-900/40 active:border-cyan-500/30 transition-colors">
+                                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                              </button>
+                          </div>
                           <p v-if="formErrors.price" class="text-red-400 text-xs">{{ formErrors.price }}</p>
                       </div>
                       <div class="space-y-1">
@@ -773,18 +784,18 @@ onUnmounted(() => {
                           <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Количество слитков</label>
                           <span class="text-[10px] text-gray-400 font-mono">макс. {{ gpbMaxBars }}</span>
                       </div>
-                      <div class="relative group">
+                      <div class="flex items-center gap-2">
+                          <button type="button" tabindex="-1" @click="gpbForm.bar_count = Math.max((gpbForm.bar_count || 1) - 1, 1)"
+                              class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-blue-50 dark:active:bg-blue-900/40 active:border-blue-500/30 transition-colors">
+                              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                          </button>
                           <input v-model.number="gpbForm.bar_count" type="number" min="1" :max="gpbMaxBars"
-                             class="w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-4 pr-10 py-3 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono text-lg focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                             class="flex-1 min-w-0 h-12 bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono text-lg text-center focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
                              :class="formErrors.bar_count ? 'border-red-500/50' : ''" />
-                          <div class="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity bg-gray-200/50 dark:bg-white/5 rounded divide-y divide-gray-300 dark:divide-white/10 border border-gray-300 dark:border-white/10 overflow-hidden">
-                              <button type="button" tabindex="-1" @click="gpbForm.bar_count = Math.min((gpbForm.bar_count || 1) + 1, gpbMaxBars || 999)" class="w-6 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-white/10 transition-colors">
-                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
-                              </button>
-                              <button type="button" tabindex="-1" @click="gpbForm.bar_count = Math.max((gpbForm.bar_count || 1) - 1, 1)" class="w-6 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-white/10 transition-colors">
-                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                              </button>
-                          </div>
+                          <button type="button" tabindex="-1" @click="gpbForm.bar_count = Math.min((gpbForm.bar_count || 1) + 1, gpbMaxBars || 999)"
+                              class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-blue-50 dark:active:bg-blue-900/40 active:border-blue-500/30 transition-colors">
+                              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                          </button>
                       </div>
                       <p v-if="formErrors.bar_count" class="text-red-400 text-xs">{{ Array.isArray(formErrors.bar_count) ? formErrors.bar_count[0] : formErrors.bar_count }}</p>
                       <!-- Slider -->
@@ -863,35 +874,35 @@ onUnmounted(() => {
               <form @submit.prevent="placeBid" class="space-y-4">
                   <div class="space-y-1">
                       <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Количество слитков</label>
-                      <div class="relative group">
+                      <div class="flex items-center gap-2">
+                          <button type="button" tabindex="-1" @click="bidForm.bar_count = Math.max((bidForm.bar_count || 1) - 1, 1)"
+                              class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-gold-50 dark:active:bg-gold-900/40 active:border-gold-500/30 transition-colors">
+                              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                          </button>
                           <input v-model.number="bidForm.bar_count" type="number" min="1" :max="auction.bar_count"
-                             class="w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-4 pr-10 py-3 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono text-lg focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500 transition-all"
+                             class="flex-1 min-w-0 h-12 bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono text-lg text-center focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500 transition-all"
                              :class="formErrors.bar_count ? 'border-red-500/50' : ''" />
-                          <div class="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity bg-gray-200/50 dark:bg-white/5 rounded divide-y divide-gray-300 dark:divide-white/10 border border-gray-300 dark:border-white/10 overflow-hidden">
-                              <button type="button" tabindex="-1" @click="bidForm.bar_count = Math.min((bidForm.bar_count || 1) + 1, auction.bar_count || 999)" class="w-6 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-white dark:hover:bg-white/10 transition-colors active:bg-gold-50 dark:active:bg-gold-900/40">
-                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
-                              </button>
-                              <button type="button" tabindex="-1" @click="bidForm.bar_count = Math.max((bidForm.bar_count || 1) - 1, 1)" class="w-6 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-white dark:hover:bg-white/10 transition-colors active:bg-gold-50 dark:active:bg-gold-900/40">
-                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                              </button>
-                          </div>
+                          <button type="button" tabindex="-1" @click="bidForm.bar_count = Math.min((bidForm.bar_count || 1) + 1, auction.bar_count || 999)"
+                              class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-gold-50 dark:active:bg-gold-900/40 active:border-gold-500/30 transition-colors">
+                              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                          </button>
                       </div>
                       <p v-if="formErrors.bar_count" class="text-red-400 text-xs">{{ Array.isArray(formErrors.bar_count) ? formErrors.bar_count[0] : formErrors.bar_count }}</p>
                   </div>
                   <div class="space-y-1">
                       <label class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Цена за грамм (₽)</label>
-                      <div class="relative group">
+                      <div class="flex items-center gap-2">
+                          <button type="button" tabindex="-1" @click="bidForm.amount = parseFloat(((Number(bidForm.amount) || Number(minBidAmount) || 0) - Number(auction.min_step || 0.01)).toFixed(2)); if (bidForm.amount < Number(minBidAmount)) bidForm.amount = Number(minBidAmount)"
+                              class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-gold-50 dark:active:bg-gold-900/40 active:border-gold-500/30 transition-colors">
+                              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+                          </button>
                           <input v-model.number="bidForm.amount" type="number" step="0.01" min="0.01" :placeholder="minBidAmount ? `от ₽ ${formatPrice(minBidAmount)}` : '0.00'"
-                             class="w-full bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg pl-4 pr-10 py-3 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono text-lg focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500 transition-all"
+                             class="flex-1 min-w-0 h-12 bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield] text-gray-900 dark:text-white font-mono text-lg text-center focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500 transition-all"
                              :class="formErrors.amount ? 'border-red-500/50' : ''" />
-                          <div class="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity bg-gray-200/50 dark:bg-white/5 rounded divide-y divide-gray-300 dark:divide-white/10 border border-gray-300 dark:border-white/10 overflow-hidden">
-                              <button type="button" tabindex="-1" @click="bidForm.amount = parseFloat(((Number(bidForm.amount) || Number(minBidAmount) || 0) + Number(auction.min_step || 0.01)).toFixed(2))" class="w-6 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-white dark:hover:bg-white/10 transition-colors active:bg-gold-50 dark:active:bg-gold-900/40">
-                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>
-                              </button>
-                              <button type="button" tabindex="-1" @click="bidForm.amount = parseFloat(((Number(bidForm.amount) || Number(minBidAmount) || 0) - Number(auction.min_step || 0.01)).toFixed(2)); if (bidForm.amount < Number(minBidAmount)) bidForm.amount = Number(minBidAmount)" class="w-6 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-gold-600 dark:hover:text-gold-400 hover:bg-white dark:hover:bg-white/10 transition-colors active:bg-gold-50 dark:active:bg-gold-900/40">
-                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                              </button>
-                          </div>
+                          <button type="button" tabindex="-1" @click="bidForm.amount = parseFloat(((Number(bidForm.amount) || Number(minBidAmount) || 0) + Number(auction.min_step || 0.01)).toFixed(2))"
+                              class="w-14 shrink-0 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-900 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 active:bg-gold-50 dark:active:bg-gold-900/40 active:border-gold-500/30 transition-colors">
+                              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                          </button>
                       </div>
                       <p v-if="formErrors.amount" class="text-red-400 text-xs">{{ Array.isArray(formErrors.amount) ? formErrors.amount[0] : formErrors.amount }}</p>
                       <div class="flex flex-col gap-0.5 mt-1">

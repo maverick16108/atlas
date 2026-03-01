@@ -5,6 +5,15 @@
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Atlas Mining Auction</title>
+    <script>
+      // Apply theme BEFORE any rendering to prevent flash
+      (function() {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
   <body class="bg-skin-primary text-skin-primary transition-colors duration-300">
     <div id="app"></div>

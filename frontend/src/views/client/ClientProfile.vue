@@ -12,7 +12,9 @@ const user = computed(() => authStore.clientUser)
 
 const isUploading = ref(false)
 const uploadSuccess = ref(false)
+const uploadError = ref('')
 const avatarPreview = ref(null)
+const isDragging = ref(false)
 
 const avatarUrl = computed(() => {
     if (avatarPreview.value) return avatarPreview.value
@@ -21,13 +23,43 @@ const avatarUrl = computed(() => {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.value?.name || 'U')}&background=${bg}&color=fff`
 })
 
-const handleAvatarSelect = (event) => {
-    const file = event.target.files[0]
+const hasCustomAvatar = computed(() => {
+    return user.value?.avatar && !user.value.avatar.includes('ui-avatars.com')
+})
+
+const processFile = (file) => {
     if (!file) return
 
-    // Preview
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        uploadError.value = 'Допустимые форматы: JPG, PNG, WebP'
+        return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+        uploadError.value = 'Максимальный размер файла: 2 МБ'
+        return
+    }
+
+    uploadError.value = ''
     avatarPreview.value = URL.createObjectURL(file)
     uploadAvatar(file)
+}
+
+const handleAvatarSelect = (event) => {
+    processFile(event.target.files[0])
+}
+
+const handleDrop = (event) => {
+    isDragging.value = false
+    const file = event.dataTransfer?.files?.[0]
+    processFile(file)
+}
+
+const handleDragOver = (event) => {
+    isDragging.value = true
+}
+
+const handleDragLeave = () => {
+    isDragging.value = false
 }
 
 const uploadAvatar = async (file) => {
@@ -42,15 +74,28 @@ const uploadAvatar = async (file) => {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
 
-        // Update user in store (persists to localStorage)
         if (response.data.avatar) {
             authStore.updateClientUser({ avatar: response.data.avatar })
         }
         uploadSuccess.value = true
         setTimeout(() => { uploadSuccess.value = false }, 3000)
     } catch (e) {
-        console.error('Avatar upload failed:', e)
+        uploadError.value = e.response?.data?.message || 'Ошибка загрузки'
         avatarPreview.value = null
+    } finally {
+        isUploading.value = false
+    }
+}
+
+const removeAvatar = async () => {
+    isUploading.value = true
+    uploadError.value = ''
+    try {
+        await axios.delete('/api/client/avatar')
+        authStore.updateClientUser({ avatar: null })
+        avatarPreview.value = null
+    } catch (err) {
+        uploadError.value = 'Ошибка удаления аватара'
     } finally {
         isUploading.value = false
     }
@@ -133,23 +178,43 @@ const uploadAvatar = async (file) => {
           <div class="order-1 lg:order-2 lg:col-span-1">
               <div class="bg-white dark:bg-stone-900/80 backdrop-blur-sm rounded-xl p-8 border border-gray-200 dark:border-white/5 shadow-sm text-center">
                   <div class="flex flex-col items-center">
-                      <!-- Avatar with upload -->
-                      <div class="relative group flex-shrink-0 mb-6">
-                          <div class="relative w-32 h-32 mx-auto">
+                      <!-- Avatar with upload + drag-and-drop -->
+                      <div class="relative group flex-shrink-0 mb-6"
+                           @drop.prevent="handleDrop"
+                           @dragover.prevent="handleDragOver"
+                           @dragleave.prevent="handleDragLeave">
+                          <div class="relative w-32 h-32 mx-auto cursor-pointer" @click="$refs.fileInput.click()">
                               <div class="absolute inset-0 rounded-full blur-lg opacity-20 group-hover:opacity-30 transition-opacity"
-                                   :class="user?.is_gpb ? 'bg-blue-500' : 'bg-emerald-500'"></div>
-                              <img :src="avatarUrl" class="relative w-full h-full rounded-full border-4 object-cover"
-                                   :class="user?.is_gpb ? 'border-blue-500/30' : 'border-emerald-500/30'" />
-                              <!-- Upload overlay -->
-                              <label class="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10">
-                                  <svg v-if="!isUploading" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  </svg>
-                                  <div v-else class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                  <input type="file" class="hidden" accept="image/png,image/jpeg,image/webp" @change="handleAvatarSelect" />
-                              </label>
+                                   :class="isDragging ? 'opacity-40 bg-gold-500' : user?.is_gpb ? 'bg-blue-500' : 'bg-emerald-500'"></div>
+                              <img :src="avatarUrl" class="relative w-full h-full rounded-full border-4 object-cover transition-all"
+                                   :class="[
+                                       isDragging ? 'border-gold-500/60 scale-105' : user?.is_gpb ? 'border-blue-500/30' : 'border-emerald-500/30'
+                                   ]" />
+                              
+                              <!-- Hover / drag overlay -->
+                              <div class="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 transition-opacity duration-200"
+                                   :class="isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'">
+                                  <div v-if="isUploading" class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                  <div v-else class="flex flex-col items-center gap-1">
+                                      <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      </svg>
+                                      <span class="text-white text-[10px] font-bold uppercase tracking-wider">{{ isDragging ? 'Отпустите' : 'Изменить' }}</span>
+                                  </div>
+                              </div>
                           </div>
+                          
+                          <!-- Remove button (only when custom avatar) -->
+                          <button
+                              v-if="hasCustomAvatar && !isUploading"
+                              @click.stop="removeAvatar"
+                              class="absolute -bottom-1 -right-1 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md transition-colors z-10"
+                              title="Удалить фото"
+                          >
+                              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                          </button>
+
                           <!-- Success indicator -->
                           <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 scale-75" enter-to-class="opacity-100 scale-100"
                                       leave-active-class="transition ease-in duration-150" leave-from-class="opacity-100" leave-to-class="opacity-0">
@@ -159,6 +224,18 @@ const uploadAvatar = async (file) => {
                           </transition>
                       </div>
 
+                      <!-- Hidden file input -->
+                      <input
+                          ref="fileInput"
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          class="hidden"
+                          @change="handleAvatarSelect"
+                      />
+
+                      <!-- Upload error -->
+                      <p v-if="uploadError" class="text-xs text-red-500 mb-3">{{ uploadError }}</p>
+
                       <!-- Name + hint -->
                       <div class="w-full">
                           <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 leading-tight">{{ user?.name || 'Участник' }}</h3>
@@ -166,7 +243,7 @@ const uploadAvatar = async (file) => {
                           <p v-else class="text-[11px] text-emerald-500 uppercase tracking-widest font-bold mb-5">{{ user?.is_accredited ? 'Аккредитован' : 'КЛИЕНТ' }}</p>
                           <div class="bg-gray-50 dark:bg-white/5 rounded-lg p-4 w-full">
                               <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed text-center">
-                                  Нажмите на фотографию, чтобы загрузить новый аватар профиля.
+                                  Нажмите на фотографию или перетащите файл, чтобы загрузить новый аватар профиля.
                               </p>
                           </div>
                       </div>
