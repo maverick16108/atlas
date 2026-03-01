@@ -1184,7 +1184,7 @@ onUnmounted(() => {
                               <td class="px-4 py-2 bg-blue-50 dark:bg-blue-500/10 border-b border-blue-200 dark:border-blue-500/20"></td>
                           </tr>
                           <!-- GPB Buyer Row -->
-                          <tr class="border-b border-blue-100 dark:border-blue-500/10 bg-blue-50/30 dark:bg-blue-500/5">
+                          <tr class="border-b border-blue-100 dark:border-blue-500/10 bg-blue-50/30 dark:bg-blue-500/5 hover:bg-blue-50/50 dark:hover:bg-blue-500/10 transition-colors">
                               <td class="px-4 py-3 text-sm text-gray-500 font-mono">1</td>
                               <td class="px-4 py-3 whitespace-nowrap">
                                   <span class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ gpbReport.gpb_user_name }}</span>
@@ -1197,7 +1197,7 @@ onUnmounted(() => {
                               <td class="px-4 py-3 text-right font-mono text-xs text-gray-500">{{ formatDate(gpbReport.created_at) }}</td>
                           </tr>
                           <!-- Taken Bids Details (indented, from whom) -->
-                          <tr v-for="(item, idx) in gpbReport.taken_bids" :key="'gpb-'+idx" class="border-b border-gray-100 dark:border-white/5 text-gray-500 dark:text-gray-500">
+                          <tr v-for="(item, idx) in gpbReport.taken_bids" :key="'gpb-'+idx" class="border-b border-gray-100 dark:border-white/5 text-gray-500 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                               <td class="px-4 py-2 font-mono text-xs"></td>
                               <td class="px-4 py-2 text-xs pl-8 whitespace-nowrap">← {{ item.participant_label }}</td>
                               <td class="px-4 py-2 text-center font-mono text-xs">{{ item.bar_count }}</td>
@@ -1226,7 +1226,7 @@ onUnmounted(() => {
                           <tr v-for="(bid, idx) in winningBids" :key="'w-'+bid.id"
                               class="border-b border-gray-100 dark:border-white/5 transition-colors"
                               :class="[
-                                bid.is_mine ? 'bg-yellow-50/70 dark:bg-amber-900/10' : 'bg-white dark:bg-transparent',
+                                bid.is_mine ? 'bg-yellow-50/70 hover:bg-yellow-100/70 dark:bg-amber-900/10 dark:hover:bg-amber-900/20' : 'bg-white hover:bg-gray-50 dark:bg-transparent dark:hover:bg-white/5',
                                 bid.is_mine ? 'ring-1 ring-inset ring-gold-500/20' : ''
                               ]">
                               <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ idx + 1 }}</td>
@@ -1256,8 +1256,8 @@ onUnmounted(() => {
                               <td class="px-4 py-2 bg-red-50/80 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-gray-100 dark:border-t-white/10"></td>
                           </tr>
                           <tr v-for="(bid, idx) in losingBids" :key="'gl-'+bid.id"
-                              class="border-b border-gray-100 dark:border-white/5"
-                              :class="bid.is_mine ? 'bg-yellow-50/50 ring-1 ring-inset ring-amber-500/20 dark:bg-amber-900/10 dark:opacity-80' : 'bg-gray-50 dark:bg-transparent dark:opacity-60'">
+                              class="border-b border-gray-100 dark:border-white/5 transition-colors"
+                              :class="bid.is_mine ? 'bg-yellow-50/50 hover:bg-yellow-100/50 ring-1 ring-inset ring-amber-500/20 dark:bg-amber-900/10 dark:hover:bg-amber-900/20 dark:opacity-80' : 'bg-gray-50 hover:bg-gray-100 dark:bg-transparent dark:hover:bg-white/5 dark:opacity-60'">
                               <td class="px-4 py-3 text-sm text-gray-600 font-mono">{{ winningBids.length + idx + 1 }}</td>
                               <td class="px-4 py-3 whitespace-nowrap">
                                   <span class="text-sm font-bold" :class="bid.is_mine ? 'text-gold-400/70' : 'text-gray-400'">{{ bid.participant_label }}</span>
@@ -1309,7 +1309,7 @@ onUnmounted(() => {
                           <tr v-for="(bid, idx) in winningBids" :key="'w-'+bid.id"
                               class="border-b border-gray-100 dark:border-white/5 transition-colors"
                               :class="[
-                                bid.is_mine ? 'bg-yellow-50/70 dark:bg-amber-900/10' : 'bg-white dark:bg-transparent',
+                                bid.is_mine ? 'bg-yellow-50/70 hover:bg-yellow-100/70 dark:bg-amber-900/10 dark:hover:bg-amber-900/20' : 'bg-white hover:bg-gray-50 dark:bg-transparent dark:hover:bg-white/5',
                                 bid.is_mine ? 'ring-1 ring-inset ring-gold-500/20' : ''
                               ]">
                               <td class="px-4 py-3 text-sm text-gray-500 font-mono">{{ idx + 1 }}</td>
@@ -1339,8 +1339,8 @@ onUnmounted(() => {
                               <td class="px-4 py-2 bg-red-50/80 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-gray-100 dark:border-t-white/10"></td>
                           </tr>
                           <tr v-for="(bid, idx) in losingBids" :key="'l-'+bid.id" 
-                              class="border-b border-gray-100 dark:border-white/5"
-                              :class="bid.is_mine ? 'bg-yellow-50/50 ring-1 ring-inset ring-amber-500/20 dark:bg-amber-900/10 dark:opacity-80' : 'bg-gray-50 dark:bg-transparent dark:opacity-60'">
+                              class="border-b border-gray-100 dark:border-white/5 transition-colors"
+                              :class="bid.is_mine ? 'bg-yellow-50/50 hover:bg-yellow-100/50 ring-1 ring-inset ring-amber-500/20 dark:bg-amber-900/10 dark:hover:bg-amber-900/20 dark:opacity-80' : 'bg-gray-50 hover:bg-gray-100 dark:bg-transparent dark:hover:bg-white/5 dark:opacity-60'">
                               <td class="px-4 py-3 text-sm text-gray-600 font-mono">{{ winningBids.length + idx + 1 }}</td>
                               <td class="px-4 py-3 whitespace-nowrap"><span class="text-sm font-bold" :class="bid.is_mine ? 'text-gold-400/70' : 'text-gray-400'">{{ bid.participant_label }}</span></td>
                               <td class="px-4 py-3 text-center font-mono text-sm text-gray-400">{{ bid.bar_count }}</td>

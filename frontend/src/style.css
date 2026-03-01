@@ -4,6 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Eliminate 300ms tap delay & tap highlight on mobile */
+a, button, input, select, textarea, label, [role="button"], .cursor-pointer {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
