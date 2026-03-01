@@ -234,7 +234,7 @@ onUnmounted(() => {
               <div v-else class="space-y-3">
                   <div v-for="auction in recentAuctions" :key="auction.id"
                        @click="router.push(`/client/auctions/${auction.id}`)"
-                       class="relative flex flex-row items-center justify-between gap-3 sm:gap-4 p-4 rounded-xl bg-gray-50/80 dark:bg-dark-800/80 border border-gray-200 dark:border-white/10 cursor-pointer overflow-hidden transition-all duration-300 group hover:-translate-y-0.5"
+                       class="relative flex flex-row items-center justify-between gap-3 sm:gap-4 p-4 rounded-xl bg-gray-50/80 dark:bg-dark-800/80 md:dark:bg-dark-900/60 border border-gray-200 dark:border-white/10 cursor-pointer overflow-hidden transition-all duration-300 group hover:-translate-y-0.5"
                        :class="['active', 'commission', 'collecting_offers'].includes(auction.status) ? 'hover:border-gold-500/40 hover:shadow-[0_4px_20px_rgba(212,175,55,0.15)] hover:bg-gradient-to-r hover:from-gold-50 dark:hover:from-gold-500/10 hover:to-white dark:hover:to-dark-900/80' : 'hover:border-gray-300 dark:hover:border-white/20 hover:bg-white dark:hover:bg-white/5'">
                        
                        <!-- Glow effect for active auctions inside the card -->
