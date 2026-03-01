@@ -425,7 +425,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="flex flex-col gap-4 lg:gap-6">
     
 
     <!-- Loading -->
@@ -444,7 +444,7 @@ onUnmounted(() => {
     <!-- Auction Content -->
     <template v-else-if="auction">
       <!-- Header Bar (Back button & Connection Status) -->
-      <div class="flex items-center gap-4 mb-4 flex-shrink-0">
+      <div class="flex items-center gap-4 flex-shrink-0">
         <button @click="goBack" class="group flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 hover:shadow-[0_0_15px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] shadow-sm dark:shadow-none transition-all duration-300 active:scale-95 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
           <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
           Аукционы
@@ -744,7 +744,7 @@ onUnmounted(() => {
               </div>
 
               <!-- My Offers List -->
-              <div class="mt-8 lg:mt-0 md:bg-white md:dark:bg-dark-800/80 md:backdrop-blur-sm md:rounded-2xl border-0 md:border md:border-gray-200 md:dark:border-white/10 md:shadow-sm dark:shadow-none py-6 md:p-6 px-2 md:px-0">
+              <div class="md:bg-white md:dark:bg-dark-800/80 md:backdrop-blur-sm md:rounded-2xl border-0 md:border md:border-gray-200 md:dark:border-white/10 md:shadow-sm dark:shadow-none py-6 md:p-6 px-2 md:px-0">
                   <h3 class="text-lg font-kanit font-bold text-gray-900 dark:text-white mb-5">Мои предложения</h3>
                   <div v-if="myOffers.length === 0" class="text-center py-8 text-gray-500">
                       <p class="text-sm">Вы ещё не отправляли предложений</p>

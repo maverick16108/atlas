@@ -1156,7 +1156,7 @@ onUnmounted(() => {
       </div>
 
       <!-- TAB: Results -->
-      <div v-show="activeTab === 'results'" class="flex flex-col gap-3">
+      <div v-show="activeTab === 'results'" class="flex flex-col gap-4">
         <div v-if="isLoadingBids" class="flex-1 flex flex-col gap-3">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-shrink-0">
             <div v-for="i in 4" :key="i" class="p-3 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-50 dark:bg-dark-900/40">
@@ -1188,7 +1188,7 @@ onUnmounted(() => {
         <template v-else>
           <!-- Summary Card -->
           <!-- Summary Card -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0 mb-4">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 flex-shrink-0">
             
             <!-- Total Bids -->
             <div class="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-transparent dark:bg-gradient-to-br dark:from-white/5 dark:to-dark-900/80 shadow-sm dark:shadow-none p-4 flex flex-col justify-between group hover:border-gray-300 dark:hover:border-white/20 hover:shadow-md dark:hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-300">
