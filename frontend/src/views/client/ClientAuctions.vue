@@ -33,7 +33,11 @@ const filters = [
 ]
 
 const fetchAuctions = async () => {
-    isLoading.value = true
+    // Only show full loader if we have no data
+    if (auctions.value.length === 0) {
+        isLoading.value = true
+    }
+    
     try {
         const params = {}
         if (activeFilter.value !== 'all') params.filter = activeFilter.value
@@ -128,11 +132,11 @@ onUnmounted(() => {
       </div>
 
       <!-- Loading -->
-      <div v-if="isLoading" class="flex items-center justify-center py-20">
+      <div v-if="isLoading && auctions.length === 0" class="flex items-center justify-center py-20">
           <div class="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
 
-      <div v-else-if="auctions.length === 0" class="rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-800/80 p-12 text-center">
+      <div v-else-if="auctions.length === 0 && !isLoading" class="rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-800/80 p-12 text-center">
           <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
