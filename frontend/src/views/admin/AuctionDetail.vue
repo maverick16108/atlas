@@ -948,7 +948,7 @@ onUnmounted(() => {
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-white/5">
-              <tr v-for="offer in initialOffers" :key="offer.id" class="hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors">
+              <tr v-for="offer in initialOffers" :key="offer.id" class="hover:bg-gray-100 dark:hover:bg-white/10 dark:bg-white/5 transition-colors">
                 <td class="px-4 py-3"><span class="text-sm text-gray-900 dark:text-white font-bold">{{ offer.user?.name || 'Н/Д' }}</span></td>
                 <td class="px-4 py-3 text-right font-mono text-sm text-gray-900 dark:text-white">{{ Number(offer.volume).toLocaleString() }}</td>
                 <td class="px-4 py-3 text-right font-mono text-sm text-emerald-600 dark:text-emerald-400 font-bold"><span class="font-sans">₽</span>&nbsp;{{ Number(offer.price).toLocaleString() }}</td>
@@ -1041,7 +1041,7 @@ onUnmounted(() => {
                 </tr>
                 <!-- Losing -->
                 <tr v-if="allocatedBids.losing.length > 0"><td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-red-500/10 dark:border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-500 dark:text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ allocatedBids.losing.reduce((sum, b) => sum + b.bar_count, 0) }})</span></td></tr>
-                <tr v-for="(bid, idx) in allocatedBids.losing" :key="'l-'+bid.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors">
+                <tr v-for="(bid, idx) in allocatedBids.losing" :key="'l-'+bid.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/10 dark:bg-white/5 transition-colors">
                   <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-600 font-mono">{{ allocatedBids.winning.length + idx + 1 }}</td>
                   <td class="px-4 py-3"><span class="text-sm text-gray-800 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.isRemainder" class="text-[10px] text-yellow-600/80 dark:text-yellow-500/60 ml-1">(остаток)</span></span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-400">{{ bid.bar_count }}</td>
@@ -1139,7 +1139,7 @@ onUnmounted(() => {
                 </tr>
                 <!-- Participant losing -->
                 <tr v-if="gpbAllocatedBids.participantLosing.length > 0"><td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-red-500/10 dark:border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-500 dark:text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ gpbAllocatedBids.participantLosing.reduce((sum, b) => sum + b.bar_count, 0) }})</span></td></tr>
-                <tr v-for="(bid, idx) in gpbAllocatedBids.participantLosing" :key="'gpbl-'+bid.id+'-'+idx" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors">
+                <tr v-for="(bid, idx) in gpbAllocatedBids.participantLosing" :key="'gpbl-'+bid.id+'-'+idx" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/10 dark:bg-white/5 transition-colors">
                   <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-600 font-mono">{{ gpbAllocatedBids.gpbBought.length + gpbAllocatedBids.participantWinning.length + idx + 1 }}</td>
                   <td class="px-4 py-3"><span class="text-sm text-gray-800 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.lostToGpb" class="text-[10px] text-blue-500/80 dark:text-blue-400/50 ml-1">(выкуп ГПБ)</span><span v-else-if="bid.isRemainder" class="text-[10px] text-yellow-600/80 dark:text-yellow-500/60 ml-1">(остаток)</span></span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-400">{{ bid.bar_count }}</td>
@@ -1289,7 +1289,7 @@ onUnmounted(() => {
                 </tr>
                 <!-- Participant Losing Section -->
                 <tr v-if="gpbAllocatedBids.participantLosing.length > 0"><td :colspan="hasBasisBids ? 8 : 7" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-red-500/10 dark:border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-500 dark:text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ gpbAllocatedBids.participantLosing.reduce((sum, b) => sum + b.bar_count, 0) }})</span></td></tr>
-                <tr v-for="(bid, idx) in gpbAllocatedBids.participantLosing" :key="'rpl-'+bid.id+'-'+idx" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors">
+                <tr v-for="(bid, idx) in gpbAllocatedBids.participantLosing" :key="'rpl-'+bid.id+'-'+idx" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/10 dark:bg-white/5 transition-colors">
                   <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-600 font-mono">{{ gpbAllocatedBids.gpbBought.length + gpbAllocatedBids.participantWinning.length + idx + 1 }}</td>
                   <td class="px-4 py-3"><span class="text-sm text-gray-800 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}<span v-if="bid.lostToGpb" class="text-[10px] text-blue-500/80 dark:text-blue-400/50 ml-1">(выкуп ГПБ)</span><span v-else-if="bid.isRemainder" class="text-[10px] text-yellow-600/80 dark:text-yellow-500/60 ml-1">(остаток)</span></span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-400">{{ bid.bar_count }}</td>
@@ -1327,7 +1327,7 @@ onUnmounted(() => {
                   <td class="px-4 py-3 text-right font-mono text-xs text-gray-500"><div>{{ new Date(bid.created_at).toLocaleDateString('ru-RU') }}</div><div>{{ new Date(bid.created_at).toLocaleTimeString('ru-RU') }}</div></td>
                 </tr>
                 <tr v-if="allocatedBids.losing.length > 0"><td colspan="6" class="px-4 py-2 bg-red-50 dark:bg-red-500/10 border-b border-red-500/20 border-t border-t-red-500/10 dark:border-t-white/10"><span class="text-xs uppercase tracking-widest text-red-500 dark:text-red-400 font-bold flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Не попали ({{ allocatedBids.losing.reduce((s,b) => s + b.bar_count, 0) }})</span></td></tr>
-                <tr v-for="(bid, idx) in allocatedBids.losing" :key="'rl-'+bid.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors">
+                <tr v-for="(bid, idx) in allocatedBids.losing" :key="'rl-'+bid.id" class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/10 dark:bg-white/5 transition-colors">
                   <td class="px-4 py-3 text-sm text-gray-400 dark:text-gray-600 font-mono">{{ allocatedBids.winning.length + idx + 1 }}</td>
                   <td class="px-4 py-3"><span class="text-sm text-gray-800 dark:text-gray-400 font-bold">{{ bid.user?.name || 'Н/Д' }}</span></td>
                   <td class="px-4 py-3 text-right font-mono text-sm text-gray-700 dark:text-gray-400">{{ bid.bar_count }}</td>
@@ -1505,7 +1505,7 @@ onUnmounted(() => {
               <button v-if="selectedParticipantIds.length > 0" type="button" @click="selectedParticipantIds = []" class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-red-400 transition-colors font-bold">Сбросить</button>
             </div>
             <div class="flex-1 overflow-y-auto min-h-0 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-dark-900/30 divide-y divide-white/5" :class="inviteAll ? 'opacity-30' : ''">
-              <label v-for="user in filteredParticipants" :key="user.id" class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-50 dark:bg-white/5 transition-colors" :class="[selectedParticipantIds.includes(user.id) ? 'bg-red-500/5' : '', inviteAll ? 'pointer-events-none' : '']">
+              <label v-for="user in filteredParticipants" :key="user.id" class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 dark:bg-white/5 transition-colors" :class="[selectedParticipantIds.includes(user.id) ? 'bg-red-500/5' : '', inviteAll ? 'pointer-events-none' : '']">
                 <div class="relative flex-shrink-0">
                   <input type="checkbox" :checked="selectedParticipantIds.includes(user.id)" @change="toggleParticipant(user.id)" class="sr-only peer"/>
                   <div class="w-5 h-5 border-2 border-gray-300 dark:border-white/30 rounded transition-all peer-checked:bg-red-500 peer-checked:border-red-500 hover:border-gray-400 dark:hover:border-white/50 flex items-center justify-center">

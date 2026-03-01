@@ -63,7 +63,7 @@ const handleSwipe = (e) => {
         }
 
         if (!isInsideHorizontalScroll) {
-            goBack()
+            requestAnimationFrame(() => goBack())
         }
     }
 }

@@ -183,7 +183,7 @@ onUnmounted(() => {
 </script>
     
     <template>
-      <div class="h-screen w-full bg-gray-100 dark:bg-dark-900 text-gray-900 dark:text-white flex overflow-hidden admin-dark-scroll transition-colors duration-300">
+      <div class="h-screen w-full min-w-[1280px] bg-gray-100 dark:bg-dark-900 text-gray-900 dark:text-white flex overflow-hidden admin-dark-scroll transition-colors duration-300">
         <!-- Grid Background -->
         <div class="fixed inset-0 bg-[url('/img/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-0 dark:opacity-10 pointer-events-none"></div>
         
